@@ -1,2 +1,1 @@
-export const demoInfo =
-  'This small accessible demo section includes a heading and a short descriptive paragraph to demonstrate semantic structure and ARIA labelling.';
+export const demoInfo = "This small demo demonstrates an accessible region with a labeled input and a polite live region that reflects your input.";
