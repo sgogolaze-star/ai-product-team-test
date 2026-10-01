@@ -1,52 +1,75 @@
-import { useState, useEffect, useRef, ChangeEvent } from 'react'
+import { useState } from 'react'
 import heroImg from './assets/hero.png'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import './App.css'
 
+type SampleKey = 'greeting' | 'instructions' | 'lorem'
+
 function App() {
   const [count, setCount] = useState(0)
 
   // Accessible demo state
-  const [demoActive, setDemoActive] = useState(false)
-  const [demoText, setDemoText] = useState('')
-  const inputRef = useRef<HTMLInputElement | null>(null)
+  const [highContrast, setHighContrast] = useState(false)
+  const [fontSize, setFontSize] = useState<number>(16)
+  const [sample, setSample] = useState<SampleKey>('greeting')
+  const [liveMessage, setLiveMessage] = useState<string>('')
 
-  // Focus the input when the demo is activated
-  useEffect(() => {
-    if (demoActive) {
-      inputRef.current?.focus()
-    }
-  }, [demoActive])
+  const sampleTextMap: Record<
+    SampleKey,
+    { title: string; text: string }
+  > = {
+    greeting: {
+      title: 'Friendly greeting',
+      text: "Hello! This is a short accessible demo. Try the controls to change contrast, text size, and sample content.",
+    },
+    instructions: {
+      title: 'Keyboard instructions',
+      text: 'Use Tab to move focus. Buttons can be activated with Enter or Space. The range input can be adjusted with arrow keys.',
+    },
+    lorem: {
+      title: 'Placeholder text',
+      text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum vestibulum.',
+    },
+  }
 
-  // Keyboard shortcut: press "t" to toggle the demo, unless typing in a form control
-  useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      const active = document.activeElement as Element | null
-      const activeTag = active?.tagName ?? ''
-      const isFormElement =
-        activeTag === 'INPUT' ||
-        activeTag === 'TEXTAREA' ||
-        activeTag === 'SELECT' ||
-        (active instanceof HTMLInputElement) ||
-        (active instanceof HTMLTextAreaElement) ||
-        (active instanceof HTMLSelectElement) ||
-        (active as HTMLElement)?.isContentEditable
+  const toggleContrast = () => {
+    setHighContrast((v) => {
+      const next = !v
+      setLiveMessage(`High contrast ${next ? 'enabled' : 'disabled'}`)
+      return next
+    })
+  }
 
-      if (isFormElement) return
+  const handleFontSizeChange = (value: number) => {
+    setFontSize(value)
+    setLiveMessage(`Font size set to ${value} pixels`)
+  }
 
-      // Toggle demo with "t" or "T"
-      if (e.key === 't' || e.key === 'T') {
-        setDemoActive((v) => !v)
-      }
-    }
+  const handleSampleChange = (value: SampleKey) => {
+    setSample(value)
+    setLiveMessage(`Sample changed to ${sampleTextMap[value].title}`)
+  }
 
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [])
+  const demoStyle: React.CSSProperties = {
+    backgroundColor: highContrast ? '#000' : '#fff',
+    color: highContrast ? '#fff' : '#111',
+    padding: '1rem',
+    borderRadius: 8,
+    fontSize: `${fontSize}px`,
+    transition: 'background-color 120ms ease, color 120ms ease, font-size 120ms ease',
+    border: highContrast ? '2px solid #fff' : '1px solid #ddd',
+  }
 
-  function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
-    setDemoText(e.target.value)
+  const visuallyHiddenStyle: React.CSSProperties = {
+    height: 1,
+    width: 1,
+    overflow: 'hidden',
+    clip: 'rect(1px, 1px, 1px, 1px)',
+    whiteSpace: 'nowrap',
+    border: 0,
+    padding: 0,
+    position: 'absolute',
   }
 
   return (
@@ -72,90 +95,86 @@ function App() {
         </button>
       </section>
 
-      {/* Small accessible demo section */}
+      {/* Accessible demo section */}
       <section
-        id="accessible-demo"
-        role="region"
-        aria-labelledby="demo-title"
-        className="demo-section"
+        id="demo"
+        aria-labelledby="demo-heading"
+        style={{ padding: '1.25rem', maxWidth: 720, margin: '0 auto' }}
       >
-        <h2 id="demo-title">Accessible demo</h2>
-        <p id="demo-desc">
-          A small interactive demo. You can toggle this demo with the button below or press the
-          "t" key (when not typing). When enabled, enter text to see it announced in a live region.
+        <h2 id="demo-heading">Accessible demo</h2>
+        <p>
+          A small interactive demo that demonstrates an accessible contrast toggle,
+          adjustable text size, and selectable sample content. Changes are announced
+          to assistive technologies.
         </p>
 
-        <div className="demo-controls">
-          <button
-            type="button"
-            aria-pressed={demoActive}
-            aria-expanded={demoActive}
-            aria-controls="demo-panel"
-            aria-describedby="demo-desc"
-            onClick={() => setDemoActive((v) => !v)}
-            className="demo-toggle"
-          >
-            {demoActive ? 'Disable demo' : 'Enable demo'}
-          </button>
+        <div
+          role="region"
+          aria-labelledby="demo-controls-heading"
+          style={{ display: 'grid', gap: '0.75rem', marginBottom: '1rem' }}
+        >
+          <h3 id="demo-controls-heading" style={{ margin: 0 }}>
+            Controls
+          </h3>
 
-          <span className="demo-state" aria-live="polite" style={{ marginLeft: '0.5rem' }}>
-            {demoActive ? 'Demo is active' : 'Demo is inactive'}
-          </span>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              onClick={toggleContrast}
+              aria-pressed={highContrast}
+              aria-label={`${highContrast ? 'Disable' : 'Enable'} high contrast`}
+            >
+              {highContrast ? 'Disable high contrast' : 'Enable high contrast'}
+            </button>
+
+            <label htmlFor="font-size-range" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span>Text size</span>
+              <input
+                id="font-size-range"
+                type="range"
+                min={12}
+                max={32}
+                value={fontSize}
+                onChange={(e) => handleFontSizeChange(Number(e.target.value))}
+                aria-valuemin={12}
+                aria-valuemax={32}
+                aria-valuenow={fontSize}
+                aria-label="Text size"
+              />
+              <span aria-hidden="true">{fontSize}px</span>
+            </label>
+
+            <label htmlFor="sample-select" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span>Sample</span>
+              <select
+                id="sample-select"
+                value={sample}
+                onChange={(e) => handleSampleChange(e.target.value as SampleKey)}
+                aria-label="Select sample content"
+              >
+                <option value="greeting">Greeting</option>
+                <option value="instructions">Instructions</option>
+                <option value="lorem">Placeholder</option>
+              </select>
+            </label>
+          </div>
         </div>
 
-        {demoActive && (
-          <div
-            id="demo-panel"
-            className="demo-panel"
-            aria-labelledby="demo-panel-title"
-            style={{ marginTop: '0.75rem' }}
-          >
-            <h3 id="demo-panel-title">Live preview</h3>
+        <div aria-live="polite" aria-atomic="true" style={visuallyHiddenStyle}>
+          {liveMessage}
+        </div>
 
-            <label htmlFor="demo-input">Type something to preview:</label>
-            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: 8 }}>
-              <input
-                id="demo-input"
-                ref={inputRef}
-                type="text"
-                value={demoText}
-                onChange={handleInputChange}
-                placeholder="Say hello..."
-                aria-describedby="demo-preview-desc"
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  setDemoText('')
-                  inputRef.current?.focus()
-                }}
-              >
-                Clear
-              </button>
-            </div>
-
-            <p id="demo-preview-desc" style={{ marginTop: 8 }}>
-              The text below is announced for screen reader users when it changes.
-            </p>
-
-            <div
-              className="demo-preview"
-              aria-live="polite"
-              aria-atomic={true}
-              style={{
-                marginTop: 8,
-                padding: '0.5rem',
-                border: '1px solid #ddd',
-                borderRadius: 4,
-                minHeight: 40,
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              {demoText.trim() === '' ? <em>Nothing to preview</em> : demoText}
-            </div>
-          </div>
-        )}
+        <div
+          className="demo-sample"
+          role="article"
+          aria-labelledby="demo-sample-title"
+          style={demoStyle}
+        >
+          <h4 id="demo-sample-title" style={{ marginTop: 0 }}>
+            {sampleTextMap[sample].title}
+          </h4>
+          <p style={{ margin: 0 }}>{sampleTextMap[sample].text}</p>
+        </div>
       </section>
 
       <div className="ticks"></div>
@@ -163,7 +182,7 @@ function App() {
       <section id="next-steps">
         <div id="docs">
           <svg className="icon" role="presentation" aria-hidden="true">
-            <use xlinkHref="/icons.svg#documentation-icon" />
+            <use href="/icons.svg#documentation-icon"></use>
           </svg>
           <h2>Documentation</h2>
           <p>Your questions, answered</p>
@@ -184,7 +203,7 @@ function App() {
         </div>
         <div id="social">
           <svg className="icon" role="presentation" aria-hidden="true">
-            <use xlinkHref="/icons.svg#social-icon" />
+            <use href="/icons.svg#social-icon"></use>
           </svg>
           <h2>Connect with us</h2>
           <p>Join the Vite community</p>
@@ -196,7 +215,7 @@ function App() {
                   role="presentation"
                   aria-hidden="true"
                 >
-                  <use xlinkHref="/icons.svg#github-icon" />
+                  <use href="/icons.svg#github-icon"></use>
                 </svg>
                 GitHub
               </a>
@@ -208,7 +227,7 @@ function App() {
                   role="presentation"
                   aria-hidden="true"
                 >
-                  <use xlinkHref="/icons.svg#discord-icon" />
+                  <use href="/icons.svg#discord-icon"></use>
                 </svg>
                 Discord
               </a>
@@ -220,7 +239,7 @@ function App() {
                   role="presentation"
                   aria-hidden="true"
                 >
-                  <use xlinkHref="/icons.svg#x-icon" />
+                  <use href="/icons.svg#x-icon"></use>
                 </svg>
                 X.com
               </a>
@@ -232,7 +251,7 @@ function App() {
                   role="presentation"
                   aria-hidden="true"
                 >
-                  <use xlinkHref="/icons.svg#bluesky-icon" />
+                  <use href="/icons.svg#bluesky-icon"></use>
                 </svg>
                 Bluesky
               </a>
