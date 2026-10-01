@@ -6,84 +6,85 @@ import './App.css'
 
 function App() {
   const [count, setCount] = useState(0)
-
-  // Demo: accessible disclosure + live region + keyboard radiogroup
-  const [isOpen, setIsOpen] = useState(false)
-  const [text, setText] = useState('')
-  const [selectedIndex, setSelectedIndex] = useState(0)
-  const radioRefs = useRef<Array<HTMLButtonElement | null>>([])
-
-  const detailsId = 'demo-details'
-  const countId = 'char-count'
+  const [noteVisible, setNoteVisible] = useState(true)
+  const noteRef = useRef<HTMLButtonElement | null>(null)
+  const headingRef = useRef<HTMLHeadingElement | null>(null)
 
   useEffect(() => {
-    // Ensure the selected radio is focusable
-    // If the component mounts, focus the selected option for keyboard users convenience
-    const el = radioRefs.current[selectedIndex]
-    if (el) el.setAttribute('tabindex', '0')
-    radioRefs.current.forEach((btn, i) => {
-      if (!btn) return
-      if (i !== selectedIndex) btn.setAttribute('tabindex', '-1')
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  useEffect(() => {
-    // keep tabindex in sync when selectedIndex changes
-    radioRefs.current.forEach((btn, i) => {
-      if (!btn) return
-      btn.tabIndex = i === selectedIndex ? 0 : -1
-    })
-  }, [selectedIndex])
-
-  function handleRadioKeyDown(e: React.KeyboardEvent, index: number) {
-    const len = radioRefs.current.length
-    let nextIndex = index
-    switch (e.key) {
-      case 'ArrowRight':
-      case 'ArrowDown':
-        nextIndex = (index + 1) % len
-        radioRefs.current[nextIndex]?.focus()
-        setSelectedIndex(nextIndex)
-        e.preventDefault()
-        break
-      case 'ArrowLeft':
-      case 'ArrowUp':
-        nextIndex = (index - 1 + len) % len
-        radioRefs.current[nextIndex]?.focus()
-        setSelectedIndex(nextIndex)
-        e.preventDefault()
-        break
-      case 'Home':
-        radioRefs.current[0]?.focus()
-        setSelectedIndex(0)
-        e.preventDefault()
-        break
-      case 'End':
-        radioRefs.current[len - 1]?.focus()
-        setSelectedIndex(len - 1)
-        e.preventDefault()
-        break
-      case ' ':
-      case 'Enter':
-        setSelectedIndex(index)
-        e.preventDefault()
-        break
-      default:
-        break
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape' && noteVisible) {
+        setNoteVisible(false)
+      }
     }
-  }
+
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [noteVisible])
+
+  // Manage focus: when the note appears, focus the dismiss button;
+  // when it is dismissed, restore focus to the main heading.
+  useEffect(() => {
+    if (noteVisible) {
+      // Focus the dismiss button so keyboard and screen reader users can act immediately
+      noteRef.current?.focus()
+    } else {
+      // Restore focus to the main heading to preserve context for keyboard users
+      headingRef.current?.focus()
+    }
+  }, [noteVisible])
 
   return (
     <>
+      {/* Small accessible note: live region, dismissible via button or Escape key */}
+      {noteVisible && (
+        <div
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          aria-label="Important note"
+          style={{
+            border: '1px solid rgba(0,0,0,0.12)',
+            padding: '10px 12px',
+            margin: '12px',
+            borderRadius: 8,
+            display: 'flex',
+            gap: 12,
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            background: 'rgba(250,250,250,0.9)'
+          }}
+        >
+          <p style={{ margin: 0 }}>
+            <strong>Note:</strong> This small accessible notice is announced to assistive technologies. You can dismiss it with the button or by pressing Escape.
+          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button
+              ref={noteRef}
+              type="button"
+              onClick={() => setNoteVisible(false)}
+              aria-label="Dismiss note"
+              style={{
+                padding: '6px 10px',
+                borderRadius: 6,
+                border: '1px solid rgba(0,0,0,0.12)',
+                background: '#fff',
+                cursor: 'pointer'
+              }}
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
+
       <section id="center">
         <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="Decorative hero" />
+          <img src={heroImg} className="base" width="170" height="179" alt="" />
           <img src={reactLogo} className="framework" alt="React logo" />
           <img src={viteLogo} className="vite" alt="Vite logo" />
         </div>
         <div>
-          <h1>Get started</h1>
+          <h1 tabIndex={-1} ref={headingRef}>Get started</h1>
           <p>
             Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
           </p>
@@ -99,92 +100,6 @@ function App() {
 
       <div className="ticks"></div>
 
-      {/* Accessible demo section */}
-      <section id="demo" aria-labelledby="demo-heading">
-        <h2 id="demo-heading">Accessible demo</h2>
-
-        {/* Disclosure / details */}
-        <div>
-          <button
-            type="button"
-            aria-expanded={isOpen}
-            aria-controls={detailsId}
-            onClick={() => setIsOpen((v) => !v)}
-          >
-            {isOpen ? 'Hide details' : 'Show details'}
-          </button>
-
-          <div
-            id={detailsId}
-            role="region"
-            aria-live="polite"
-            style={{
-              marginTop: '0.5rem',
-              border: '1px solid #ddd',
-              padding: '0.5rem',
-              display: isOpen ? 'block' : 'none',
-            }}
-          >
-            <p>
-              This is an example of an accessible disclosure. Use the button to
-              toggle visibility. The region uses aria-live so assistive
-              technologies are informed when it appears.
-            </p>
-          </div>
-        </div>
-
-        {/* Live character count for a text input */}
-        <div style={{ marginTop: '1rem' }}>
-          <label htmlFor="demo-input">Type a short message</label>
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-            <input
-              id="demo-input"
-              aria-describedby={countId}
-              maxLength={140}
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              style={{ padding: '0.25rem' }}
-            />
-            <div id={countId} aria-live="polite">
-              {text.length} / 140
-            </div>
-          </div>
-        </div>
-
-        {/* Keyboard navigable radiogroup */}
-        <div style={{ marginTop: '1rem' }}>
-          <span id="rg-label">Choose an option (arrow keys to navigate)</span>
-          <div
-            role="radiogroup"
-            aria-labelledby="rg-label"
-            style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}
-          >
-            {['Option A', 'Option B', 'Option C'].map((label, i) => (
-              <button
-                key={label}
-                ref={(el) => (radioRefs.current[i] = el)}
-                role="radio"
-                aria-checked={selectedIndex === i}
-                tabIndex={selectedIndex === i ? 0 : -1}
-                onKeyDown={(e) => handleRadioKeyDown(e, i)}
-                onClick={() => setSelectedIndex(i)}
-                aria-label={label}
-                style={{
-                  padding: '0.4rem 0.6rem',
-                  border: selectedIndex === i ? '2px solid #0b66ff' : '1px solid #ccc',
-                  background: selectedIndex === i ? '#e6f0ff' : 'white',
-                }}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-          <div style={{ marginTop: '0.5rem' }} aria-live="polite">
-            Selected: {['Option A', 'Option B', 'Option C'][selectedIndex]}
-          </div>
-        </div>
-      </section>
-
       <section id="next-steps">
         <div id="docs">
           <svg className="icon" role="presentation" aria-hidden="true">
@@ -194,13 +109,13 @@ function App() {
           <p>Your questions, answered</p>
           <ul>
             <li>
-              <a href="https://vite.dev/" target="_blank">
+              <a href="https://vite.dev/" target="_blank" rel="noopener noreferrer">
                 <img className="logo" src={viteLogo} alt="" />
                 Explore Vite
               </a>
             </li>
             <li>
-              <a href="https://react.dev/" target="_blank">
+              <a href="https://react.dev/" target="_blank" rel="noopener noreferrer">
                 <img className="button-icon" src={reactLogo} alt="" />
                 Learn more
               </a>
@@ -215,7 +130,7 @@ function App() {
           <p>Join the Vite community</p>
           <ul>
             <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
+              <a href="https://github.com/vitejs/vite" target="_blank" rel="noopener noreferrer">
                 <svg
                   className="button-icon"
                   role="presentation"
@@ -227,7 +142,7 @@ function App() {
               </a>
             </li>
             <li>
-              <a href="https://chat.vite.dev/" target="_blank">
+              <a href="https://chat.vite.dev/" target="_blank" rel="noopener noreferrer">
                 <svg
                   className="button-icon"
                   role="presentation"
@@ -239,7 +154,7 @@ function App() {
               </a>
             </li>
             <li>
-              <a href="https://x.com/vite_js" target="_blank">
+              <a href="https://x.com/vite_js" target="_blank" rel="noopener noreferrer">
                 <svg
                   className="button-icon"
                   role="presentation"
@@ -251,7 +166,7 @@ function App() {
               </a>
             </li>
             <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
+              <a href="https://bsky.app/profile/vite.dev" target="_blank" rel="noopener noreferrer">
                 <svg
                   className="button-icon"
                   role="presentation"
