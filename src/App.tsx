@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import heroImg from './assets/hero.png'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
@@ -7,40 +7,27 @@ import './App.css'
 function App() {
   const [count, setCount] = useState(0)
 
-  // Final Preview Test state
-  const [showPreview, setShowPreview] = useState(true)
-  const [previewText, setPreviewText] = useState('This is a live preview')
-  const [previewColor, setPreviewColor] = useState('light')
-
-  const previewRef = useRef<HTMLDivElement | null>(null)
-  const checkboxRef = useRef<HTMLInputElement | null>(null)
+  // Final Preview Test states
+  const [previewText, setPreviewText] = useState('Type to preview')
+  const [fontSize, setFontSize] = useState(20)
+  const [isBold, setIsBold] = useState(false)
   const [announcement, setAnnouncement] = useState('')
+  const inputRef = useRef<HTMLInputElement | null>(null)
 
-  // Manage focus and screen reader announcements when preview visibility changes
-  useEffect(() => {
-    if (showPreview) {
-      setAnnouncement('Preview shown')
-      // Move focus to the preview for keyboard users when it becomes visible
-      previewRef.current?.focus()
-    } else {
-      setAnnouncement('Preview hidden')
-      // Move focus back to the Show preview checkbox when preview is hidden
-      checkboxRef.current?.focus()
-    }
-  }, [showPreview])
-
-  const bgMap: Record<string, string> = {
-    light: '#f7f7f7',
-    yellow: '#fff9c4',
-    cyan: '#e0f7fa',
-    lavender: '#ede7f6',
+  const resetPreview = () => {
+    setPreviewText('Type to preview')
+    setFontSize(20)
+    setIsBold(false)
+    setAnnouncement('Preview reset')
+    // return focus to the text input for quick keyboard access
+    inputRef.current?.focus()
   }
 
   return (
     <>
       <section id="center">
         <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="Vite + React hero" />
+          <img src={heroImg} className="base" width="170" height="179" alt="Decorative hero" />
           <img src={reactLogo} className="framework" alt="React logo" />
           <img src={viteLogo} className="vite" alt="Vite logo" />
         </div>
@@ -70,13 +57,13 @@ function App() {
           <p>Your questions, answered</p>
           <ul>
             <li>
-              <a href="https://vite.dev/" target="_blank" rel="noopener noreferrer">
+              <a href="https://vite.dev/" target="_blank">
                 <img className="logo" src={viteLogo} alt="" />
                 Explore Vite
               </a>
             </li>
             <li>
-              <a href="https://react.dev/" target="_blank" rel="noopener noreferrer">
+              <a href="https://react.dev/" target="_blank">
                 <img className="button-icon" src={reactLogo} alt="" />
                 Learn more
               </a>
@@ -91,7 +78,7 @@ function App() {
           <p>Join the Vite community</p>
           <ul>
             <li>
-              <a href="https://github.com/vitejs/vite" target="_blank" rel="noopener noreferrer">
+              <a href="https://github.com/vitejs/vite" target="_blank">
                 <svg
                   className="button-icon"
                   role="presentation"
@@ -103,7 +90,7 @@ function App() {
               </a>
             </li>
             <li>
-              <a href="https://chat.vite.dev/" target="_blank" rel="noopener noreferrer">
+              <a href="https://chat.vite.dev/" target="_blank">
                 <svg
                   className="button-icon"
                   role="presentation"
@@ -115,7 +102,7 @@ function App() {
               </a>
             </li>
             <li>
-              <a href="https://x.com/vite_js" target="_blank" rel="noopener noreferrer">
+              <a href="https://x.com/vite_js" target="_blank">
                 <svg
                   className="button-icon"
                   role="presentation"
@@ -127,7 +114,7 @@ function App() {
               </a>
             </li>
             <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank" rel="noopener noreferrer">
+              <a href="https://bsky.app/profile/vite.dev" target="_blank">
                 <svg
                   className="button-icon"
                   role="presentation"
@@ -144,84 +131,100 @@ function App() {
 
       <div className="ticks"></div>
 
-      {/* Final Preview Test section - visible, accessible, interactive */}
+      {/* Final Preview Test: visible, interactive, and accessible */}
       <section id="final-preview" aria-labelledby="final-preview-heading">
         <h2 id="final-preview-heading">Final Preview Test</h2>
-        <p>
-          Use the controls below to interact with the live preview. Changes are announced to assistive
-          technologies and the preview receives focus when shown.
-        </p>
 
-        <div className="preview-controls" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          <label htmlFor="show-preview" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-            <input
-              id="show-preview"
-              ref={checkboxRef}
-              type="checkbox"
-              checked={showPreview}
-              onChange={(e) => setShowPreview(e.target.checked)}
-            />
-            Show preview
-          </label>
+        <form
+          onSubmit={(e) => {
+            // prevent form submission so pressing Enter doesn't reload
+            e.preventDefault()
+            setAnnouncement('Preview updated')
+          }}
+          aria-describedby="final-preview-desc"
+        >
+          <p id="final-preview-desc">Use the controls below to change the preview. Changes are announced.</p>
 
-          <label htmlFor="preview-text" style={{ display: 'inline-flex', flexDirection: 'column' }}>
-            Preview text
+          <div>
+            <label htmlFor="preview-input">Preview text</label>
             <input
-              id="preview-text"
+              id="preview-input"
+              ref={inputRef}
               type="text"
               value={previewText}
-              onChange={(e) => setPreviewText(e.target.value)}
-              placeholder="Type preview text"
-              aria-describedby="preview-text-help"
+              onChange={(e) => {
+                setPreviewText(e.target.value)
+                setAnnouncement(`Preview text set to ${e.target.value || 'empty'}`)
+              }}
             />
-            <small id="preview-text-help">Text shown inside the live preview region.</small>
-          </label>
+          </div>
 
-          <label htmlFor="preview-color" style={{ display: 'inline-flex', flexDirection: 'column' }}>
-            Background
-            <select
-              id="preview-color"
-              value={previewColor}
-              onChange={(e) => setPreviewColor(e.target.value)}
-            >
-              <option value="light">Light</option>
-              <option value="yellow">Yellow</option>
-              <option value="cyan">Cyan</option>
-              <option value="lavender">Lavender</option>
-            </select>
-          </label>
-        </div>
+          <div>
+            <label htmlFor="font-size">Font size: {fontSize}px</label>
+            <input
+              id="font-size"
+              type="range"
+              min={12}
+              max={48}
+              value={fontSize}
+              aria-valuemin={12}
+              aria-valuemax={48}
+              aria-valuenow={fontSize}
+              onChange={(e) => {
+                const val = Number(e.target.value)
+                setFontSize(val)
+                setAnnouncement(`Font size ${val} pixels`)
+              }}
+            />
+          </div>
 
-        {/* Offscreen live region for explicit show/hide announcements */}
-        <div aria-live="polite" style={{ position: 'absolute', left: -9999, width: 1, height: 1, overflow: 'hidden' }}>
-          {announcement}
-        </div>
+          <div>
+            <label htmlFor="bold-toggle">
+              <input
+                id="bold-toggle"
+                type="checkbox"
+                checked={isBold}
+                onChange={(e) => {
+                  setIsBold(e.target.checked)
+                  setAnnouncement(e.target.checked ? 'Bold enabled' : 'Bold disabled')
+                }}
+              />
+              Bold
+            </label>
+          </div>
 
-        {showPreview ? (
-          <div
-            ref={previewRef}
-            tabIndex={-1}
-            role="status"
-            aria-live="polite"
-            aria-atomic="true"
-            aria-label="Live preview"
+          <div>
+            <button type="button" onClick={resetPreview} aria-label="Reset preview">
+              Reset
+            </button>
+          </div>
+        </form>
+
+        <div
+          role="region"
+          aria-atomic="true"
+          style={{
+            border: '1px solid #ccc',
+            padding: '12px',
+            marginTop: '12px',
+            minHeight: '48px',
+          }}
+        >
+          <p
             style={{
-              marginTop: '12px',
-              padding: '16px',
-              borderRadius: '6px',
-              background: bgMap[previewColor] || bgMap.light,
-              border: '1px solid rgba(0,0,0,0.08)',
-              maxWidth: 'min(640px, 100%)',
+              fontSize: `${fontSize}px`,
+              fontWeight: isBold ? '700' : '400',
+              margin: 0,
             }}
           >
-            <strong>Preview:</strong>
-            <div style={{ marginTop: '8px' }}>{previewText || <em>No preview text</em>}</div>
-          </div>
-        ) : (
-          <div style={{ marginTop: '12px' }} aria-hidden="true">
-            <em>The preview is hidden.</em>
-          </div>
-        )}
+            {previewText}
+          </p>
+        </div>
+
+        {/* Single live region for announcements (screen reader friendly) */}
+        <div id="final-preview-announcement" aria-live="polite" aria-atomic="true" style={{marginTop: '8px'}}>
+          {announcement}
+        </div>
       </section>
 
       <section id="spacer"></section>
