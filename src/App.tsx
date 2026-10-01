@@ -7,75 +7,72 @@ import './App.css'
 function App() {
   const [count, setCount] = useState(0)
 
-  // Demo states
-  const [highContrast, setHighContrast] = useState(false)
-  const [announcement, setAnnouncement] = useState('')
-
-  const [name, setName] = useState('')
-  const [nameError, setNameError] = useState('')
-  const nameInputRef = useRef<HTMLInputElement | null>(null)
-
-  const options = ['Red', 'Green', 'Blue']
+  // Demo: accessible disclosure + live region + keyboard radiogroup
+  const [isOpen, setIsOpen] = useState(false)
+  const [text, setText] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(0)
-  const [activeIndex, setActiveIndex] = useState(0)
+  const radioRefs = useRef<Array<HTMLButtonElement | null>>([])
 
-  // Announce changes to assistive technologies
+  const detailsId = 'demo-details'
+  const countId = 'char-count'
+
   useEffect(() => {
-    if (announcement) {
-      const t = setTimeout(() => setAnnouncement(''), 4000)
-      return () => clearTimeout(t)
-    }
-  }, [announcement])
-
-  // When contrast toggles, announce it
-  function toggleContrast() {
-    setHighContrast((c) => {
-      const next = !c
-      setAnnouncement(next ? 'High contrast enabled' : 'High contrast disabled')
-      return next
+    // Ensure the selected radio is focusable
+    // If the component mounts, focus the selected option for keyboard users convenience
+    const el = radioRefs.current[selectedIndex]
+    if (el) el.setAttribute('tabindex', '0')
+    radioRefs.current.forEach((btn, i) => {
+      if (!btn) return
+      if (i !== selectedIndex) btn.setAttribute('tabindex', '-1')
     })
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    if (!name.trim()) {
-      setNameError('Name is required')
-      setAnnouncement('Please enter your name')
-      // focus the invalid control
-      nameInputRef.current?.focus()
-      return
-    }
-    setNameError('')
-    setAnnouncement(`Hello ${name}, form submitted`)
-  }
-
-  // Keyboard navigation for options (roving tabindex using role=listbox/option)
-  function onOptionsKeyDown(e: React.KeyboardEvent) {
-    const last = options.length - 1
-    if (e.key === 'ArrowDown') {
-      e.preventDefault()
-      setActiveIndex((i) => (i === last ? 0 : i + 1))
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault()
-      setActiveIndex((i) => (i === 0 ? last : i - 1))
-    } else if (e.key === 'Home') {
-      e.preventDefault()
-      setActiveIndex(0)
-    } else if (e.key === 'End') {
-      e.preventDefault()
-      setActiveIndex(last)
-    } else if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      setSelectedIndex(activeIndex)
-      setAnnouncement(`${options[activeIndex]} selected`) 
-    }
-  }
-
-  // Keep focus on the active option when it changes
   useEffect(() => {
-    const el = document.getElementById(`opt-${activeIndex}`) as HTMLElement | null
-    if (el) el.focus()
-  }, [activeIndex])
+    // keep tabindex in sync when selectedIndex changes
+    radioRefs.current.forEach((btn, i) => {
+      if (!btn) return
+      btn.tabIndex = i === selectedIndex ? 0 : -1
+    })
+  }, [selectedIndex])
+
+  function handleRadioKeyDown(e: React.KeyboardEvent, index: number) {
+    const len = radioRefs.current.length
+    let nextIndex = index
+    switch (e.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        nextIndex = (index + 1) % len
+        radioRefs.current[nextIndex]?.focus()
+        setSelectedIndex(nextIndex)
+        e.preventDefault()
+        break
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        nextIndex = (index - 1 + len) % len
+        radioRefs.current[nextIndex]?.focus()
+        setSelectedIndex(nextIndex)
+        e.preventDefault()
+        break
+      case 'Home':
+        radioRefs.current[0]?.focus()
+        setSelectedIndex(0)
+        e.preventDefault()
+        break
+      case 'End':
+        radioRefs.current[len - 1]?.focus()
+        setSelectedIndex(len - 1)
+        e.preventDefault()
+        break
+      case ' ':
+      case 'Enter':
+        setSelectedIndex(index)
+        e.preventDefault()
+        break
+      default:
+        break
+    }
+  }
 
   return (
     <>
@@ -100,117 +97,93 @@ function App() {
         </button>
       </section>
 
+      <div className="ticks"></div>
+
       {/* Accessible demo section */}
       <section id="demo" aria-labelledby="demo-heading">
-        <h2 id="demo-heading">Accessible UI demo</h2>
+        <h2 id="demo-heading">Accessible demo</h2>
 
-        <div id="contrast-demo">
-          <h3>Toggle contrast</h3>
-          <p>
-            A toggle that exposes its state to assistive technologies via
-            aria-pressed and updates the demo surface.
-          </p>
+        {/* Disclosure / details */}
+        <div>
           <button
-            id="contrast-toggle"
             type="button"
-            aria-pressed={highContrast}
-            aria-controls="demo-surface"
-            onClick={toggleContrast}
+            aria-expanded={isOpen}
+            aria-controls={detailsId}
+            onClick={() => setIsOpen((v) => !v)}
           >
-            {highContrast ? 'Disable high contrast' : 'Enable high contrast'}
+            {isOpen ? 'Hide details' : 'Show details'}
           </button>
 
           <div
-            id="demo-surface"
+            id={detailsId}
+            role="region"
+            aria-live="polite"
             style={{
-              marginTop: 12,
-              padding: 12,
-              backgroundColor: highContrast ? '#000' : '#fff',
-              color: highContrast ? '#fff' : '#000',
-              border: '1px solid #ccc',
+              marginTop: '0.5rem',
+              border: '1px solid #ddd',
+              padding: '0.5rem',
+              display: isOpen ? 'block' : 'none',
             }}
           >
-            This surface reflects the current contrast setting.
+            <p>
+              This is an example of an accessible disclosure. Use the button to
+              toggle visibility. The region uses aria-live so assistive
+              technologies are informed when it appears.
+            </p>
           </div>
         </div>
 
-        <div id="form-demo" style={{ marginTop: 20 }}>
-          <h3>Simple accessible form</h3>
-          <p>
-            Form shows validation messages with proper role and id so screen readers
-            can associate the message with the control.
-          </p>
-
-          <form onSubmit={handleSubmit} noValidate>
-            <div>
-              <label htmlFor="name">Your name</label>
-              <input
-                id="name"
-                ref={nameInputRef}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                aria-invalid={!!nameError}
-                aria-describedby={nameError ? 'name-error' : undefined}
-                style={{ display: 'block', marginTop: 6 }}
-              />
+        {/* Live character count for a text input */}
+        <div style={{ marginTop: '1rem' }}>
+          <label htmlFor="demo-input">Type a short message</label>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <input
+              id="demo-input"
+              aria-describedby={countId}
+              maxLength={140}
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              style={{ padding: '0.25rem' }}
+            />
+            <div id={countId} aria-live="polite">
+              {text.length} / 140
             </div>
-
-            {nameError && (
-              <div id="name-error" role="alert" style={{ color: 'crimson', marginTop: 6 }}>
-                {nameError}
-              </div>
-            )}
-
-            <button type="submit" style={{ marginTop: 10 }}>
-              Submit
-            </button>
-          </form>
+          </div>
         </div>
 
-        <div id="options-demo" style={{ marginTop: 20 }}>
-          <h3 id="options-heading">Selectable options (keyboard accessible)</h3>
-          <p>Use Arrow keys to navigate, Enter/Space to choose.</p>
-
+        {/* Keyboard navigable radiogroup */}
+        <div style={{ marginTop: '1rem' }}>
+          <span id="rg-label">Choose an option (arrow keys to navigate)</span>
           <div
-            role="listbox"
-            aria-labelledby="options-heading"
-            tabIndex={0}
-            onKeyDown={onOptionsKeyDown}
-            style={{ display: 'inline-block', border: '1px solid #ddd', padding: 6 }}
+            role="radiogroup"
+            aria-labelledby="rg-label"
+            style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}
           >
-            {options.map((opt, i) => (
-              <div
-                key={opt}
-                id={`opt-${i}`}
-                role="option"
-                aria-selected={selectedIndex === i}
-                tabIndex={activeIndex === i ? 0 : -1}
-                onClick={() => {
-                  setSelectedIndex(i)
-                  setActiveIndex(i)
-                  setAnnouncement(`${opt} selected`)
-                }}
-                onFocus={() => setActiveIndex(i)}
+            {['Option A', 'Option B', 'Option C'].map((label, i) => (
+              <button
+                key={label}
+                ref={(el) => (radioRefs.current[i] = el)}
+                role="radio"
+                aria-checked={selectedIndex === i}
+                tabIndex={selectedIndex === i ? 0 : -1}
+                onKeyDown={(e) => handleRadioKeyDown(e, i)}
+                onClick={() => setSelectedIndex(i)}
+                aria-label={label}
                 style={{
-                  padding: '6px 12px',
-                  cursor: 'pointer',
-                  background: selectedIndex === i ? '#eef' : 'transparent',
-                  outline: activeIndex === i ? '2px solid #007acc' : 'none',
+                  padding: '0.4rem 0.6rem',
+                  border: selectedIndex === i ? '2px solid #0b66ff' : '1px solid #ccc',
+                  background: selectedIndex === i ? '#e6f0ff' : 'white',
                 }}
               >
-                {opt}
-              </div>
+                {label}
+              </button>
             ))}
           </div>
-        </div>
-
-        {/* Live region for announcements */}
-        <div aria-live="polite" aria-atomic="true" style={{ marginTop: 12 }}>
-          {announcement}
+          <div style={{ marginTop: '0.5rem' }} aria-live="polite">
+            Selected: {['Option A', 'Option B', 'Option C'][selectedIndex]}
+          </div>
         </div>
       </section>
-
-      <div className="ticks"></div>
 
       <section id="next-steps">
         <div id="docs">
