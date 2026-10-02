@@ -1,501 +1,485 @@
-import React, { useEffect, useRef, useState } from 'react'
-import './App.css'
+import React, { useEffect, useRef, useState } from "react";
+import "./App.css";
 
-type SSOProvider = { id: string; name: string; icon?: string; redirectUrl: string; type?: string }
+type FieldError = { field: string; message: string };
 
-// Lightweight mock API layer for demo purposes
-async function api<T = any>(path: string, opts?: RequestInit): Promise<{ status: number; body: T }> {
-  await new Promise((r) => setTimeout(r, 700)) // simulate latency
-  if (path === '/auth/sso/providers' && (!opts || opts.method === 'GET')) {
-    const providers: SSOProvider[] = [
-      { id: 'google', name: 'Google', icon: '', redirectUrl: '/sso/redirect?provider=Google', type: 'oauth' },
-      { id: 'okta', name: 'Okta', icon: '', redirectUrl: '/sso/redirect?provider=Okta', type: 'saml' },
-      { id: 'samlcorp', name: 'Acme SAML', icon: '', redirectUrl: '/sso/redirect?provider=Acme', type: 'saml' }
-    ]
-    return { status: 200, body: providers as any }
-  }
-
-  if (path === '/auth/login' && opts?.method === 'POST') {
-    // Robustly handle different body types: prefer string, fall back to JSON serialization
-    let bodyText = '{}'
-    try {
-      if (typeof opts.body === 'string') {
-        bodyText = opts.body
-      } else if (opts.body instanceof URLSearchParams) {
-        bodyText = opts.body.toString()
-      } else if (opts.body instanceof Blob) {
-        // Blob can't be synchronously read easily in this mock; attempt toString
-        bodyText = (opts.body as any).toString() || '{}'
-      } else if (opts.body) {
-        try {
-          bodyText = JSON.stringify(opts.body)
-        } catch {
-          bodyText = (opts.body as any).toString() || '{}'
-        }
-      }
-    } catch {
-      bodyText = '{}'
-    }
-
-    let parsed: any = {}
-    try {
-      parsed = JSON.parse(bodyText)
-    } catch {
-      parsed = {}
-    }
-    const { email, password } = parsed
-    // simple validation
-    const fieldErrors: Record<string, string> = {}
-    if (!email) fieldErrors.email = 'Email is required.'
-    else if (!/^\S+@\S+\.\S+$/.test(email)) fieldErrors.email = 'Enter a valid email.'
-    if (!password) fieldErrors.password = 'Password is required.'
-    if (Object.keys(fieldErrors).length) {
-      return { status: 400, body: { fieldErrors, formErrors: ['Please fix the errors below.'] } as any }
-    }
-
-    // success only for a known test account
-    if (email === 'user@example.com' && password === 'password') {
-      // server would set cookie; here we just return redirect
-      return { status: 200, body: { redirect: '/dashboard' } as any }
-    }
-
-    return {
-      status: 401,
-      body: { formErrors: ['Invalid email or password.'], fieldErrors: {} } as any
-    }
-  }
-
-  if (path === '/auth/password-reset' && opts?.method === 'POST') {
-    // Always return 200 to avoid account enumeration
-    return { status: 200, body: { message: 'If an account exists, password reset instructions have been sent.' } as any }
-  }
-
-  return { status: 404, body: {} as any }
-}
-
-function VisuallyHidden({ children }: { children: React.ReactNode }) {
-  return <span className="visually-hidden">{children}</span>
-}
+const ICONS = {
+  logo: (
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <rect width="24" height="24" rx="6" fill="var(--primary-600)" />
+      <path d="M7 12h10" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  ),
+  sso: (
+    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" fill="var(--surface)" stroke="var(--stroke)" />
+      <path d="M8 12h8" stroke="var(--text-900)" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  ),
+};
 
 function usePrefersReducedMotion() {
-  const [reduced, setReduced] = useState(false)
+  const [reduced, setReduced] = useState(false);
   useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const handler = () => setReduced(mq.matches)
-    handler()
-    if (mq.addEventListener) mq.addEventListener('change', handler)
-    else mq.addListener(handler)
-    return () => {
-      if (mq.removeEventListener) mq.removeEventListener('change', handler)
-      else mq.removeListener(handler)
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduced(mq.matches);
+    const handler = () => setReduced(mq.matches);
+    try {
+      mq.addEventListener("change", handler);
+    } catch {
+      mq.addListener(handler);
     }
-  }, [])
-  return reduced
+    return () => {
+      try {
+        mq.removeEventListener("change", handler);
+      } catch {
+        mq.removeListener(handler);
+      }
+    };
+  }, []);
+  return reduced;
 }
 
 export default function App(): JSX.Element {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [remember, setRemember] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [formErrors, setFormErrors] = useState<string[]>([])
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
-  const [providers, setProviders] = useState<SSOProvider[]>([])
-  const [toast, setToast] = useState<string | null>(null)
-  const [successToast, setSuccessToast] = useState<string | null>(null)
-  const [forgotOpen, setForgotOpen] = useState(false)
-  const [forgotEmail, setForgotEmail] = useState('')
-  const [forgotState, setForgotState] = useState<'idle' | 'loading' | 'success'>('idle')
-  const errorSummaryRef = useRef<HTMLDivElement | null>(null)
-  const emailRef = useRef<HTMLInputElement | null>(null)
-  const forgotTriggerRef = useRef<HTMLButtonElement | null>(null)
-  const modalRef = useRef<HTMLDivElement | null>(null)
-  const hasMounted = useRef(false)
-  const reducedMotion = usePrefersReducedMotion()
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<FieldError[]>([]);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [providers, setProviders] = useState<Array<{ id: string; name: string; icon?: string; redirectUrl?: string }>>([]);
+  const [ssoOpen, setSsoOpen] = useState(false);
+  const [ssoRedirecting, setSsoRedirecting] = useState<string | null>(null);
+  const [networkToast, setNetworkToast] = useState<string | null>(null);
 
+  const idRef = useRef<HTMLInputElement | null>(null);
+  const pwdRef = useRef<HTMLInputElement | null>(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
+  const errorSummaryRef = useRef<HTMLDivElement | null>(null);
+
+  const prefersReducedMotion = usePrefersReducedMotion();
+
+  // Fetch SSO providers on mount
   useEffect(() => {
-    let mounted = true
-    api<SSOProvider[]>('/auth/sso/providers')
+    let mounted = true;
+    fetch("/auth/sso/providers")
       .then((r) => {
-        if (mounted && r.status === 200) setProviders(r.body)
+        if (!r.ok) throw new Error("no providers");
+        return r.json();
       })
-      .catch(() => {})
-    hasMounted.current = true
+      .then((data) => {
+        if (mounted && Array.isArray(data)) setProviders(data);
+      })
+      .catch(() => {
+        // fallback static providers
+        if (mounted)
+          setProviders([
+            { id: "okta", name: "Okta", redirectUrl: "/auth/sso?provider=okta" },
+            { id: "azure", name: "Azure AD", redirectUrl: "/auth/sso?provider=azure" },
+          ]);
+      });
     return () => {
-      mounted = false
-    }
-  }, [])
+      mounted = false;
+    };
+  }, []);
 
+  // Focus management: if form-level errors present, move focus to summary
   useEffect(() => {
-    if (successToast) {
-      const t = setTimeout(() => {
-        // redirect to dashboard in 1.5s
-        window.location.assign('/dashboard')
-      }, 1500)
-      return () => clearTimeout(t)
+    if (formError && errorSummaryRef.current) {
+      errorSummaryRef.current.focus();
     }
-  }, [successToast])
+  }, [formError]);
 
-  useEffect(() => {
-    if (formErrors.length && errorSummaryRef.current) {
-      errorSummaryRef.current.focus()
+  function validate(): { ok: boolean; errors: FieldError[] } {
+    const errors: FieldError[] = [];
+    if (!identifier.trim()) {
+      errors.push({ field: "identifier", message: "Email or username is required" });
+    } else if (identifier.includes("@")) {
+      // basic email regex
+      const re = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+      if (!re.test(identifier)) errors.push({ field: "identifier", message: "Enter a valid work email" });
     }
-  }, [formErrors])
-
-  function resetErrors() {
-    setFormErrors([])
-    setFieldErrors({})
+    if (!password) errors.push({ field: "password", message: "Password cannot be empty" });
+    return { ok: errors.length === 0, errors };
   }
 
-  async function handleSubmit(e?: React.FormEvent) {
-    e?.preventDefault()
-    if (loading) return
-    resetErrors()
-    // client-side validation
-    const clientFieldErrors: Record<string, string> = {}
-    if (!email) clientFieldErrors.email = 'Email is required.'
-    else if (!/^\S+@\S+\.\S+$/.test(email)) clientFieldErrors.email = 'Enter a valid email.'
-    if (!password) clientFieldErrors.password = 'Password is required.'
-    if (Object.keys(clientFieldErrors).length) {
-      setFieldErrors(clientFieldErrors)
-      setFormErrors(['Please fix the errors below.'])
-      return
+  function mapFieldErrors(list: FieldError[] | undefined) {
+    if (!list) return;
+    setFieldErrors(list);
+  }
+
+  async function onSubmit(e?: React.FormEvent) {
+    e?.preventDefault();
+    setFormError(null);
+    const { ok, errors } = validate();
+    setFieldErrors(errors);
+    if (!ok) {
+      // focus first invalid
+      const first = errors[0];
+      if (first?.field === "identifier") idRef.current?.focus();
+      else if (first?.field === "password") pwdRef.current?.focus();
+      // show summary
+      setFormError("Please fix the highlighted fields.");
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
+    setFormError(null);
+    // disable via loading state; mark aria-busy on form
     try {
-      const body = JSON.stringify({ email, password, remember })
-      const res = await api('/auth/login', { method: 'POST', body })
-      if (res.status === 200) {
-        setSuccessToast('Signed in successfully. Redirecting…')
-        // clear sensitive state
-        setPassword('')
-        // server is expected to set HttpOnly cookie
-        return
+      const res = await fetch("/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ identifier: identifier.trim(), password, remember }),
+      });
+      const isJson = res.headers.get("content-type")?.includes("application/json");
+      const data = isJson ? await res.json() : null;
+      if (res.ok) {
+        // success: redirect
+        const redirect = (data && data.redirect) || "/";
+        // some servers return a token; we'll just redirect
+        window.location.href = redirect;
+        return;
       }
-      const bodyJson: any = res.body
-      if (res.status === 400 || res.status === 401) {
-        setFieldErrors(bodyJson.fieldErrors || {})
-        setFormErrors(bodyJson.formErrors || ['Sign in failed.'])
+      if (res.status === 400 && data) {
+        // field errors
+        mapFieldErrors(data.fieldErrors);
+        if (data.message) setFormError(data.message);
+        else setFormError("Please check your input and try again.");
+        // focus summary
+        setTimeout(() => errorSummaryRef.current?.focus(), 0);
+      } else if (res.status === 401) {
+        setFormError("Incorrect email or password.");
+        setFieldErrors([]);
       } else {
-        setFormErrors(['Unexpected server error. Please try again.'])
+        setFormError((data && data.message) || "Unable to sign in. Please try again later.");
       }
     } catch (err) {
-      setFormErrors(['Network error. Please try again.'])
+      setNetworkToast("Network error. Please check your connection.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
-  function handleSSO(provider: SSOProvider) {
-    if (loading) return
-    setToast(`Redirecting to ${provider.name}…`)
-    // slight delay to show toast then navigate
-    setTimeout(() => {
-      // simulate redirect
-      try {
-        window.location.assign(provider.redirectUrl)
-      } catch {
-        setToast(null)
-        setFormErrors([`Failed to redirect to ${provider.name}.`])
-      }
-    }, reducedMotion ? 10 : 600)
+  function onForgot() {
+    const url = "/auth/forgot" + (identifier ? `?email=${encodeURIComponent(identifier)}` : "");
+    window.location.href = url;
   }
 
-  // close forgot modal and restore focus
-  function closeForgot() {
-    setForgotOpen(false)
-    // restore focus to trigger
-    setTimeout(() => {
-      forgotTriggerRef.current?.focus()
-    }, 0)
-  }
-
-  // Forgot password modal focus trap
+  // SSO modal focus trap
+  const ssoRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (!forgotOpen) return
-      if (e.key === 'Escape') {
-        closeForgot()
-        return
+    if (!ssoOpen) return;
+    const node = ssoRef.current;
+    if (!node) return;
+    const focusableList = node.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+    );
+    const focusable = Array.from(focusableList);
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    const onKey = (ev: KeyboardEvent) => {
+      if (ev.key === "Escape") {
+        ev.preventDefault();
+        setSsoOpen(false);
       }
-      if (e.key !== 'Tab') return
-      const container = modalRef.current
-      if (!container) return
-      const focusable = Array.from(
-        container.querySelectorAll<HTMLElement>(
-          'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
-        )
-      ).filter((el) => !el.hasAttribute('disabled'))
-      if (focusable.length === 0) {
-        e.preventDefault()
-        return
+      if (ev.key === "Tab") {
+        // if no focusable elements, keep focus on modal container
+        if (focusable.length === 0) {
+          ev.preventDefault();
+          (node as HTMLElement).focus();
+          return;
+        }
+        if (ev.shiftKey && document.activeElement === first) {
+          ev.preventDefault();
+          (last as HTMLElement | undefined)?.focus();
+        } else if (!ev.shiftKey && document.activeElement === last) {
+          ev.preventDefault();
+          (first as HTMLElement | undefined)?.focus();
+        }
       }
-      const first = focusable[0]
-      const last = focusable[focusable.length - 1]
-      if (!document.activeElement) return
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault()
-        last.focus()
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault()
-        first.focus()
-      }
-    }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [forgotOpen])
+    };
+    document.addEventListener("keydown", onKey);
+    // focus first focusable or the modal container
+    if (first) (first as HTMLElement).focus();
+    else (node as HTMLElement).focus();
+    return () => document.removeEventListener("keydown", onKey);
+  }, [ssoOpen]);
 
-  useEffect(() => {
-    if (forgotOpen) {
+  function openSso(providerId?: string) {
+    if (providerId) {
+      const p = providers.find((x) => x.id === providerId);
+      const url = p?.redirectUrl || `/auth/sso?provider=${providerId}`;
+      setSsoRedirecting(p?.name || providerId);
+      // announce and redirect (short consistent delay)
       setTimeout(() => {
-        const h = document.getElementById('forgot-heading')
-        h?.focus()
-      }, 0)
+        window.location.href = url;
+      }, 300);
+      return;
     }
-  }, [forgotOpen])
+    setSsoOpen(true);
+  }
 
-  async function submitForgot(e?: React.FormEvent) {
-    e?.preventDefault()
-    setForgotState('loading')
-    try {
-      await api('/auth/password-reset', { method: 'POST', body: JSON.stringify({ email: forgotEmail }) })
-      setForgotState('success')
-      // focus confirmation
-      setTimeout(() => {
-        const el = document.getElementById('forgot-confirm')
-        el?.focus()
-      }, 0)
-    } catch {
-      setForgotState('idle')
-    }
+  function onSsoSelect(p: { id: string; redirectUrl?: string; name: string }) {
+    setSsoRedirecting(p.name);
+    // small consistent delay to show message for screen readers
+    setTimeout(() => {
+      window.location.href = p.redirectUrl || `/auth/sso?provider=${p.id}`;
+    }, 300);
   }
 
   return (
-    <div className="page-root" style={{ padding: 'env(safe-area-inset-top) 16px env(safe-area-inset-bottom)' }}>
-      <main className="center-wrap" aria-labelledby="product-heading">
-        <header className="brand">
-          <img src="/logo192.png" alt="" aria-hidden="true" className="brand-logo" />
-          <h1 id="product-heading" className="brand-title">
-            Acme Platform
-          </h1>
-          <span className="brand-sub">Secure B2B SaaS</span>
-        </header>
+    <div className="page-root">
+      <main className="container" aria-hidden={ssoOpen}>
+        <div className="auth-card" role="region" aria-labelledby="signin-title">
+          <header className="brand">
+            <div className="logo" aria-hidden="true">{ICONS.logo}</div>
+            <h1 id="signin-title" className="title">
+              Sign in
+            </h1>
+            <p className="caption">Use work email or username</p>
+          </header>
 
-        <div className="auth-card" role="form" aria-labelledby="signin-heading">
-          <h2 id="signin-heading" className="card-heading">
-            Sign in to your account
-          </h2>
-
-          {formErrors.length > 0 && (
-            <div
-              ref={errorSummaryRef}
-              tabIndex={-1}
-              role="alert"
-              aria-live="assertive"
-              aria-labelledby="error-summary-heading"
-              className="error-summary"
-            >
-              <strong id="error-summary-heading">There was a problem</strong>
-              <ul>
-                {formErrors.map((f, i) => (
-                  <li key={i}>{f}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} noValidate>
-            <div className="field">
-              <label htmlFor="email" className="label">
-                Email
-              </label>
-              <div className="input-row">
-                <input
-                  id="email"
-                  name="email"
-                  ref={emailRef}
-                  type="email"
-                  autoComplete="email"
-                  placeholder="you@company.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  aria-invalid={Boolean(fieldErrors.email)}
-                  aria-describedby={fieldErrors.email ? 'email-error' : undefined}
-                  className={`input ${fieldErrors.email ? 'input-error' : ''}`}
-                  disabled={loading}
-                />
-                <span className="field-icon" aria-hidden>
-                  @
-                </span>
+          <form
+            ref={formRef}
+            className="auth-form"
+            onSubmit={(e) => onSubmit(e)}
+            aria-busy={loading}
+            noValidate
+          >
+            {formError && (
+              <div
+                ref={errorSummaryRef}
+                tabIndex={-1}
+                className="error-summary"
+                role="alert"
+                aria-live="assertive"
+              >
+                <p className="error-summary-title">{formError}</p>
+                {fieldErrors.length > 0 && (
+                  <ul>
+                    {fieldErrors.slice(0, 3).map((err, i) => (
+                      <li key={i}>
+                        <a
+                          href={`#${err.field}-field`}
+                          onClick={(ev) => {
+                            ev.preventDefault();
+                            if (err.field === "identifier") idRef.current?.focus();
+                            else if (err.field === "password") pwdRef.current?.focus();
+                          }}
+                        >
+                          {err.message}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
-              {fieldErrors.email && (
-                <div id="email-error" className="field-error">
-                  {fieldErrors.email}
-                </div>
+            )}
+
+            <div className="field">
+              <label htmlFor="identifier" className="field-label">
+                Email or username
+              </label>
+              <input
+                id="identifier"
+                name="identifier"
+                ref={idRef}
+                className={`input ${fieldErrors.some((f) => f.field === "identifier") ? "input-error" : ""}`}
+                type="text"
+                autoComplete="username"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                onBlur={() => {
+                  // lightweight validation on blur
+                  const re = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+                  if (identifier.includes("@") && !re.test(identifier)) {
+                    setFieldErrors((prev) => {
+                      const others = prev.filter((p) => p.field !== "identifier");
+                      return [...others, { field: "identifier", message: "Enter a valid work email" }];
+                    });
+                  } else {
+                    setFieldErrors((prev) => prev.filter((p) => p.field !== "identifier"));
+                  }
+                }}
+                aria-invalid={fieldErrors.some((f) => f.field === "identifier")}
+                aria-describedby={fieldErrors.some((f) => f.field === "identifier") ? "identifier-error" : undefined}
+                disabled={loading}
+                aria-disabled={loading}
+              />
+              <div className="helper">Use your organization email or your username.</div>
+              {fieldErrors.map((f, i) =>
+                f.field === "identifier" ? (
+                  <div key={i} id="identifier-error" className="field-error" role="status">
+                    {f.message}
+                  </div>
+                ) : null
               )}
             </div>
 
             <div className="field">
-              <label htmlFor="password" className="label">
+              <label htmlFor="password" className="field-label">
                 Password
               </label>
-              <div className="input-row">
+              <div className="password-row">
                 <input
                   id="password"
                   name="password"
-                  type={showPassword ? 'text' : 'password'}
+                  ref={pwdRef}
+                  className={`input ${fieldErrors.some((f) => f.field === "password") ? "input-error" : ""}`}
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
-                  placeholder="Your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  aria-invalid={Boolean(fieldErrors.password)}
-                  aria-describedby={fieldErrors.password ? 'password-error' : undefined}
-                  className={`input ${fieldErrors.password ? 'input-error' : ''}`}
+                  aria-invalid={fieldErrors.some((f) => f.field === "password")}
+                  aria-describedby={fieldErrors.some((f) => f.field === "password") ? "password-error" : undefined}
                   disabled={loading}
+                  aria-disabled={loading}
                 />
                 <button
                   type="button"
+                  className="pwd-toggle"
                   aria-pressed={showPassword}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                   onClick={() => setShowPassword((s) => !s)}
-                  className="password-toggle"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                   disabled={loading}
+                  aria-disabled={loading}
                 >
-                  {showPassword ? 'Hide' : 'Show'}
+                  {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
-              {fieldErrors.password && (
-                <div id="password-error" className="field-error">
-                  {fieldErrors.password}
-                </div>
+              {fieldErrors.map((f, i) =>
+                f.field === "password" ? (
+                  <div key={i} id="password-error" className="field-error" role="status">
+                    {f.message}
+                  </div>
+                ) : null
               )}
             </div>
 
-            <div className="row between">
-              <label className="checkbox">
+            <div className="row-between">
+              <label className="remember">
                 <input
                   type="checkbox"
                   checked={remember}
                   onChange={(e) => setRemember(e.target.checked)}
+                  aria-checked={remember}
                   disabled={loading}
+                  aria-disabled={loading}
                 />
                 <span>Remember me</span>
               </label>
-
-              <button
-                type="button"
-                className="link-button"
-                onClick={() => setForgotOpen(true)}
-                disabled={loading}
-                ref={forgotTriggerRef}
-              >
+              <button type="button" className="text-link" onClick={onForgot} disabled={loading} aria-disabled={loading}>
                 Forgot password?
               </button>
             </div>
 
-            <div className="field">
+            <div className="actions">
               <button
                 type="submit"
                 className="primary"
                 disabled={loading}
+                aria-disabled={loading}
                 aria-busy={loading}
               >
                 {loading ? (
-                  <>
-                    <span className="spinner" aria-hidden></span>
+                  <span className="btn-content">
+                    <span
+                      className={`spinner ${prefersReducedMotion ? "no-motion" : ""}`}
+                      role="img"
+                      aria-hidden="true"
+                    />
+                    <span className="visually-hidden">Signing in…</span>
                     <span>Signing in…</span>
-                  </>
+                  </span>
                 ) : (
-                  'Sign in'
+                  "Sign in"
                 )}
               </button>
             </div>
+
+            <div className="sso-row">
+              <div className="divider"><span>or</span></div>
+              <div className="sso-buttons">
+                <button type="button" className="sso-btn" onClick={() => openSso()} disabled={loading} aria-disabled={loading}>
+                  <span className="sso-icon">{ICONS.sso}</span>
+                  Sign in with SSO
+                </button>
+                {providers.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    className="sso-btn outline"
+                    onClick={() => openSso(p.id)}
+                    disabled={loading}
+                    aria-disabled={loading}
+                  >
+                    <span className="sso-icon" aria-hidden>
+                      {ICONS.sso}
+                    </span>
+                    {p.name}
+                  </button>
+                ))}
+              </div>
+            </div>
           </form>
 
-          <div className="alt">
-            <div className="divider">or continue with</div>
-            <div className="sso-list" role="list">
-              {providers.map((p) => (
-                <button
-                  key={p.id}
-                  className="sso-btn"
-                  onClick={() => handleSSO(p)}
-                  disabled={loading}
-                  aria-label={`Sign in with ${p.name}`}
-                  role="listitem"
-                >
-                  <span className="sso-icon" aria-hidden>
-                    {p.name[0]}
-                  </span>
-                  <span className="sso-label">{p.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <footer className="card-foot">
-            <small>
-              By continuing you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.
-            </small>
-            <div>
-              <a href="#" className="enterprise">Enterprise SSO</a>
-            </div>
+          <footer className="card-footer" aria-hidden>
+            <small>© Your Company</small>
           </footer>
         </div>
+      </main>
 
-        {/* Toasts */}
-        <div aria-live="polite" className="toast-region">
-          {toast && <div className="toast" role="status">{toast}</div>}
-          {successToast && <div className="toast success" role="status">{successToast}</div>}
-        </div>
-
-        {/* Forgot Password Modal */}
-        {forgotOpen && (
-          <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="forgot-heading">
-            <div className="modal" ref={modalRef}>
-              <h3 id="forgot-heading" tabIndex={-1} className="modal-heading">
-                Forgot your password
-              </h3>
-              {forgotState !== 'success' ? (
-                <form onSubmit={submitForgot}>
-                  <p className="modal-desc">Enter your account email and we'll send reset instructions.</p>
-                  <label className="label" htmlFor="forgot-email">
-                    Email
-                  </label>
-                  <input
-                    id="forgot-email"
-                    type="email"
-                    autoComplete="email"
-                    value={forgotEmail}
-                    onChange={(e) => setForgotEmail(e.target.value)}
-                    className="input"
-                    disabled={forgotState === 'loading'}
-                  />
-                  <div className="row">
-                    <button type="submit" className="primary" disabled={forgotState === 'loading'}>
-                      {forgotState === 'loading' ? 'Sending…' : 'Send reset email'}
-                    </button>
-                    <button type="button" className="secondary" onClick={closeForgot}>
-                      Cancel
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <div id="forgot-confirm" tabIndex={-1} className="modal-confirm">
-                  If an account exists, we have sent password reset instructions. Check your email.
-                  <div className="row" style={{ marginTop: 12 }}>
-                    <button className="primary" onClick={closeForgot}>
-                      Done
-                    </button>
-                  </div>
-                </div>
-              )}
+      {ssoOpen && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="sso-title">
+          <div className="modal" ref={ssoRef} tabIndex={-1}>
+            <div className="modal-header">
+              <h2 id="sso-title">Sign in with SSO</h2>
+              <button
+                className="modal-close"
+                aria-label="Close SSO dialog"
+                onClick={() => setSsoOpen(false)}
+                disabled={loading}
+                aria-disabled={loading}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <p className="modal-instruction">Choose your identity provider</p>
+              <div className="modal-list">
+                {providers.map((p) => (
+                  <button key={p.id} className="sso-list-btn" onClick={() => onSsoSelect(p)} disabled={loading} aria-disabled={loading}>
+                    <span className="sso-list-icon">{ICONS.sso}</span>
+                    <span>{p.name}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
-        )}
-      </main>
+        </div>
+      )}
+
+      {ssoRedirecting && (
+        <div className="aria-live" aria-live="assertive">
+          Redirecting to {ssoRedirecting}…
+        </div>
+      )}
+
+      {networkToast && (
+        <div className="toast" role="status" aria-live="polite">
+          <span>{networkToast}</span>
+          <button onClick={() => { setNetworkToast(null); onSubmit(); }} className="toast-retry">Retry</button>
+        </div>
+      )}
     </div>
-  )
+  );
 }
