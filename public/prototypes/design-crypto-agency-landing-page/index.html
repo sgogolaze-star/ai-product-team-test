@@ -1,0 +1,878 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LedgerWave — Crypto Agency Prototype</title>
+  <style>
+    /* Design tokens (from HANDOFF.design_system) */
+    :root{
+      --color-primary:#0B63FF;
+      --color-primary-700:#0849B8;
+      --color-neutral-900:#0B1723;
+      --color-neutral-600:#586675;
+      --color-surface:#FFFFFF;
+      --color-surface-2:#F7FAFC;
+      --color-success:#00C48C;
+      --accent-gradient:linear-gradient(135deg,#0B63FF 0%,#7C4DFF 100%);
+      --font-sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;
+      --spacing-1:4px; --spacing-2:8px; --spacing-3:12px; --spacing-4:16px; --spacing-5:24px; --spacing-6:32px; --spacing-7:48px; --spacing-8:64px;
+      --radius-sm:8px; --radius-md:12px; --radius-lg:16px;
+      --shadow-8:0 6px 18px rgba(11,23,35,0.08);
+      --shadow-16:0 10px 30px rgba(11,23,35,0.12);
+      --focus-ring: 3px solid rgba(11,99,255,0.18);
+      --text-large:40px; --text-large-line:44px; --text-medium:28px; --text-medium-line:32px; --text-body:16px; --text-body-line:24px;
+    }
+
+    /* Basic reset & layout */
+    *{box-sizing:border-box}
+    html,body{height:100%;background:var(--color-surface-2);color:var(--color-neutral-900);font-family:var(--font-sans);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+    img{max-width:100%;display:block}
+    a{color:inherit}
+    main{max-width:1200px;margin:0 auto;padding:0 var(--spacing-4)}
+
+    /* Skip link */
+    .skip-link{position:fixed;left:12px;top:12px;background:var(--color-primary);color:#fff;padding:8px 12px;border-radius:8px;z-index:2000;transform:translateY(-120%);transition:transform .18s ease-in-out}
+    .skip-link:focus{transform:translateY(0)}
+
+    /* Top nav */
+    header{position:sticky;top:0;z-index:1200;background:linear-gradient(180deg,rgba(255,255,255,0.95),rgba(255,255,255,0.9));backdrop-filter:saturate(120%) blur(6px);transition:box-shadow .18s ease,height .18s ease;padding:12px 0}
+    header.scrolled{box-shadow:var(--shadow-8);}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:1200px;margin:0 auto}
+    .logo{display:flex;gap:12px;align-items:center}
+    .brand{display:flex;flex-direction:column;line-height:1}
+    .brand strong{font-weight:700;font-size:18px}
+    nav.primary{display:flex;align-items:center;gap:12px}
+    .nav-links{display:none;gap:16px;align-items:center}
+    .nav-links a{padding:8px 10px;border-radius:8px;color:var(--color-neutral-600);text-decoration:none}
+    .nav-ctas{display:flex;gap:8px}
+    .btn{display:inline-flex;align-items:center;gap:8px;cursor:pointer;border:0;padding:10px 14px;border-radius:10px;font-weight:600}
+    .btn-primary{background:var(--accent-gradient);color:#fff;box-shadow:var(--shadow-8)}
+    .btn-ghost{background:transparent;border:1px solid rgba(11,23,35,0.06);color:var(--color-neutral-900)}
+    .hamburger{width:44px;height:44px;border-radius:10px;background:#fff;border:1px solid rgba(11,23,35,0.06);display:flex;align-items:center;justify-content:center}
+    .mobile-menu{position:fixed;inset:0;background:rgba(11,23,35,0.6);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:1400}
+    .mobile-menu.open{display:flex}
+    .mobile-panel{background:var(--color-surface);width:92%;max-width:420px;padding:20px;border-radius:14px;box-shadow:var(--shadow-16)}
+
+    /* Hero */
+    .hero{display:grid;gap:20px;align-items:center;padding:48px 0 36px}
+    .hero-inner{display:flex;flex-direction:column;gap:16px}
+    h1{font-size:var(--text-large);line-height:var(--text-large-line);margin:0}
+    .lead{font-size:18px;color:var(--color-neutral-600);max-width:62ch}
+    .hero-ctas{display:flex;gap:12px;margin-top:8px}
+    /* Token grid decorative */
+    .token-grid{position:relative;width:100%;height:160px;border-radius:12px;overflow:hidden;background:linear-gradient(180deg,rgba(11,99,255,0.06),rgba(124,77,255,0.04));display:flex;align-items:center;justify-content:center}
+    .tokens{display:grid;grid-template-columns:repeat(8,48px);gap:12px;padding:12px;transform:translateY(0);transition:transform .6s ease-in-out}
+    .token{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid rgba(11,23,35,0.04);box-shadow:0 6px 12px rgba(11,23,35,0.06)}
+    .token svg{width:28px;height:28px}
+    /* reduced motion */
+    @media (prefers-reduced-motion:reduce){.tokens{transition:none}}
+
+    /* Services grid */
+    .services{display:grid;gap:12px;padding:28px 0}
+    .service-grid{display:grid;grid-template-columns:1fr;gap:12px}
+    .service-card{background:var(--color-surface);padding:16px;border-radius:12px;box-shadow:none;transition:transform .18s ease,box-shadow .18s ease;display:flex;flex-direction:column;gap:8px}
+    .service-card:hover{transform:translateY(-8px);box-shadow:var(--shadow-8)}
+    .service-illustration{width:48px;height:48px}
+    .service-bullets{color:var(--color-neutral-600);font-size:14px}
+    .learn-more{margin-top:auto;color:var(--color-primary);font-weight:600;text-decoration:none}
+
+    /* Case studies */
+    .cases{padding:24px 0}
+    .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+    .filter-btn{padding:8px 12px;border-radius:10px;background:#fff;border:1px solid rgba(11,23,35,0.06);cursor:pointer}
+    .cases-grid{display:grid;grid-template-columns:1fr;gap:12px;overflow:hidden;transition:max-height .28s ease}
+    .case-card{display:flex;gap:12px;background:var(--color-surface);padding:12px;border-radius:12px;align-items:center}
+    .case-thumb{width:120px;height:80px;border-radius:8px;background:linear-gradient(90deg,#e6f0ff,#f7f7fb);flex-shrink:0}
+    .metric-badge{background:var(--color-primary);color:white;padding:6px 8px;border-radius:999px;font-weight:700}
+    .pill-list{display:flex;gap:6px;flex-wrap:wrap}
+    .pill{background:rgba(11,23,35,0.05);padding:6px 8px;border-radius:999px;font-size:12px}
+
+    /* Process */
+    .process{padding:24px 0}
+    .steps{display:flex;gap:12px;align-items:center}
+    .step{background:var(--color-surface);padding:12px;border-radius:10px;flex:1;display:flex;gap:12px;align-items:center}
+    .step-num{width:36px;height:36px;border-radius:8px;background:var(--color-primary);color:white;display:flex;align-items:center;justify-content:center;font-weight:700}
+
+    /* Trust & testimonials */
+    .trust{padding:20px 0;display:flex;flex-direction:column;gap:12px}
+    .partners{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .partner{width:96px;height:40px;background:linear-gradient(90deg,#fff,#f6f9ff);display:flex;align-items:center;justify-content:center;border-radius:8px;filter:grayscale(100%);opacity:0.8}
+    .testimonial{background:var(--color-surface);padding:16px;border-radius:12px;box-shadow:var(--shadow-8)}
+    .carousel{position:relative}
+    .carousel-controls{display:flex;gap:8px;position:absolute;right:8px;top:8px}
+
+    /* Pricing */
+    .pricing{padding:24px 0;display:grid;gap:12px}
+    .pricing-grid{display:grid;grid-template-columns:1fr;gap:12px}
+    .price-card{background:var(--color-surface);padding:16px;border-radius:12px}
+    .check{color:var(--color-success);font-weight:700}
+
+    /* Contact & Modal */
+    .contact{padding:24px 0}
+    form .field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+    input[type="text"],input[type="email"],select,textarea{padding:10px;border-radius:8px;border:1px solid rgba(11,23,35,0.08);font-size:15px}
+    textarea{min-height:120px}
+    .error{color:#B00020;font-size:13px}
+    .error-summary{background:#fff5f5;border:1px solid #ffd6d6;padding:12px;border-radius:8px;color:#8a1f1f}
+
+    /* Modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(11,23,35,0.5);display:none;align-items:center;justify-content:center;z-index:1600}
+    .modal-backdrop.open{display:flex}
+    .modal{background:var(--color-surface);width:94%;max-width:640px;padding:20px;border-radius:12px;box-shadow:var(--shadow-16);}
+
+    /* Accordion */
+    .faq{padding:24px 0}
+    .accordion-item{background:var(--color-surface);border-radius:10px;margin-bottom:8px}
+    .accordion-summary{display:flex;justify-content:space-between;align-items:center;padding:12px;cursor:pointer}
+    .accordion-panel{padding:12px;border-top:1px solid rgba(11,23,35,0.04);display:none}
+    .accordion-item.open .accordion-panel{display:block}
+
+    /* Footer */
+    footer{padding:24px 0;border-top:1px solid rgba(11,23,35,0.04);margin-top:24px}
+    .footer-grid{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+
+    /* State switcher */
+    .state-switcher{position:fixed;right:16px;bottom:16px;background:#0B1723;color:#fff;padding:8px;border-radius:10px;z-index:2000;font-size:13px}
+    .state-switcher select{margin-left:8px;padding:6px;border-radius:6px;border:0}
+
+    /* Focus visible */
+    :focus{outline-offset:4px}
+    :focus-visible{outline:var(--focus-ring)}
+
+    /* Responsive */
+    @media(min-width:641px){
+      .service-grid{grid-template-columns:repeat(2,1fr)}
+      .cases-grid{grid-template-columns:repeat(2,1fr)}
+      .pricing-grid{grid-template-columns:repeat(2,1fr)}
+      .nav-links{display:flex}
+    }
+    @media(min-width:1025px){
+      main{padding:0 var(--spacing-8)}
+      .hero{grid-template-columns:1fr 440px;align-items:center}
+      .token-grid{height:220px}
+      .service-grid{grid-template-columns:repeat(3,1fr)}
+      .cases-grid{grid-template-columns:repeat(3,1fr)}
+      .pricing-grid{grid-template-columns:repeat(3,1fr)}
+    }
+
+    /* Utility */
+    .muted{color:var(--color-neutral-600)}
+    .center{display:flex;align-items:center;justify-content:center}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header id="site-header" aria-label="Primary" role="banner">
+    <div class="nav-inner" style="padding:0 12px;">
+      <div class="logo" aria-hidden="false">
+        <!-- inline SVG logo -->
+        <svg width="44" height="44" viewBox="0 0 24 24" aria-hidden="true">
+          <defs>
+            <linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#0B63FF"/><stop offset="1" stop-color="#7C4DFF"/></linearGradient>
+          </defs>
+          <rect width="24" height="24" rx="6" fill="url(#g1)" />
+          <path d="M6 12l4 4 8-8" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <div class="brand">
+          <strong>LedgerWave</strong>
+          <span class="muted" style="font-size:12px">Crypto strategy & engineering</span>
+        </div>
+      </div>
+
+      <nav class="primary" role="navigation" aria-label="Main navigation">
+        <div class="nav-links" id="nav-links">
+          <a href="#services">Services</a>
+          <a href="#cases">Case Studies</a>
+          <a href="#process">How We Work</a>
+          <a href="#team">Team</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#contact">Contact</a>
+        </div>
+
+        <div class="nav-ctas">
+          <button class="btn btn-ghost" id="audit-btn">Get Audit</button>
+          <button class="btn btn-primary" id="contact-btn">Contact</button>
+          <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">☰</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+    <div class="mobile-panel" role="dialog" aria-modal="true" aria-label="Mobile menu">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="display:flex;gap:10px;align-items:center"><svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="#0B63FF"/></svg><strong>LedgerWave</strong></div>
+        <button id="mobile-close" class="hamburger" aria-label="Close menu">✕</button>
+      </div>
+      <nav style="display:flex;flex-direction:column;gap:8px">
+        <a href="#services" class="filter-link">Services</a>
+        <a href="#cases" class="filter-link">Case Studies</a>
+        <a href="#process">How We Work</a>
+        <a href="#team">Team</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#contact">Contact</a>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button class="btn btn-ghost" id="mobile-audit">Get Audit</button>
+          <button class="btn btn-primary" id="mobile-contact">Contact</button>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <main id="main" tabindex="-1">
+    <section class="hero" id="hero">
+      <div class="hero-inner">
+        <h1>We design and ship token economies your users love.</h1>
+        <p class="lead">We blend product-first strategy, bulletproof tokenomics, and on-chain engineering to help projects scale TVL, users, and utility.</p>
+        <div class="hero-ctas">
+          <button class="btn btn-primary" id="hero-cta">Get a free audit</button>
+          <button class="btn btn-ghost" id="hero-cta-secondary">Book a demo</button>
+        </div>
+        <div style="margin-top:12px;color:var(--color-neutral-600);font-size:14px">Trusted by builders across DeFi and NFTs</div>
+      </div>
+
+      <div aria-hidden="true">
+        <div class="token-grid" id="token-grid" role="img" aria-hidden="true" title="Decorative tokens">
+          <div class="tokens" id="tokens">
+            <!-- decorative tokens as inline svgs -->
+            <div class="token"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="url(#g1)"/></svg></div>
+            <div class="token"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="6" fill="#7C4DFF"/></svg></div>
+            <div class="token"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12" stroke="#0B63FF" stroke-width="2" stroke-linecap="round"/></svg></div>
+            <div class="token"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#fff" stroke="#0B63FF"/></svg></div>
+            <div class="token"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12,4 20,20 4,20" fill="#7C4DFF"/></svg></div>
+            <div class="token"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="4" fill="#0B63FF"/></svg></div>
+            <div class="token"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6" fill="#7C4DFF"/></svg></div>
+            <div class="token"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 16l4-8 4 8" stroke="#0B63FF" stroke-width="1.6" fill="none"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <section id="services" class="services" aria-labelledby="services-title">
+      <h2 id="services-title">Services</h2>
+      <p class="muted">End-to-end product & engineering for token-led growth</p>
+      <div class="service-grid" id="service-grid">
+        <article class="service-card" data-service="Strategy" tabindex="0">
+          <div style="display:flex;gap:12px;align-items:center">
+            <div class="service-illustration" aria-hidden="true">
+              <svg width="48" height="48" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#0B63FF"/></svg>
+            </div>
+            <div>
+              <strong>Strategy</strong>
+              <div class="muted" style="font-size:13px">Positioning, token utility & runway</div>
+            </div>
+          </div>
+          <ul class="service-bullets">
+            <li>Product-market fit for tokens</li>
+            <li>Economics & incentive design</li>
+            <li>Go-to-market playbook</li>
+          </ul>
+          <a class="learn-more" href="#" data-service-link>Learn more →</a>
+        </article>
+
+        <article class="service-card" data-service="Tokenomics" tabindex="0">
+          <div style="display:flex;gap:12px;align-items:center">
+            <div class="service-illustration" aria-hidden="true">
+              <svg width="48" height="48" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="6" fill="#7C4DFF"/></svg>
+            </div>
+            <div>
+              <strong>Tokenomics</strong>
+              <div class="muted" style="font-size:13px">Modeling, emissions, vesting</div>
+            </div>
+          </div>
+          <ul class="service-bullets">
+            <li>Simulations & stress tests</li>
+            <li>Emission schedules</li>
+            <li>Governance design</li>
+          </ul>
+          <a class="learn-more" href="#" data-service-link>Learn more →</a>
+        </article>
+
+        <article class="service-card" data-service="Smart Contracts" tabindex="0">
+          <div style="display:flex;gap:12px;align-items:center">
+            <div class="service-illustration" aria-hidden="true">
+              <svg width="48" height="48" viewBox="0 0 24 24"><path d="M4 6h16v12H4z" fill="#0B63FF"/></svg>
+            </div>
+            <div>
+              <strong>Smart Contracts</strong>
+              <div class="muted" style="font-size:13px">Audits, builds, integrations</div>
+            </div>
+          </div>
+          <ul class="service-bullets">
+            <li>Security-first implementations</li>
+            <li>Comprehensive audits</li>
+          </ul>
+          <a class="learn-more" href="#" data-service-link>Learn more →</a>
+        </article>
+
+        <article class="service-card" data-service="Launch" tabindex="0">
+          <div style="display:flex;gap:12px;align-items:center">
+            <div class="service-illustration" aria-hidden="true">
+              <svg width="48" height="48" viewBox="0 0 24 24"><path d="M12 2l4 10-4 2-4-2z" fill="#7C4DFF"/></svg>
+            </div>
+            <div>
+              <strong>Launch & Growth</strong>
+              <div class="muted" style="font-size:13px">Onchain growth and ops</div>
+            </div>
+          </div>
+          <ul class="service-bullets">
+            <li>Incentive campaigns</li>
+            <li>Partnerships & liquidity</li>
+            <li>Analytics & iteration</li>
+          </ul>
+          <a class="learn-more" href="#" data-service-link>Learn more →</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="cases" class="cases" aria-labelledby="cases-title">
+      <h2 id="cases-title">Case Studies</h2>
+      <div class="filters" role="toolbar" aria-label="Filter case studies">
+        <button class="filter-btn" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="Strategy">Strategy</button>
+        <button class="filter-btn" data-filter="Tokenomics">Tokenomics</button>
+        <button class="filter-btn" data-filter="Smart Contracts">Smart Contracts</button>
+        <button class="filter-btn" data-filter="Launch">Launch</button>
+      </div>
+      <div id="cases-live" class="sr-only" aria-live="polite"></div>
+      <div class="cases-grid" id="cases-grid" style="max-height:2000px">
+        <!-- case cards -->
+        <article class="case-card" data-services="Tokenomics Launch">
+          <div class="case-thumb" aria-hidden="true"></div>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;justify-content:space-between">
+              <div><strong>Protocol X</strong><div class="muted" style="font-size:13px">DeFi protocol — AMM</div></div>
+              <div class="metric-badge">+250% TVL</div>
+            </div>
+            <p class="muted" style="margin:6px 0">Launched emissions redesign, increased retention and liquidity.</p>
+            <div class="pill-list"><span class="pill">Solidity</span><span class="pill">Subgraph</span></div>
+          </div>
+        </article>
+
+        <article class="case-card" data-services="Strategy Tokenomics">
+          <div class="case-thumb" aria-hidden="true"></div>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;justify-content:space-between">
+              <div><strong>Collective A</strong><div class="muted" style="font-size:13px">NFT community</div></div>
+              <div class="metric-badge">+18k users</div>
+            </div>
+            <p class="muted" style="margin:6px 0">Designed token utility & access layers to grow DAU.</p>
+            <div class="pill-list"><span class="pill">IPFS</span><span class="pill">Oracle</span></div>
+          </div>
+        </article>
+
+        <article class="case-card" data-services="Smart Contracts">
+          <div class="case-thumb" aria-hidden="true"></div>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;justify-content:space-between">
+              <div><strong>BridgeCo</strong><div class="muted" style="font-size:13px">Cross-chain infra</div></div>
+              <div class="metric-badge">$10M secured</div>
+            </div>
+            <p class="muted" style="margin:6px 0">Built audited bridge contracts and relayers.</p>
+            <div class="pill-list"><span class="pill">Rust</span><span class="pill">Audit</span></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="process" class="process" aria-labelledby="process-title">
+      <h2 id="process-title">How We Work</h2>
+      <p class="muted">A tight, three-step process to ship impact fast</p>
+      <div class="steps" role="list">
+        <div class="step" role="listitem">
+          <div class="step-num">1</div>
+          <div>
+            <strong>Discover & model</strong>
+            <div class="muted">Research, assumptions & token modeling</div>
+          </div>
+        </div>
+        <div class="step" role="listitem">
+          <div class="step-num">2</div>
+          <div>
+            <strong>Build & audit</strong>
+            <div class="muted">Contracts, integrations & tests</div>
+          </div>
+        </div>
+        <div class="step" role="listitem">
+          <div class="step-num">3</div>
+          <div>
+            <strong>Launch & iterate</strong>
+            <div class="muted">Ops, incentives & analytics</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px"><button class="btn btn-primary" id="process-cta">Work with us</button></div>
+    </section>
+
+    <section id="team" class="trust" aria-labelledby="team-title">
+      <h2 id="team-title">Team & Trust</h2>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <div style="display:flex;gap:12px;align-items:center">
+          <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect width='64' height='64' rx='12' fill='%230B63FF'/><text x='32' y='36' font-size='20' fill='white' text-anchor='middle' font-family='Arial'>AW</text></svg>" width="64" height="64" alt="Founder's avatar">
+          <div>
+            <strong>Ava Winters</strong>
+            <div class="muted" style="font-size:13px">Founder • ex-ProtocolX</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:center">
+          <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect width='64' height='64' rx='12' fill='%237C4DFF'/><text x='32' y='36' font-size='20' fill='white' text-anchor='middle' font-family='Arial'>MK</text></svg>" width="64" height="64" alt="Co-founder avatar">
+          <div>
+            <strong>Marcus Lee</strong>
+            <div class="muted" style="font-size:13px">Head of Engineering • audited $1B+</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        <div class="partners" id="partners">
+          <!-- placeholders for lazy loaded logos -->
+          <div class="partner" data-src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='40'><rect width='96' height='40' rx='8' fill='%23e8f0ff'/><text x='48' y='24' font-size='12' fill='%230B1723' text-anchor='middle'>ProtocolX</text></svg>">Loading...</div>
+          <div class="partner" data-src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='40'><rect width='96' height='40' rx='8' fill='%23f6f0ff'/><text x='48' y='24' font-size='12' fill='%230B1723' text-anchor='middle'>BridgeCo</text></svg>">Loading...</div>
+          <div class="partner" data-src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='40'><rect width='96' height='40' rx='8' fill='%23f0fff6'/><text x='48' y='24' font-size='12' fill='%230B1723' text-anchor='middle'>Collective A</text></svg>">Loading...</div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        <div class="carousel" aria-roledescription="carousel" aria-label="Testimonials">
+          <div class="carousel-controls">
+            <button class="btn" id="prev-test" aria-label="Previous testimonial">◀</button>
+            <button class="btn" id="next-test" aria-label="Next testimonial">▶</button>
+          </div>
+          <div id="testimonial-live" class="sr-only" aria-live="polite"></div>
+          <div class="testimonial" id="testimonial-1" tabindex="0">"LedgerWave redesigned our token emissions — TVL more than doubled in 3 months" — Lead @ ProtocolX</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="pricing" class="pricing" aria-labelledby="pricing-title">
+      <h2 id="pricing-title">Pricing & Packages</h2>
+      <p class="muted">Flexible engagement for startups and enterprises</p>
+      <div class="pricing-grid">
+        <div class="price-card">
+          <strong>Starter</strong>
+          <div class="muted">Audit & token advisory</div>
+          <div style="font-size:20px;margin:12px 0">$8k+</div>
+          <ul>
+            <li><span class="check">✓</span> Token health audit</li>
+            <li><span class="check">✓</span> Emissions model</li>
+          </ul>
+          <div style="margin-top:12px"><button class="btn btn-primary price-cta">Contact</button></div>
+        </div>
+
+        <div class="price-card">
+          <strong>Scale</strong>
+          <div class="muted">End-to-end token design & build</div>
+          <div style="font-size:20px;margin:12px 0">$25k+</div>
+          <ul>
+            <li><span class="check">✓</span> Full tokenomics</li>
+            <li><span class="check">✓</span> Contracts & audits</li>
+          </ul>
+          <div style="margin-top:12px"><button class="btn btn-primary price-cta">Contact</button></div>
+        </div>
+
+        <div class="price-card">
+          <strong>Enterprise</strong>
+          <div class="muted">Custom engagements</div>
+          <div style="font-size:20px;margin:12px 0">Custom</div>
+          <ul>
+            <li><span class="check">✓</span> Dedicated team</li>
+            <li><span class="check">✓</span> SLA & oncall</li>
+          </ul>
+          <div style="margin-top:12px"><button class="btn btn-primary price-cta">Contact</button></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="contact" aria-labelledby="contact-title">
+      <h2 id="contact-title">Contact</h2>
+      <p class="muted">Tell us about your project — or book time.</p>
+      <form id="lead-form" novalidate>
+        <div id="form-error-summary" aria-live="assertive" style="display:none"></div>
+        <div class="field">
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" required aria-required="true" />
+          <div class="error" id="error-name" role="alert" aria-live="assertive"></div>
+        </div>
+        <div class="field">
+          <label for="company">Company</label>
+          <input id="company" name="company" type="text" />
+          <div class="error" id="error-company"></div>
+        </div>
+        <div class="field">
+          <label for="email">Work email</label>
+          <input id="email" name="email" type="email" required aria-required="true" />
+          <div class="error" id="error-email" role="alert" aria-live="assertive"></div>
+        </div>
+        <div class="field">
+          <label for="budget">Budget</label>
+          <select id="budget" name="budget">
+            <option value="<$10k">&lt;$10k</option>
+            <option value="$10k-$50k">$10k–$50k</option>
+            <option value=">$50k">&gt;$50k</option>
+          </select>
+          <div class="error" id="error-budget"></div>
+        </div>
+        <div class="field">
+          <label for="message">Message</label>
+          <textarea id="message" name="message"></textarea>
+          <div class="error" id="error-message"></div>
+        </div>
+        <div class="field">
+          <label for="file">Attach file <span class="muted" style="font-size:12px">(optional)</span></label>
+          <input id="file" name="file" type="file" aria-describedby="file-desc" />
+          <div id="file-desc" class="muted" style="font-size:12px">Max 5MB. We accept PDFs and docs.</div>
+        </div>
+        <div class="field">
+          <label><input type="checkbox" id="recaptcha-fallback" /> I'm not a robot (fallback)</label>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn btn-primary" id="form-submit" type="submit">Send</button>
+          <div id="form-status" class="muted" aria-live="polite"></div>
+        </div>
+      </form>
+    </section>
+
+    <section id="faq" class="faq" aria-labelledby="faq-title">
+      <h2 id="faq-title">FAQ</h2>
+      <div class="accordion">
+        <div class="accordion-item" data-idx="0">
+          <div class="accordion-summary" tabindex="0" role="button" aria-expanded="false">What is an audit? <span aria-hidden="true">+</span></div>
+          <div class="accordion-panel">A security review of smart contracts and economic attack vectors.</div>
+        </div>
+        <div class="accordion-item" data-idx="1">
+          <div class="accordion-summary" tabindex="0" role="button" aria-expanded="false">How long does a token design take? <span aria-hidden="true">+</span></div>
+          <div class="accordion-panel">Typically 2–6 weeks depending on scope and integrations.</div>
+        </div>
+        <div class="accordion-item" data-idx="2">
+          <div class="accordion-summary" tabindex="0" role="button" aria-expanded="false">Do you perform audits? <span aria-hidden="true">+</span></div>
+          <div class="accordion-panel">Yes — we both build and audit; we also partner with specialist firms.</div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-grid">
+        <div>
+          <strong>LedgerWave</strong>
+          <div class="muted">© <span id="year"></span> LedgerWave — All rights reserved</div>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:12px;align-items:center">
+          <a href="#" class="muted">Terms</a>
+          <a href="#" class="muted">Privacy</a>
+          <form id="newsletter-form" style="display:flex;gap:8px;align-items:center">
+            <label for="newsletter" class="sr-only">Subscribe to newsletter</label>
+            <input id="newsletter" type="email" placeholder="Your email" aria-label="Your email" />
+            <button class="btn btn-primary" type="submit">Subscribe</button>
+          </form>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <!-- Modal -->
+  <div class="modal-backdrop" id="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button id="modal-close" class="hamburger" style="float:right" aria-label="Close">✕</button>
+      <h3 id="modal-title">Start your audit</h3>
+      <form id="modal-form" novalidate>
+        <div id="modal-error" class="error-summary" style="display:none" aria-live="assertive"></div>
+        <div class="field"><label for="m-name">Name</label><input id="m-name" type="text" required></div>
+        <div class="field"><label for="m-email">Email</label><input id="m-email" type="email" required></div>
+        <div class="field"><label for="m-budget">Budget</label><select id="m-budget"><option>$10k–$50k</option><option>&gt;$50k</option></select></div>
+        <div style="display:flex;gap:8px;align-items:center"><button class="btn btn-primary" id="modal-submit">Request audit</button><div id="modal-status" class="muted" aria-live="polite"></div></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- State switcher -->
+  <div class="state-switcher" aria-hidden="false">
+    State:
+    <select id="state-selector" aria-label="Prototype state selector">
+      <option value="default">Default</option>
+      <option value="nav-scrolled">Nav: Scrolled</option>
+      <option value="nav-mobile">Nav: Mobile Open</option>
+      <option value="hero-loading">Hero CTA: Loading</option>
+      <option value="form-submitting">Form: Submitting</option>
+      <option value="form-success">Form: Success</option>
+      <option value="carousel-paused">Carousel: Paused</option>
+    </select>
+  </div>
+
+  <script>
+    (function(){
+      // Utilities
+      const $ = s => document.querySelector(s);
+      const $$ = s => Array.from(document.querySelectorAll(s));
+      const now = () => new Date().getTime();
+
+      // Header sticky shadow on scroll
+      const header = $('#site-header');
+      function handleScroll(){
+        if(window.scrollY > 40) header.classList.add('scrolled'); else header.classList.remove('scrolled');
+      }
+      handleScroll();
+      window.addEventListener('scroll', handleScroll, {passive:true});
+
+      // Mobile menu
+      const hamburger = $('#hamburger');
+      const mobileMenu = $('#mobile-menu');
+      const mobileClose = $('#mobile-close');
+      const mobileOpenButtons = [$('#mobile-audit'), $('#mobile-contact')];
+
+      function openMobile(){
+        mobileMenu.classList.add('open');
+        hamburger.setAttribute('aria-expanded','true');
+        mobileMenu.setAttribute('aria-hidden','false');
+        document.body.style.overflow='hidden';
+        // focus trap: focus first link
+        mobileMenu.querySelector('a,button').focus();
+      }
+      function closeMobile(){
+        mobileMenu.classList.remove('open');
+        hamburger.setAttribute('aria-expanded','false');
+        mobileMenu.setAttribute('aria-hidden','true');
+        document.body.style.overflow='';
+        hamburger.focus();
+      }
+      hamburger.addEventListener('click', ()=>{ if(mobileMenu.classList.contains('open')) closeMobile(); else openMobile();});
+      mobileClose.addEventListener('click', closeMobile);
+      mobileMenu.addEventListener('click', (e)=>{ if(e.target===mobileMenu) closeMobile(); });
+
+      // Hero tokens animation (decorative)
+      const tokens = $('#tokens');
+      let tokenPos = 0;
+      let tokenAnim;
+      function animateTokens(){
+        if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        tokenAnim = setInterval(()=>{
+          tokenPos = (tokenPos - 12) % 96;
+          tokens.style.transform = `translateY(${(Math.sin(Date.now()/1500))*6}px) translateX(${tokenPos}px)`;
+        }, 600);
+      }
+      animateTokens();
+
+      // CTA -> opens modal
+      const heroCTA = $('#hero-cta');
+      const modalBackdrop = $('#modal-backdrop');
+      const modalClose = $('#modal-close');
+      const modalForm = $('#modal-form');
+      const modalSubmit = $('#modal-submit');
+      const modalStatus = $('#modal-status');
+
+      let lastFocusedBeforeModal = null;
+
+      function openModal(){
+        lastFocusedBeforeModal = document.activeElement;
+        modalBackdrop.classList.add('open');
+        modalBackdrop.setAttribute('aria-hidden','false');
+        document.body.style.overflow='hidden';
+        $('#m-name').focus();
+        trapFocus(modalBackdrop);
+      }
+      function closeModal(){
+        modalBackdrop.classList.remove('open');
+        modalBackdrop.setAttribute('aria-hidden','true');
+        document.body.style.overflow='';
+        releaseTrap();
+        if(lastFocusedBeforeModal) lastFocusedBeforeModal.focus();
+      }
+      heroCTA.addEventListener('click', ()=>{
+        setButtonLoading(heroCTA, true);
+        setTimeout(()=>{ setButtonLoading(heroCTA,false); openModal(); }, 700);
+      });
+      $('#contact-btn').addEventListener('click', openModal);
+      $('#audit-btn').addEventListener('click', openModal);
+      modalClose.addEventListener('click', closeModal);
+      modalBackdrop.addEventListener('click', (e)=>{ if(e.target===modalBackdrop) closeModal(); });
+      window.addEventListener('keydown',(e)=>{ if(e.key==='Escape'){ if(modalBackdrop.classList.contains('open')) closeModal(); if(mobileMenu.classList.contains('open')) closeMobile(); } });
+
+      // Button pressed/loading states
+      function setButtonLoading(btn, loading){
+        if(loading){
+          btn.disabled = true;
+          btn.setAttribute('aria-busy','true');
+          btn.dataset.prevText = btn.innerHTML;
+          btn.innerHTML = 'Loading…';
+        } else {
+          btn.disabled = false;
+          btn.removeAttribute('aria-busy');
+          if(btn.dataset.prevText) btn.innerHTML = btn.dataset.prevText;
+        }
+      }
+
+      // Modal form submit
+      modalForm.addEventListener('submit', (e)=>{ e.preventDefault(); submitModal(); });
+      function submitModal(){
+        modalStatus.textContent = '';
+        modalSubmit.disabled = true; modalSubmit.textContent='Sending…';
+        setTimeout(()=>{ modalSubmit.disabled=false; modalSubmit.textContent='Request audit'; modalStatus.textContent='Request received — we will follow up by email.'; // success
+          // keep modal open but show success state
+        }, 1200);
+      }
+
+      // Form validation for lead form
+      const leadForm = $('#lead-form');
+      const formStatus = $('#form-status');
+      function validateField(el){
+        const id = el.id; const val = el.value.trim();
+        const errEl = $('#error-'+id.replace('m-','').replace('error-','')) || $('#error-'+id);
+        if(el.required && !val){ if(errEl) errEl.textContent = 'This field is required.'; return false; }
+        if(el.type==='email' && val){ const ok = /\S+@\S+\.\S+/.test(val); if(!ok){ if(errEl) errEl.textContent = 'Enter a valid email.'; return false; } }
+        if(errEl) errEl.textContent = '';
+        return true;
+      }
+
+      leadForm.querySelectorAll('input,textarea,select').forEach(inp=>{
+        inp.addEventListener('blur', ()=>{ validateField(inp); });
+      });
+
+      leadForm.addEventListener('submit',(e)=>{
+        e.preventDefault();
+        submitLeadForm();
+      });
+
+      function submitLeadForm(){
+        const fields = Array.from(leadForm.querySelectorAll('input,textarea,select')).filter(f=>f.type!=='file');
+        let valid=true; let errors=[];
+        fields.forEach(f=>{ const ok = validateField(f); if(!ok) { valid=false; errors.push(f.name||f.id);} });
+        const summary = $('#form-error-summary');
+        if(!valid){ summary.style.display='block'; summary.textContent = 'Please fix the highlighted fields.'; summary.className='error-summary'; summary.focus(); return; }
+        summary.style.display='none';
+        // simulate submit
+        $('#form-submit').disabled = true; $('#form-submit').textContent='Sending…'; formStatus.textContent='';
+        setTimeout(()=>{
+          $('#form-submit').disabled = false; $('#form-submit').textContent='Send';
+          // simulate success 201
+          leadForm.innerHTML = '<div style="padding:20px;border-radius:8px;background:linear-gradient(90deg, #f0fff6, #fff)"><strong>Thanks — we received your message.</strong><p class="muted">A member of our team will contact you shortly. <button id="book-call" class="btn btn-ghost">Book a call</button></p></div>';
+          $('#book-call')?.addEventListener('click', ()=>{ alert('Open scheduler (prototype)'); });
+        }, 1100);
+      }
+
+      // Case study filters
+      const filterBtns = $$('.filter-btn');
+      const caseCards = $$('.case-card');
+      const casesLive = $('#cases-live');
+      filterBtns.forEach(btn=>btn.addEventListener('click', ()=>{
+        const f = btn.dataset.filter;
+        let count=0;
+        caseCards.forEach(card=>{
+          if(f==='all' || card.dataset.services.includes(f)){
+            card.style.display='flex'; card.setAttribute('aria-hidden','false'); count++; }
+          else { card.style.display='none'; card.setAttribute('aria-hidden','true'); }
+        });
+        // announce
+        casesLive.textContent = `${count} results for ${f}`;
+        // animate height: measure container
+        const grid = $('#cases-grid');
+        grid.style.transition='max-height .28s ease';
+        // set explicit max-height to allow animation (we just keep large enough)
+      }));
+
+      // Services card touch persistent expanded state
+      const serviceCards = $$('.service-card');
+      serviceCards.forEach(card=>{
+        let touchTimer;
+        card.addEventListener('touchstart', ()=>{ serviceCards.forEach(c=>c.classList.remove('expanded')); card.classList.add('expanded'); });
+        card.addEventListener('mouseenter', ()=> card.classList.add('hover'))
+        card.addEventListener('mouseleave', ()=> card.classList.remove('hover'))
+      });
+
+      // Partners lazy load when in view
+      const partners = $$('#partners .partner');
+      const obs = new IntersectionObserver(entries=>{
+        entries.forEach(en=>{
+          if(en.isIntersecting){ const el = en.target; const src = el.dataset.src; if(src){ el.innerHTML=''; const img = document.createElement('img'); img.alt = el.textContent.trim() || ''; img.src = src; img.width=96; img.height=40; img.style.filter='grayscale(100%)'; el.appendChild(img); el.dataset.src=''; obs.unobserve(el); } }
+        });
+      },{threshold:0.2});
+      partners.forEach(p=>obs.observe(p));
+
+      // Testimonials carousel autoplay 6s, pause on hover/focus
+      const testimonials = [ '"LedgerWave redesigned our token emissions — TVL more than doubled in 3 months" — Lead @ ProtocolX', '"They surfaced key attack vectors before launch — saved us time and capital" — Founder @ BridgeCo', '"Excellent strategic guidance and hands-on engineering" — COO @ Collective A' ];
+      let tIndex=0; let tTimer=null; const tEl = $('#testimonial-1'); const tLive = $('#testimonial-live');
+      function showTest(i){ tIndex = (i+testimonials.length)%testimonials.length; tEl.textContent = testimonials[tIndex]; tLive.textContent = `Showing testimonial ${tIndex+1} of ${testimonials.length}`; }
+      function startCarousel(){ tTimer = setInterval(()=>{ showTest(tIndex+1); }, 6000); }
+      function stopCarousel(){ clearInterval(tTimer); tTimer=null; }
+      showTest(0); startCarousel();
+      $('#prev-test').addEventListener('click', ()=>{ stopCarousel(); showTest(tIndex-1); });
+      $('#next-test').addEventListener('click', ()=>{ stopCarousel(); showTest(tIndex+1); });
+      tEl.addEventListener('mouseenter', ()=>{ stopCarousel(); }); tEl.addEventListener('focus', ()=>{ stopCarousel(); }); tEl.addEventListener('mouseleave', ()=>{ startCarousel(); });
+
+      // Pricing card contact buttons open modal
+      $$('.price-cta').forEach(b=>b.addEventListener('click', openModal));
+
+      // Accordion: single-expand, keyboard support
+      const accordions = $$('.accordion-item');
+      accordions.forEach(item=>{
+        const summary = item.querySelector('.accordion-summary');
+        summary.addEventListener('click', ()=> toggleAccordion(item));
+        summary.addEventListener('keydown',(e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); toggleAccordion(item); } if(e.key==='ArrowDown'){ const next = item.nextElementSibling; next?.querySelector('.accordion-summary')?.focus(); } if(e.key==='ArrowUp'){ const prev = item.previousElementSibling; prev?.querySelector('.accordion-summary')?.focus(); } });
+      });
+      function toggleAccordion(item){ const was = item.classList.contains('open'); accordions.forEach(i=>{ i.classList.remove('open'); i.querySelector('.accordion-summary').setAttribute('aria-expanded','false'); }); if(!was){ item.classList.add('open'); item.querySelector('.accordion-summary').setAttribute('aria-expanded','true'); } }
+
+      // Newsletter form
+      $('#newsletter-form').addEventListener('submit',(e)=>{ e.preventDefault(); const email = $('#newsletter').value.trim(); if(!/\S+@\S+\.\S+/.test(email)){ alert('Please enter a valid email'); return; } alert('Subscribed: ' + email); $('#newsletter').value=''; });
+
+      // Modal/trap focus utilities
+      let focusable = []; let prevActive=null;
+      function trapFocus(container){ prevActive = document.activeElement; focusable = Array.from(container.querySelectorAll('a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])')).filter(el=>!el.hasAttribute('disabled')); const first = focusable[0]; const last = focusable[focusable.length-1]; container.addEventListener('keydown', handleTrap);
+        function handleTrap(e){ if(e.key!=='Tab') return; if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); } else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); } }
+        container._handleTrap = handleTrap;
+      }
+      function releaseTrap(){ if(modalBackdrop && modalBackdrop._handleTrap) modalBackdrop.removeEventListener('keydown', modalBackdrop._handleTrap); }
+
+      // State switcher (prototype control)
+      const stateSelector = $('#state-selector');
+      stateSelector.addEventListener('change',(e)=> applyState(e.target.value));
+      function applyState(s){ // reset
+        header.classList.remove('scrolled'); mobileMenu.classList.remove('open'); tokens.style.opacity=1; stopCarousel(); startCarousel(); // defaults
+        // reset forms
+        // apply
+        if(s==='nav-scrolled'){ header.classList.add('scrolled'); window.scrollTo({top:80,behavior:'smooth'}); }
+        if(s==='nav-mobile'){ openMobile(); }
+        if(s==='hero-loading'){ setButtonLoading(heroCTA, true); setTimeout(()=>setButtonLoading(heroCTA,false),2000); }
+        if(s==='form-submitting'){ // simulate pressing send
+          $('#form-submit').disabled=true; $('#form-submit').textContent='Sending…'; setTimeout(()=>{ $('#form-submit').disabled=false; $('#form-submit').textContent='Send'; },2000)
+        }
+        if(s==='form-success'){ // replace contact form with success state
+          leadForm.innerHTML = '<div style="padding:20px;border-radius:8px;background:linear-gradient(90deg, #f0fff6, #fff)"><strong>Thanks — we received your message.</strong><p class="muted">A member of our team will contact you shortly.</p></div>';
+        }
+        if(s==='carousel-paused'){ stopCarousel(); }
+      }
+
+      // Accessibility and initial states
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      // Ensure no horizontal scroll
+      const checkOverflow = ()=>{ if(document.body.scrollWidth>window.innerWidth){ document.body.style.overflowX='hidden'; } };
+      window.addEventListener('resize', checkOverflow); checkOverflow();
+
+      // Keyboard focus outlines for all interactive elements (already covered by :focus-visible)
+
+      // final small enhancements: allow service 'Learn more' to open modal with prefilled service
+      $$('[data-service-link]').forEach(link=>{
+        link.addEventListener('click',(e)=>{ e.preventDefault(); const s = e.target.closest('[data-service]')?.dataset.service || ''; openModal(); setTimeout(()=>{$('#m-message')?.value = `Inquiry about ${s}`;},200);
+        });
+      });
+
+      // Simulate lazy-load of case thumbnails: small delay
+      $$('.case-thumb').forEach((thumb,i)=>{
+        thumb.style.background = 'linear-gradient(120deg,#eef6ff,#fafbff)';
+        setTimeout(()=>{ thumb.style.background = 'linear-gradient(90deg,#e6f0ff,#f7f7fb)'; }, 500 + i*200);
+      });
+
+      // Ensure interactive targets >=44px
+      $$('button, .filter-btn, .hamburger, .btn').forEach(el=>{ el.style.minWidth='44px'; el.style.minHeight='44px'; });
+
+      // Announce initial state
+      setTimeout(()=>{ casesLive.textContent = caseCards.length + ' case studies'; }, 300);
+
+    })();
+  </script>
+</body>
+</html>

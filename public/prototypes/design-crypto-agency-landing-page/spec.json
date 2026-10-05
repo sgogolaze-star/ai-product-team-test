@@ -1,0 +1,64 @@
+{
+  "feature": "Crypto agency marketing landing page — conversion-focused, trust-building, responsive design for desktop/tablet/mobile.",
+  "screens": [
+    "Hero — value prop, CTA, subtle animated token grid",
+    "Services — cards for Strategy, Tokenomics, Smart Contracts, Launch & Growth",
+    "Case Studies — project cards with metrics, filter by service",
+    "How We Work — 3-step process with timeline and CTA",
+    "Team & Trust — founder bios, logos, certifications, partners",
+    "Pricing / Packages — summary cards + contact form CTA",
+    "Contact — lead gen form, calendar scheduler CTA, FAQ accordion",
+    "Footer — legal links, social links, newsletter signup"
+  ],
+  "components": [
+    "Top Nav: logo (SVG), primary CTAs (Contact, Get Audit), hamburger for mobile; sticky with 8px shadow on scroll",
+    "Hero Module: headline (H1), 3 line supporting copy, primary CTA (filled), secondary CTA (ghost), animated crypto motif (SVG token grid) — tokens decorative aria-hidden",
+    "Services Grid: 3–4 cards, title, 2–3 bullets, micro-illustration (svg), ‘Learn more’ link",
+    "Case Card: image thumbnail, metric badge (e.g., +250% TVL), short outcome, tech stack pill list",
+    "Process Stepper: numbered steps, horizontal on desktop, vertical on mobile, progress indicator",
+    "Trust Strip: partner logos (lazy loaded, grayscale), testimonials carousel (aria-live)",
+    "Pricing Cards: price label, included items checklist, primary action opens contact modal",
+    "Contact Form: name, company, email, budget (select), message, file upload (optional), reCAPTCHA fallback",
+    "Modal: contact/quote with success/validation states, keyboard and focus trap",
+    "Accordion (FAQ): accessible, single-expand by default, keyboard navigable",
+    "Footer: sitemap, legal, newsletter input with inline validation"
+  ],
+  "interactions": [
+    "Hero CTA opens contact modal (focus to first input)",
+    "Primary nav: sticky transition on scroll (0→8px shadow, height 72px→56px)",
+    "Case study filters: client-side filter with smooth height animation and aria-live region announcing results count",
+    "Services card hover: elevate 8px, shadow, reveal CTA; on touch show persistent expanded state",
+    "Testimonials carousel: automatic 6s, pause on hover/focus, accessible controls with aria-labels",
+    "Form validation: inline validation on blur, summary error at top if submit fails, success state replaces form with message and CTA to book call",
+    "Lazy-loading images and partner logos with low-res placeholder (blur-up)",
+    "Reduced motion support: respect prefers-reduced-motion, disable non-essential motion",
+    "Keyboard navigation: all interactive elements focusable, visible focus ring (3px), skip-to-content link"
+  ],
+  "states": [
+    "Nav: default, scrolled, mobile-open (overlay), aria-expanded",
+    "Hero CTA: idle, hover, pressed, loading (spinner, disable), success (open modal)",
+    "Form: idle, validating, error per-field, error-summary, submitting (disabled), success",
+    "Case Cards: default, hover/active, filtered-hidden (aria-hidden true)",
+    "Carousel: idle, autoplay, paused, focused",
+    "Modal: closed, open, submitting, success, error"
+  ],
+  "responsive": "Mobile-first. Breakpoints: small ≤640px (stacked single-column), medium 641–1024px (two-column for hero/services), large ≥1025px (three+ columns where applicable). Navigation: full nav on ≥1025px, collapsed hamburger below. Hero: headline 28px mobile → 40px desktop; token motif switches from decorative grid (desktop) to simplified badge row (mobile). Services grid: 1 column mobile, 2 columns tablet, 3 columns desktop. Ensure no horizontal scroll; content padding: mobile 16px, tablet 24px, desktop 48px. Touch targets ≥44×44px, 8px min spacing between interactive elements.",
+  "design_system": "Proposed tokens (if no existing system):\n- Colors: primary #0B63FF (accessible), primary-700 #0849B8, neutral-900 #0B1723, neutral-600 #586675, success #00C48C, accent-gradient linear-gradient(135deg,#0B63FF 0%,#7C4DFF 100%)\n- Backgrounds: surface #FFFFFF, surface-2 #F7FAFC\n- Typography: Inter (variable) — H1 40/44, H2 28/32, H3 20/24, body 16/24; weight: 700/600/400. Base font-size 16px\n- Spacing scale: 4/8/12/16/24/32/48/64\n- Elevation: none, 8dp, 16dp (shadows specified in CSS tokens)\n- Iconography: 24px/16px system, SVGs optimized, aria-hidden true if decorative\n- Motion: reveal 180ms ease-out, stagger 60ms, reduced-motion: none\n- Accessibility: WCAG AA contrast minimum, focus ring 3px primary with 12px offset, all images have alt or aria-hidden",
+  "api_needs": [
+    "Contact form POST /api/leads (name,email,company,budget,message,utm) — returns 201 + lead id",
+    "Request case study data GET /api/case-studies?filter=service — returns list with metrics and image URLs",
+    "Partner logos list GET /api/partners (lazy)",
+    "Newsletter subscribe POST /api/newsletter (email)",
+    "Availability: optional Calendar scheduling integration endpoint (e.g., /api/schedule)"
+  ],
+  "acceptance_criteria": [
+    "Hero visible within first viewport on desktop and mobile without layout shift (CLS <0.1)",
+    "Primary CTA opens modal and focuses first input; modal traps focus and is keyboard closable (Esc)",
+    "All images lazy-load with low-res placeholders; partner logos grayscale by default and have alt text",
+    "Forms validate inline and show error summary; successful submit returns 201 and displays success message",
+    "Navigation accessible: skip-to-content link present, all interactive elements keyboard-focusable with visible focus ring",
+    "Responsive behavior: no horizontal scroll at all breakpoints; layout matches column rules; touch targets ≥44×44px",
+    "Prefers-reduced-motion respected: no non-essential animations when set",
+    "ARIA: carousel and accordion announce state changes via aria-live where applicable"
+  ]
+}
