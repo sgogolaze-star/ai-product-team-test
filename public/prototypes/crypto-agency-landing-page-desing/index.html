@@ -1,0 +1,780 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Crypto Agency — Prototype</title>
+  <style>
+    /* Design tokens (from HANDOFF.design_system) */
+    :root{
+      --color-bg:#0F1724;
+      --color-surface:#0B1220;
+      --color-accent:#00D1B2;
+      --color-accent-600:#00BFA0;
+      --color-cta-text:#04202A;
+      --color-text:#E6F0F6;
+      --color-muted:#9AA8B3;
+      --color-danger:#FF6B6B;
+      --radius:8px;
+      --space-1:8px; --space-2:16px; --space-3:24px; --space-4:32px; --space-5:48px; --space-6:64px;
+      --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      --container-max:1280px;
+      --shadow: 0 6px 20px rgba(2,8,23,0.6);
+      --easing: cubic-bezier(0.2,0.8,0.2,1);
+      --dur-fast:120ms; --dur-med:200ms; --dur-long:320ms;
+    }
+    @media (prefers-color-scheme: light){
+      /* provide a light inversion variant */
+      :root{--color-bg:#F8FBFB; --color-surface:#FFFFFF; --color-text:#052027; --color-muted:#586569; --shadow:0 10px 30px rgba(3,12,16,0.06);} 
+    }
+    /* Reset */
+    *{box-sizing:border-box}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      font-family:var(--font-ui);
+      background:linear-gradient(180deg,var(--color-bg), #07111a 140%);
+      color:var(--color-text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.4;
+      font-size:16px;
+    }
+    a{color:var(--color-accent); text-decoration:none}
+    a:focus{outline:3px solid color-mix(in srgb, var(--color-accent) 40%, transparent); outline-offset:3px}
+
+    /* Layout container */
+    .site{max-width:var(--container-max); margin:0 auto; padding:0 var(--space-2);} 
+    header{position:sticky; top:0; z-index:60; backdrop-filter: blur(6px); background:linear-gradient(180deg, rgba(11,18,32,0.6), rgba(11,18,32,0.4)); transition:height var(--dur-med) var(--easing), box-shadow var(--dur-med) var(--easing), transform var(--dur-med) var(--easing);}
+    header.reduced{transition:none}
+    .header-inner{display:flex;align-items:center;justify-content:space-between;max-width:var(--container-max);margin:0 auto;padding:18px 0; gap:16px}
+    header.compact .header-inner{padding:8px 0}
+    .logo{display:flex;align-items:center;gap:12px}
+    .logo svg{width:36px;height:36px}
+    nav{display:flex;align-items:center;gap:14px}
+    .nav-links{display:flex;gap:12px;align-items:center}
+    .nav-links a{padding:8px 12px; border-radius:6px; color:var(--color-text); font-weight:600}
+    .nav-links a:focus-visible{outline:3px solid var(--color-accent); outline-offset:3px}
+    .primary-cta{background:var(--color-accent); color:var(--color-cta-text); padding:10px 14px; border-radius:10px; font-weight:700; border:none; cursor:pointer; min-height:44px}
+    .primary-cta[disabled]{opacity:.5; cursor:not-allowed}
+
+    /* Hamburger (mobile) */
+    .hamburger{display:none;background:transparent;border:1px solid rgba(255,255,255,0.04); padding:8px;border-radius:8px}
+    .menu-panel{display:none; position:absolute; right:16px; top:64px;background:var(--color-surface); padding:12px; border-radius:10px; box-shadow:var(--shadow)}
+
+    /* Hero */
+    .hero{display:grid; grid-template-columns:1fr; gap:24px; align-items:center; padding:48px 0}
+    .hero-inner{display:grid; gap:24px}
+    .hero-left h1{font-size:clamp(28px,4.2vw,48px); margin:0 0 8px; line-height:1.03}
+    .hero-left p{margin:0 0 16px; color:var(--color-muted)}
+    .hero-actions{display:flex; gap:12px; flex-wrap:wrap}
+    .trust-bar{display:flex; gap:12px; align-items:center; color:var(--color-muted); font-size:14px}
+    .trust-logos{display:flex; gap:12px; align-items:center}
+    figure.device{justify-self:center; margin:0; width:100%; max-width:560px; display:flex; align-items:center; justify-content:center}
+    .orb{width:320px; height:320px; border-radius:50%; background:radial-gradient(circle at 30% 30%, rgba(0,209,178,0.12), transparent 35%), conic-gradient(from 200deg at 50% 50%, rgba(0,209,178,0.06), rgba(0,191,160,0.06)); display:grid; place-items:center; box-shadow:inset 0 -20px 60px rgba(2,8,23,0.4), 0 6px 30px rgba(0,209,178,0.06);}
+    .orb svg{width:70%;height:70%}
+    .animate-orb{animation:rotate 12s linear infinite}
+    @keyframes rotate{from{transform:rotate(0)} to{transform:rotate(360deg)}}
+
+    /* Services */
+    .services{display:grid; gap:12px; grid-template-columns:repeat(1,1fr);}
+    .service-card{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); padding:16px; border-radius:8px; display:flex; gap:12px; align-items:flex-start; min-height:84px; cursor:pointer; transition:transform var(--dur-fast) var(--easing), box-shadow var(--dur-fast) var(--easing); border:1px solid rgba(255,255,255,0.03)}
+    .service-card:focus{outline:3px solid var(--color-accent); outline-offset:2px}
+    .service-card:hover{transform:translateY(-6px) scale(1.02); box-shadow:0 8px 30px rgba(2,8,23,0.6)}
+    .service-icon{width:44px;height:44px;border-radius:8px;background:rgba(0,209,178,0.08);display:grid;place-items:center}
+    .service-title{font-weight:700}
+    .service-cta{margin-left:auto; color:var(--color-accent); font-weight:700}
+
+    /* Cards grid */
+    .grid-3{display:grid; grid-template-columns:repeat(1,1fr); gap:12px}
+
+    /* Cases carousel */
+    .cases{position:relative}
+    .cases-track{display:flex; gap:12px; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; padding-bottom:8px}
+    .case{min-width:260px; flex:0 0 86%; max-width:420px; scroll-snap-align:center; background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.03)}
+    .case img{width:100%; height:150px; object-fit:cover; border-radius:8px}
+    .kpis{display:flex; gap:8px; margin-top:8px}
+    .kpi{background:rgba(0,0,0,0.18); padding:6px 8px; border-radius:8px; font-weight:700; color:var(--color-accent)}
+    .carousel-controls{display:flex; gap:8px; align-items:center; justify-content:center; margin-top:12px}
+    .dot{width:10px;height:10px;border-radius:50%; background:rgba(255,255,255,0.12); border:none}
+    .dot.active{background:var(--color-accent)}
+
+    /* Pricing */
+    .pricing-toggle{display:inline-flex;background:rgba(255,255,255,0.04); border-radius:999px;padding:4px;border:1px solid rgba(255,255,255,0.02)}
+    .billing-btn{padding:8px 12px;border-radius:999px;background:transparent;border:none;color:var(--color-text);cursor:pointer}
+    .billing-btn[aria-pressed="true"]{background:var(--color-surface); box-shadow:inset 0 -2px 0 rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.03)}
+    .tiers{display:grid; gap:12px}
+    .tier{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); padding:16px; border-radius:12px; border:1px solid rgba(255,255,255,0.03)}
+    .price{font-size:20px; font-weight:800}
+    .features{list-style:none;padding:0;margin:12px 0 0}
+    .features li{display:flex; gap:8px; align-items:center; color:var(--color-muted)}
+
+    /* Contact modal */
+    .modal-backdrop{position:fixed; inset:0; background:rgba(2,6,12,0.6); display:none; align-items:center; justify-content:center; padding:20px; z-index:100}
+    .modal{background:var(--color-surface); border-radius:12px; width:100%; max-width:720px; box-shadow:var(--shadow); padding:20px}
+    .modal header{display:flex; justify-content:space-between; align-items:center}
+    .form-row{display:flex; gap:12px; margin-top:12px}
+    .form-row .field{flex:1}
+    label{display:block;font-size:13px;margin-bottom:6px}
+    input[type="text"], input[type="email"], select, textarea{width:100%; padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:var(--color-text)}
+    input:focus, textarea:focus, select:focus{outline:3px solid rgba(0,209,178,0.18); outline-offset:2px}
+    textarea{min-height:100px}
+    .small-muted{font-size:13px;color:var(--color-muted)}
+    .error{color:var(--color-danger); font-weight:700}
+    .banner{padding:12px;border-radius:8px;margin-top:12px}
+    .banner.success{background:linear-gradient(90deg, rgba(0,209,178,0.08), rgba(0,191,160,0.04)); color:var(--color-text); border:1px solid rgba(0,209,178,0.12)}
+    .banner.error{background:linear-gradient(90deg, rgba(255,107,107,0.06), rgba(255,107,107,0.02)); color:var(--color-text); border:1px solid rgba(255,107,107,0.12)}
+    .submit-btn{background:var(--color-accent); color:var(--color-cta-text); padding:10px 14px; border-radius:8px; border:none; cursor:pointer}
+    .submit-btn[aria-busy="true"]{opacity:.8; cursor:progress}
+
+    /* Newsletter */
+    .newsletter{display:flex; gap:8px; align-items:center}
+    .newsletter input{flex:1}
+
+    /* Footer */
+    footer{margin-top:48px;padding:32px 0;color:var(--color-muted); border-top:1px solid rgba(255,255,255,0.03)}
+    .footer-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+
+    /* State switcher */
+    .state-switcher{position:fixed; right:12px; bottom:12px; z-index:200; background:rgba(2,6,12,0.8); padding:8px; border-radius:8px; color:var(--color-text); font-size:13px; display:flex; gap:8px; align-items:center}
+    .state-switcher select{background:transparent;color:var(--color-text); border:none}
+
+    /* Responsive breakpoints (mobile-first) */
+    @media(min-width:600px){
+      .hero{grid-template-columns:1fr 1fr}
+      .grid-3{grid-template-columns:repeat(2,1fr)}
+      .services{grid-template-columns:repeat(2,1fr)}
+      .cases-track .case{flex:0 0 46%}
+    }
+    @media(min-width:960px){
+      .hamburger{display:none}
+      nav{gap:20px}
+      .nav-links{display:flex}
+      .menu-panel{display:none}
+      .hero{grid-template-columns:1fr 1fr; padding:64px 0}
+      .grid-3{grid-template-columns:repeat(3,1fr)}
+      .services{grid-template-columns:repeat(3,1fr)}
+      .cases-track .case{flex:0 0 33%}
+    }
+    @media(min-width:1280px){
+      .site{max-width:1280px}
+      .hero{padding:80px 0}
+    }
+
+    /* Focus visible and reduced-motion */
+    :focus{outline:none}
+    @media (prefers-reduced-motion:reduce){
+      .animate-orb{animation:none}
+      *{transition:none !important}
+      header{transition:none}
+    }
+
+    /* Utility */
+    .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap}
+    .muted{color:var(--color-muted)}
+    .skeleton{background:linear-gradient(100deg, rgba(255,255,255,0.02), rgba(255,255,255,0.06), rgba(255,255,255,0.02)); min-height:60px; border-radius:8px}
+
+  </style>
+</head>
+<body>
+  <header id="site-header" class="">
+    <div class="header-inner site" role="banner">
+      <div class="logo">
+        <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false" role="img">
+          <defs>
+            <linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#00D1B2"/><stop offset="1" stop-color="#00BFA0"/></linearGradient>
+          </defs>
+          <circle cx="24" cy="24" r="22" fill="url(#g1)" />
+          <text x="50%" y="54%" fill="#04202A" font-weight="700" font-size="16" text-anchor="middle" font-family="Arial">CA</text>
+        </svg>
+        <div>
+          <div style="font-weight:800">CryptoAgency</div>
+          <div class="muted" style="font-size:12px; margin-top:2px">Token launches & audits</div>
+        </div>
+      </div>
+
+      <nav aria-label="Primary navigation">
+        <button class="hamburger" id="hamburger" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">☰</button>
+        <div class="nav-links" id="nav-links">
+          <a href="#services">Services</a>
+          <a href="#cases">Cases</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#team">Team</a>
+          <button class="primary-cta" id="hire-btn">Hire Us</button>
+        </div>
+      </nav>
+    </div>
+
+    <div class="menu-panel" id="mobile-menu" role="menu" aria-hidden="true">
+      <a href="#services" role="menuitem">Services</a>
+      <a href="#cases" role="menuitem">Cases</a>
+      <a href="#pricing" role="menuitem">Pricing</a>
+      <a href="#team" role="menuitem">Team</a>
+      <button class="primary-cta" id="hire-mobile">Hire Us</button>
+    </div>
+  </header>
+
+  <main class="site" id="main">
+    <!-- HERO -->
+    <section class="hero" id="hero">
+      <div class="hero-left hero-inner">
+        <div>
+          <h1>We launch tokens, smart contracts & Web3 strategies that scale.</h1>
+          <p class="muted">From audits to GTM, we help crypto projects raise, ship and secure products trusted by leading DAOs.</p>
+        </div>
+        <div class="hero-actions">
+          <button class="primary-cta" id="primary-cta">Request Proposal</button>
+          <button class="secondary-cta" id="secondary-cta" style="background:transparent;border:1px solid rgba(255,255,255,0.04);padding:10px 12px;border-radius:10px;color:var(--color-text);min-height:44px">Explore Cases</button>
+        </div>
+        <div class="trust-bar" aria-hidden="false">
+          <div class="muted">Trusted by</div>
+          <div class="trust-logos">
+            <svg width="56" height="24" aria-hidden="true" focusable="false"><rect width="56" height="24" rx="4" fill="rgba(255,255,255,0.03)"/></svg>
+            <svg width="56" height="24" aria-hidden="true" focusable="false"><rect width="56" height="24" rx="4" fill="rgba(255,255,255,0.03)"/></svg>
+            <svg width="56" height="24" aria-hidden="true" focusable="false"><rect width="56" height="24" rx="4" fill="rgba(255,255,255,0.03)"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <figure class="device" role="img" aria-label="3D token orb showing network connections">
+        <div class="orb" aria-hidden="false">
+          <!-- decorative token orb -->
+          <svg class="animate-orb" viewBox="0 0 200 200" aria-hidden="true" focusable="false">
+            <defs>
+              <radialGradient id="tg"><stop offset="0" stop-color="#00D1B2" stop-opacity="0.9"/><stop offset="1" stop-color="#002" stop-opacity="0.1"/></radialGradient>
+            </defs>
+            <circle cx="100" cy="100" r="72" fill="url(#tg)" opacity="0.95"/>
+            <g fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2">
+              <path d="M20,100 Q60,10 120,40 Q180,80 160,140 Q120,190 60,160 Q10,120 20,100z"/>
+              <circle cx="140" cy="70" r="4" fill="#fff" stroke="none"/>
+              <circle cx="70" cy="130" r="4" fill="#fff" stroke="none"/>
+            </g>
+          </svg>
+        </div>
+      </figure>
+    </section>
+
+    <!-- SERVICES -->
+    <section id="services" style="margin-top:12px">
+      <h2 style="margin:12px 0">Services</h2>
+      <p class="muted">Full-stack crypto services: token launches, audits, smart contract development, and Web3 strategy.</p>
+      <div class="grid-3" style="margin-top:12px" id="services-grid">
+        <article tabindex="0" class="service-card" data-service="token">
+          <div class="service-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor"/></svg>
+          </div>
+          <div>
+            <div class="service-title">Token Launches</div>
+            <div class="muted">End-to-end token economics, audits and listing support.</div>
+          </div>
+          <a class="service-cta" href="#" aria-label="Read more token launches">Explore →</a>
+        </article>
+
+        <article tabindex="0" class="service-card" data-service="smart">
+          <div class="service-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor"/></svg>
+          </div>
+          <div>
+            <div class="service-title">Smart Contracts</div>
+            <div class="muted">Robust Solidity & Vyper implementations with security best practices.</div>
+          </div>
+          <a class="service-cta" href="#" aria-label="Read more smart contracts">Explore →</a>
+        </article>
+
+        <article tabindex="0" class="service-card" data-service="audit">
+          <div class="service-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 12h16" stroke="currentColor" stroke-width="2"/></svg>
+          </div>
+          <div>
+            <div class="service-title">Audits</div>
+            <div class="muted">Comprehensive security reviews and remediation plans.</div>
+          </div>
+          <a class="service-cta" href="#" aria-label="Read more audits">Explore →</a>
+        </article>
+
+        <article tabindex="0" class="service-card" data-service="strategy">
+          <div class="service-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2 L12 22" stroke="currentColor" stroke-width="2"/></svg>
+          </div>
+          <div>
+            <div class="service-title">Web3 Strategy</div>
+            <div class="muted">Community growth, tokenomics, partnerships and DAO design.</div>
+          </div>
+          <a class="service-cta" href="#" aria-label="Read more strategy">Explore →</a>
+        </article>
+      </div>
+    </section>
+
+    <!-- CASE STUDIES -->
+    <section id="cases" style="margin-top:32px">
+      <h2>Case Studies</h2>
+      <div style="display:flex; gap:8px; margin-top:8px; align-items:center">
+        <div class="muted">Filter:</div>
+        <div role="tablist" aria-label="Case filters">
+          <button class="filter" data-filter="all" aria-pressed="true">All</button>
+          <button class="filter" data-filter="featured" aria-pressed="false">Featured</button>
+          <button class="filter" data-filter="token" aria-pressed="false">Token</button>
+          <button class="filter" data-filter="audit" aria-pressed="false">Audit</button>
+        </div>
+      </div>
+
+      <div class="cases" style="margin-top:12px">
+        <div class="cases-track" id="cases-track" tabindex="0" aria-live="polite">
+          <article class="case" data-tags="featured token">
+            <img alt="Launch dashboard screenshot" loading="lazy" srcdata="">
+            <h3>Project Atlas</h3>
+            <p class="muted">Token launch with dynamic supply model and community farms.</p>
+            <div class="kpis"><div class="kpi">$5M raised</div><div class="kpi">20k holders</div></div>
+          </article>
+
+          <article class="case" data-tags="audit">
+            <img alt="Audit report snapshot" loading="lazy" srcdata="">
+            <h3>SecureSwap</h3>
+            <p class="muted">Comprehensive audit that reduced critical issues to zero.</p>
+            <div class="kpis"><div class="kpi">0 critical</div><div class="kpi">65 issues fixed</div></div>
+          </article>
+
+          <article class="case" data-tags="token">
+            <img alt="Campaign visual" loading="lazy" srcdata="">
+            <h3>MetaYield</h3>
+            <p class="muted">Tokenomics redesign boosted liquidity & governance participation.</p>
+            <div class="kpis"><div class="kpi">+42% TVL</div><div class="kpi">Gov turnout 78%</div></div>
+          </article>
+        </div>
+
+        <div class="carousel-controls" aria-hidden="false" style="margin-top:12px">
+          <button class="dot" aria-label="Slide 1" data-index="0"></button>
+          <button class="dot" aria-label="Slide 2" data-index="1"></button>
+          <button class="dot" aria-label="Slide 3" data-index="2"></button>
+        </div>
+      </div>
+
+      <div id="cases-empty" style="display:none; margin-top:12px; text-align:center">
+        <svg width="160" height="120" aria-hidden="true">
+          <rect width="160" height="120" rx="12" fill="rgba(255,255,255,0.02)"/>
+        </svg>
+        <div style="margin-top:12px; font-weight:700">No case studies found</div>
+        <div class="muted">Try resetting filters or explore all services.</div>
+        <div style="margin-top:12px"><button id="reset-filters">Reset filters</button></div>
+      </div>
+    </section>
+
+    <!-- PRICING -->
+    <section id="pricing" style="margin-top:32px">
+      <h2>Pricing & Packages</h2>
+      <div style="display:flex; gap:12px; align-items:center; margin-top:8px">
+        <div class="pricing-toggle" role="group" aria-label="Billing period">
+          <button class="billing-btn" id="billing-monthly" aria-pressed="true">Monthly</button>
+          <button class="billing-btn" id="billing-annual" aria-pressed="false">Annual</button>
+        </div>
+        <div class="muted" aria-hidden="false" id="billing-announcer" style="margin-left:8px" aria-live="polite"></div>
+      </div>
+
+      <div class="tiers" style="margin-top:12px">
+        <div class="tier">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div><strong>Starter</strong><div class="muted">For early projects</div></div><div class="price" data-month="$2,500" data-annual="$25,000">$2,500/mo</div></div>
+          <ul class="features">
+            <li>Smart contract dev</li>
+            <li>Basic audit</li>
+            <li>Tokenomics advisory</li>
+          </ul>
+          <div style="margin-top:12px"><button class="primary-cta tier-cta">Select</button></div>
+        </div>
+
+        <div class="tier">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div><strong>Growth</strong><div class="muted">For scaling teams</div></div><div class="price" data-month="$7,500" data-annual="$75,000">$7,500/mo</div></div>
+          <ul class="features">
+            <li>Full audits</li>
+            <li>Launch orchestration</li>
+            <li>Community growth</li>
+          </ul>
+          <div style="margin-top:12px"><button class="primary-cta tier-cta">Select</button></div>
+        </div>
+
+        <div class="tier">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div><strong>Enterprise</strong><div class="muted">Custom solutions</div></div><div class="price" data-month="$20,000+" data-annual="$200,000+">$20,000+/mo</div></div>
+          <ul class="features">
+            <li>Dedicated team</li>
+            <li>Governance design</li>
+            <li>Continuous security</li>
+          </ul>
+          <div style="margin-top:12px"><button class="primary-cta tier-cta">Contact sales</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TEAM & PARTNERS -->
+    <section id="team" style="margin-top:32px">
+      <h2>Team & Credibility</h2>
+      <p class="muted">Partners, certifications and team highlights.</p>
+      <div style="display:flex;gap:12px; margin-top:12px; flex-wrap:wrap; align-items:center">
+        <svg width="120" height="48" aria-hidden="true"><rect width="120" height="48" rx="8" fill="rgba(255,255,255,0.03)"/></svg>
+        <svg width="120" height="48" aria-hidden="true"><rect width="120" height="48" rx="8" fill="rgba(255,255,255,0.03)"/></svg>
+        <svg width="120" height="48" aria-hidden="true"><rect width="120" height="48" rx="8" fill="rgba(255,255,255,0.03)"/></svg>
+      </div>
+    </section>
+
+    <!-- CONTACT MODAL TRIGGER (invoked from CTAs) -->
+    <div id="contact-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+      <div class="modal" role="document" aria-labelledby="modal-title">
+        <header>
+          <div>
+            <h3 id="modal-title">Request a Proposal</h3>
+            <div class="muted">Tell us about your project and budget — we’ll respond within 48 hours.</div>
+          </div>
+          <div>
+            <button id="modal-close" aria-label="Close modal">✕</button>
+          </div>
+        </header>
+
+        <form id="lead-form" novalidate>
+          <div class="form-row">
+            <div class="field">
+              <label for="name">Name *</label>
+              <input id="name" name="name" type="text" required />
+              <div class="small-muted">Full name</div>
+            </div>
+            <div class="field">
+              <label for="company">Company</label>
+              <input id="company" name="company" type="text" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label for="email">Email *</label>
+              <input id="email" name="email" type="email" required />
+            </div>
+            <div class="field">
+              <label for="budget">Budget *</label>
+              <select id="budget" name="budget" required>
+                <option value="">Select</option>
+                <option>$2k - $10k</option>
+                <option>$10k - $50k</option>
+                <option>$50k+</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:12px">
+            <label for="message">Message *</label>
+            <textarea id="message" name="message" required></textarea>
+          </div>
+
+          <div style="margin-top:12px; display:flex; gap:12px; align-items:center">
+            <div>
+              <label for="attachment" class="small-muted">Attachment (optional)</label>
+              <input type="file" id="attachment" name="attachment" aria-describedby="attachment-desc" />
+              <div id="attachment-desc" class="small-muted">Max 5MB</div>
+            </div>
+            <div style="margin-left:auto"><button class="submit-btn" type="submit" id="submit-lead">Send Proposal</button></div>
+          </div>
+
+          <div id="form-banner"></div>
+        </form>
+
+      </div>
+    </div>
+
+    <!-- NEWSLETTER & FOOTER -->
+    <section style="margin-top:32px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap">
+      <div style="flex:1; min-width:260px">
+        <h3 style="margin:0">Subscribe to our newsletter</h3>
+        <div class="muted" style="margin-top:6px">Timely insights on token launches and security.</div>
+      </div>
+      <form id="newsletter" class="newsletter" style="flex:1; min-width:320px; max-width:520px">
+        <label for="news-email" class="visually-hidden">Email</label>
+        <input id="news-email" type="email" placeholder="you@company.com" aria-label="Newsletter email" required />
+        <button type="submit" class="primary-cta" id="news-submit">Subscribe</button>
+      </form>
+    </section>
+
+    <footer>
+      <div class="site footer-grid">
+        <div>
+          <div style="font-weight:700">CryptoAgency</div>
+          <div class="muted" style="margin-top:8px">We build secure, scalable crypto products.</div>
+        </div>
+        <div style="text-align:right">
+          <div class="muted">Links</div>
+          <nav aria-label="Footer">
+            <a href="#services">Services</a> · <a href="#cases">Cases</a> · <a href="#pricing">Pricing</a>
+          </nav>
+          <div class="muted" style="margin-top:12px">© <span id="year"></span> CryptoAgency</div>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <div class="state-switcher" aria-hidden="false">
+    <label for="state-select" class="visually-hidden">UI State</label>
+    <select id="state-select" aria-label="Select UI state">
+      <option value="default">Default</option>
+      <option value="loading">Loading</option>
+      <option value="empty">Empty (cases)</option>
+      <option value="error">Error (form)</option>
+      <option value="reduced-motion">Reduced motion</option>
+    </select>
+  </div>
+
+  <script>
+    // Utilities
+    const supportsReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const header = document.getElementById('site-header');
+    const hireBtn = document.getElementById('hire-btn');
+    const hireMobile = document.getElementById('hire-mobile');
+    const primaryCta = document.getElementById('primary-cta');
+    const secondaryCta = document.getElementById('secondary-cta');
+    const modal = document.getElementById('contact-modal');
+    const modalClose = document.getElementById('modal-close');
+    const leadForm = document.getElementById('lead-form');
+    const formBanner = document.getElementById('form-banner');
+    const submitBtn = document.getElementById('submit-lead');
+    const stateSelect = document.getElementById('state-select');
+    const serviceCards = document.querySelectorAll('.service-card');
+    const casesTrack = document.getElementById('cases-track');
+    const dots = document.querySelectorAll('.dot');
+    const filterBtns = document.querySelectorAll('.filter');
+    const casesEmpty = document.getElementById('cases-empty');
+    const resetFilters = document.getElementById('reset-filters');
+    const billingMonthly = document.getElementById('billing-monthly');
+    const billingAnnual = document.getElementById('billing-annual');
+    const billingAnnouncer = document.getElementById('billing-announcer');
+    const tierCtas = document.querySelectorAll('.tier-cta');
+    const newsForm = document.getElementById('newsletter');
+    const newsEmail = document.getElementById('news-email');
+    const newsSubmit = document.getElementById('news-submit');
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const year = document.getElementById('year');
+
+    year.textContent = new Date().getFullYear();
+
+    // Sticky header shrink on scroll > 64px
+    let lastScroll = 0;
+    window.addEventListener('scroll', ()=>{
+      const sc = window.scrollY;
+      if (sc > 64){ header.classList.add('compact'); header.style.boxShadow = 'var(--shadow)'; }
+      else { header.classList.remove('compact'); header.style.boxShadow = 'none'; }
+      lastScroll = sc;
+    }, {passive:true});
+
+    // Hamburger toggle
+    hamburger.addEventListener('click', ()=>{
+      const expanded = hamburger.getAttribute('aria-expanded') === 'true';
+      hamburger.setAttribute('aria-expanded', String(!expanded));
+      mobileMenu.style.display = expanded ? 'none' : 'block';
+      mobileMenu.setAttribute('aria-hidden', String(expanded));
+    });
+
+    // Open modal helper
+    function openModal(trigger){
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden', 'false');
+      modal.dataset.trigger = trigger?.id||null;
+      // trap focus
+      trapFocus(modal);
+      const first = modal.querySelector('input,select,textarea,button');
+      if (first) first.focus();
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal(){
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      releaseFocus();
+      // return focus
+      const triggerId = modal.dataset.trigger;
+      if (triggerId){ const t = document.getElementById(triggerId); if(t) t.focus(); }
+    }
+
+    // Click handlers
+    [hireBtn, hireMobile, primaryCta].forEach(btn=> btn && btn.addEventListener('click', (e)=>{ e.preventDefault(); openModal(btn); }));
+    secondaryCta.addEventListener('click', (e)=>{ e.preventDefault(); const target = document.getElementById('cases'); smoothScrollTo(target); });
+    modalClose.addEventListener('click',(e)=>{ e.preventDefault(); closeModal(); });
+
+    // ESC to close modal and global key handlers
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape'){
+        if(modal.style.display === 'flex'){ closeModal(); }
+      }
+      // carousel navigation when focused
+      if(document.activeElement === casesTrack || document.activeElement.closest('#cases')){
+        if(e.key === 'ArrowRight') moveCarousel(1);
+        if(e.key === 'ArrowLeft') moveCarousel(-1);
+      }
+    });
+
+    // Trap focus implementation
+    let lastFocused = null;
+    let focusables = [];
+    function trapFocus(container){
+      lastFocused = document.activeElement;
+      focusables = Array.from(container.querySelectorAll('a[href], button:not([disabled]), input, textarea, select, [tabindex]:not([tabindex="-1"])')).filter(n => !n.hasAttribute('disabled'));
+      function handle(e){
+        if(e.key === 'Tab'){
+          const idx = focusables.indexOf(document.activeElement);
+          if(e.shiftKey && idx === 0){ e.preventDefault(); focusables[focusables.length-1].focus(); }
+          else if(!e.shiftKey && idx === focusables.length-1){ e.preventDefault(); focusables[0].focus(); }
+        }
+      }
+      container.__onKey = handle;
+      container.addEventListener('keydown', handle);
+    }
+    function releaseFocus(){
+      if(modal){ modal.removeEventListener('keydown', modal.__onKey); }
+      if(lastFocused) lastFocused.focus();
+    }
+
+    // Form validation & simulated submit
+    leadForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      clearBanner();
+      const data = new FormData(leadForm);
+      const name = data.get('name')?.toString().trim();
+      const email = data.get('email')?.toString().trim();
+      const budget = data.get('budget')?.toString().trim();
+      const message = data.get('message')?.toString().trim();
+      let valid = true;
+      if(!name){ showFieldError('name', 'Name is required'); valid = false; }
+      if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showFieldError('email', 'Valid email required'); valid = false; }
+      if(!budget){ showFieldError('budget', 'Select a budget'); valid = false; }
+      if(!message){ showFieldError('message', 'Please include a short description'); valid = false; }
+      if(!valid){ scrollToTopOfForm(); return; }
+      // optimistic UI
+      submitBtn.setAttribute('aria-busy','true'); submitBtn.disabled = true;
+      const spinner = document.createElement('span'); spinner.textContent = ' ⏳'; submitBtn.appendChild(spinner);
+      try{
+        // simulate network latency
+        await fakePost('/leads', {name, email, budget, message});
+        showBanner('success', 'Thanks — your request was received. We’ll follow up within 48 hours.');
+        setTimeout(()=>{ closeModal(); resetForm(); }, 1800);
+      }catch(err){ showBanner('error', 'There was a problem submitting the form. Try again.'); }
+      submitBtn.removeAttribute('aria-busy'); submitBtn.disabled = false; if(spinner) spinner.remove();
+    });
+
+    function showFieldError(fieldId, message){
+      const field = document.getElementById(fieldId);
+      if(!field) return;
+      field.style.borderColor = 'var(--color-danger)';
+      const err = document.createElement('div'); err.className = 'error'; err.textContent = message; err.id = fieldId + '-error';
+      if(!field.parentNode.querySelector('#'+err.id)) field.parentNode.appendChild(err);
+      field.addEventListener('input', ()=>{ field.style.borderColor=''; const e = field.parentNode.querySelector('#'+err.id); if(e) e.remove(); });
+    }
+    function clearBanner(){ formBanner.innerHTML = ''; }
+    function showBanner(type, text){ const b = document.createElement('div'); b.className = 'banner ' + (type==='success'?'success':'error'); b.textContent = text; formBanner.appendChild(b); b.setAttribute('role','status'); b.setAttribute('aria-live','polite'); b.tabIndex= -1; b.focus(); }
+    function scrollToTopOfForm(){ leadForm.scrollIntoView({behavior: 'smooth', block:'center'}); }
+    function resetForm(){ leadForm.reset(); }
+
+    // Fake POST to mimic API (no network)
+    function fakePost(url, payload){
+      return new Promise((resolve,reject)=>{
+        setTimeout(()=>{
+          if(stateSelect.value === 'error') return reject({status:500});
+          resolve({status:201, leadId:'L-'+Math.floor(Math.random()*90000+10000)});
+        }, 900);
+      });
+    }
+
+    // Newsletter debounce & fake POST
+    let newsTimer = null;
+    newsForm.addEventListener('submit', (e)=>{ e.preventDefault(); handleNewsletter(); });
+    newsEmail.addEventListener('input', ()=>{
+      clearTimeout(newsTimer); newsTimer = setTimeout(()=>{ handleNewsletter(false); }, 700);
+    });
+    function handleNewsletter(userClick=true){
+      const email = newsEmail.value.trim();
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+        newsEmail.style.borderColor = 'var(--color-danger)'; return;
+      }
+      newsSubmit.disabled = true; newsSubmit.textContent = 'Sending...';
+      // simulate response
+      setTimeout(()=>{
+        const already = email.endsWith('@exists.com');
+        if(already){ newsSubmit.textContent = 'Subscribe'; newsSubmit.disabled=false; showInlineMessage(newsForm, 'You are already subscribed.', 'error'); }
+        else{ newsSubmit.textContent = 'Subscribed ✓'; showInlineMessage(newsForm, 'Thanks for subscribing!', 'success'); newsSubmit.disabled=false; }
+      }, 700);
+    }
+    function showInlineMessage(container, text, type){ let m = container.querySelector('.inline-msg'); if(m) m.remove(); m = document.createElement('div'); m.className = 'inline-msg'; m.textContent = text; m.style.marginLeft='8px'; m.style.color = type==='success'? 'var(--color-accent)' : 'var(--color-danger)'; m.setAttribute('role','status'); container.appendChild(m); }
+
+    // Carousel behavior
+    let slideIndex = 0;
+    const slides = Array.from(document.querySelectorAll('.case'));
+    function updateDots(){ dots.forEach((d,i)=> d.classList.toggle('active', i===slideIndex)); }
+    function moveCarousel(dir){ slideIndex = Math.max(0, Math.min(slideIndex + dir, slides.length-1)); const node = slides[slideIndex]; node.scrollIntoView({behavior: supportsReduced? 'auto': 'smooth', block:'center', inline:'center'}); updateDots(); announceSlide(); }
+    dots.forEach(d=> d.addEventListener('click',(e)=>{ slideIndex = Number(d.dataset.index); slides[slideIndex].scrollIntoView({behavior:'smooth', block:'center', inline:'center'}); updateDots(); announceSlide(); }));
+    function announceSlide(){ const ann = document.createElement('div'); ann.className='visually-hidden'; ann.textContent = `Showing ${slideIndex+1} of ${slides.length}`; ann.setAttribute('aria-live','polite'); document.body.appendChild(ann); setTimeout(()=>ann.remove(),800); }
+    // Drag/swipe for carousel
+    let isDown=false, startX=0, scrollLeft=0;
+    casesTrack.addEventListener('pointerdown', (e)=>{ isDown=true; startX=e.clientX; scrollLeft = casesTrack.scrollLeft; casesTrack.setPointerCapture(e.pointerId); });
+    casesTrack.addEventListener('pointermove', (e)=>{ if(!isDown) return; const dx = (startX - e.clientX); casesTrack.scrollLeft = scrollLeft + dx; });
+    casesTrack.addEventListener('pointerup', (e)=>{ isDown=false; determineClosestSlide(); });
+    casesTrack.addEventListener('pointercancel', ()=>{ isDown=false; });
+    function determineClosestSlide(){ const rects = slides.map(s=> s.getBoundingClientRect().left + s.getBoundingClientRect().width/2); const center = window.innerWidth/2; let closest=0; let min=1e9; for(let i=0;i<rects.length;i++){ const d = Math.abs(rects[i]-center); if(d<min){ min=d; closest=i; } } slideIndex = closest; slides[slideIndex].scrollIntoView({behavior: supportsReduced? 'auto':'smooth', block:'center', inline:'center'}); updateDots(); announceSlide(); }
+
+    // Filters
+    filterBtns.forEach(b=> b.addEventListener('click', ()=>{ filterBtns.forEach(x=>x.setAttribute('aria-pressed','false')); b.setAttribute('aria-pressed','true'); applyFilter(b.dataset.filter); }));
+    function applyFilter(filter){ const all = slides; if(filter === 'all'){ all.forEach(s=> s.style.display='block'); casesEmpty.style.display='none'; return; }
+      let found=false; all.forEach(s=>{ const tags = s.dataset.tags||''; if(tags.split(' ').includes(filter)){ s.style.display='block'; found=true; } else s.style.display='none'; });
+      if(!found){ casesEmpty.style.display='block'; } else casesEmpty.style.display='none';
+    }
+    resetFilters.addEventListener('click', ()=>{ filterBtns[0].click(); casesEmpty.style.display='none'; });
+
+    // Pricing toggle
+    function setBilling(isAnnual){ billingMonthly.setAttribute('aria-pressed', String(!isAnnual)); billingAnnual.setAttribute('aria-pressed', String(isAnnual)); const prices = document.querySelectorAll('.price'); prices.forEach(p=> p.textContent = isAnnual? p.dataset.annual + '/yr' : p.dataset.month + '/mo'); billingAnnouncer.textContent = isAnnual? 'Annual billing selected' : 'Monthly billing selected'; }
+    billingMonthly.addEventListener('click', ()=> setBilling(false)); billingAnnual.addEventListener('click', ()=> setBilling(true));
+
+    // Tier CTAs open modal and prefill budget
+    tierCtas.forEach(btn=> btn.addEventListener('click', ()=>{ openModal(btn); const tier = btn.closest('.tier'); const price = tier.querySelector('.price').textContent; document.getElementById('budget').value = price; }));
+
+    // Service card keyboard interactions
+    serviceCards.forEach(card=>{
+      card.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.querySelector('.service-cta').click(); } });
+    });
+
+    // Smooth scroll helper respects reduced-motion
+    function smoothScrollTo(node){ if(!node) return; node.scrollIntoView({behavior: supportsReduced? 'auto' : 'smooth', block: 'start'}); }
+
+    // State switcher
+    stateSelect.addEventListener('change', ()=>{
+      const v = stateSelect.value;
+      if(v === 'loading'){ enableLoading(); }
+      else if(v === 'empty'){ enableEmpty(); }
+      else if(v === 'error'){ enableError(); }
+      else if(v === 'reduced-motion'){ document.documentElement.style.setProperty('transition','none'); document.documentElement.classList.add('reduced'); }
+      else{ resetStates(); }
+    });
+    function enableLoading(){ // skeleton for services and cases
+      document.querySelectorAll('#services-grid .service-card').forEach(c=>{ c.innerHTML = '<div class="skeleton" style="height:72px;width:100%"></div>'; c.style.pointerEvents='none'; });
+      document.querySelectorAll('.case').forEach(c=>{ c.innerHTML = '<div class="skeleton" style="height:180px;width:100%"></div>'; });
+    }
+    function enableEmpty(){ // filter to none
+      document.querySelectorAll('.case').forEach(c=> c.style.display='none'); casesEmpty.style.display='block'; }
+    function enableError(){ // set error state for form submission
+      stateSelect.value = 'error'; showBanner('error','Simulated server error state active. Form submits will fail.'); openModal(); }
+    function resetStates(){ location.reload(); }
+
+    // Fill images lazily with inline placeholders
+    document.querySelectorAll('.case img').forEach((img,idx)=>{ img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="300"><rect width="100%" height="100%" fill="rgba(255,255,255,0.02)"/><text x="50%" y="50%" fill="#9AA8B3" font-size="20" text-anchor="middle" dominant-baseline="middle">Case image ${idx+1}</text></svg>`); });
+
+    // Initial dot activation
+    updateDots(); announceSlide();
+
+    // Accessibility: ensure touch targets >=44px
+    document.querySelectorAll('button, .primary-cta, .service-card').forEach(el=>{ el.style.minHeight='44px'; el.style.minWidth='44px'; });
+
+    // Reduced-motion respect on load
+    if(supportsReduced) document.documentElement.classList.add('reduced');
+
+    // Make interactive elements focus-visible friendly
+    document.addEventListener('keydown', function(e){ document.body.classList.add('using-keyboard'); }, {once:true});
+
+    // Provide hover visual states for keyboard via focus
+    document.querySelectorAll('.service-card').forEach(card=> card.addEventListener('focus', ()=>{ card.style.transform = 'translateY(-6px) scale(1.02)'; card.style.boxShadow = '0 8px 30px rgba(2,8,23,0.6)'; }));
+    document.querySelectorAll('.service-card').forEach(card=> card.addEventListener('blur', ()=>{ card.style.transform='none'; card.style.boxShadow='none'; }));
+
+    // Helper functions for state switcher control when reopened via error
+    function showBanner(type, text){ formBanner.innerHTML=''; const b = document.createElement('div'); b.className='banner '+(type==='success'?'success':'error'); b.textContent = text; formBanner.appendChild(b); b.setAttribute('role','status'); b.setAttribute('aria-live','polite'); }
+
+    // Clean up: ensure focus returns on modal close already handled
+  </script>
+</body>
+</html>
