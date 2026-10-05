@@ -1,0 +1,57 @@
+{
+  "feature": "B2B SaaS Pricing Page — 3 plans (Starter, Team, Enterprise) with monthly/yearly toggle and highlighted recommended plan",
+  "screens": [
+    "Hero (headline + pricing toggle + short benefits)",
+    "Pricing grid — desktop (3-column plan cards with feature comparison)",
+    "Pricing stack — tablet (2-up + stacked Enterprise)",
+    "Pricing stack — mobile (vertical cards + accordion feature lists)",
+    "Enterprise modal/contact form (for Contact Sales CTA)",
+    "Toggle error/toast states and CTA disabled state overlay"
+  ],
+  "components": [
+    "Top bar: small headline (H6) + month/year toggle (segmented control)",
+    "Pricing Card (reusable) — header (plan name + recommended badge) + price area + billing note + feature list (check/limited/disabled rows) + primary CTA + secondary link (view details)",
+    "Recommended Badge — prominent ribbon or chip",
+    "Feature comparison matrix (desktop) — table with row labels left, plan columns right",
+    "Monthly/Yearly Toggle — segmented control with animated price swap and discount hint (e.g., “Save 20%/yr”)",
+    "Enterprise Modal — contact form (name, company, email, team size, message), success & error states",
+    "Toast / Inline Error — toggle load failure message with Retry action",
+    "Disabled CTA overlay — tooltip explaining restriction (e.g., trial limit)"
+  ],
+  "interactions": [
+    "Toggle switch: tap changes pricing view with 200ms crossfade + numeric count animation for price (prefers-reduced-motion = reduce animations)",
+    "Toggle loading: show skeletons in price area; disable CTAs while loading",
+    "Toggle failure: show inline toast with error message + Retry (re-fetch prices)",
+    "Price change animation: fade + slide up for new price; discount badge animates in from top",
+    "Recommended plan emphasis: elevated card (scale 1.03), 2px shadow increase, 8px outline accent; keyboard-focusable",
+    "CTA actions: Starter/Team primary = Start free (opens signup flow), Enterprise primary = Contact sales (opens modal)",
+    "Feature rows: hover/focus highlight row; on mobile features collapse into accordion per card",
+    "Accessibility: all interactive components keyboard operable, aria-live region for price updates, aria-pressed for toggle, descriptive aria-labels",
+    "Disabled CTA: shows 12px helper text and tooltip on hover/focus explaining reason"
+  ],
+  "states": [
+    "Default: prices show monthly by default (or last saved preference)",
+    "Yearly: prices show discounted annual price and “You save X%” subtext",
+    "Loading toggle: skeleton blocks for price & features; CTAs disabled",
+    "Toggle failure: toast with message “Unable to fetch prices” + Retry button; CTAs re-enabled using last-known prices if available",
+    "CTA disabled: state for when signup not available — button greyed, aria-disabled true, tooltip on hover/focus",
+    "Form states (Enterprise modal): idle, validating, success (thank-you message), server error (inline field or top error summary)",
+    "Empty/Edge: feature list overflow uses vertical scroll inside card at fixed height (max 420px)"
+  ],
+  "responsive": "Desktop: 3-column equal-width grid, comparison matrix visible. Tablet (≥768px & <1024px): 2-column grid with Enterprise stacked below; comparison uses condensed table or grouped accordion. Mobile (<768px): vertical card stack; each card contains a collapsible feature accordion and primary CTA pinned to card bottom. Touch targets ≥44×44px, 16px outer padding, 16–20px card gap. Breakpoint specs: mobile 0–767px, tablet 768–1023px, desktop ≥1024px.",
+  "design_system": "Tokens: color-primary (#0A66FF), color-accent (#0B7AFF), neutral-900, neutral-700, neutral-300, success, error; spacing scale (space-4=8px,8=16px,16=32px, etc.); typography: Inter (H1 28/36, H2 20/28, body 16/24); radius-2 (6px) for cards; elevation tokens (e1,e2). Components to deliver in Figma: PricingCard (variants: default/recommended/disabled), Toggle (states: idle/active/loading/error), FeatureRow (included/limited/not included), Enterprise Modal, Toast. Export assets: badge SVG, check/close icons (24px, SVG), ribbon. Provide layout specs: 12-column grid (desktop), gutters 24px; spacing token mapping, pixel-perfect distances, and component measurements. Accessibility tokens: focus-outline 3px color-accent, contrast ratios >=4.5:1 for body text.",
+  "api_needs": [
+    "GET /pricing?billing=monthly|yearly — returns plans, prices, discounts, feature matrix",
+    "GET /pricing/last-known — fallback cached prices for toggle failure",
+    "POST /leads/contact-sales — enterprise contact form submission (name, company, email, team_size, message)",
+    "Telemetry: POST /events {pricing_toggle, cta_click, contact_submit}"
+  ],
+  "acceptance_criteria": [
+    "Monthly/Yearly toggle updates all displayed prices and shows discount badge for yearly",
+    "Recommended plan visually distinct (ribbon + scale + outline) and marked in DOM for screen readers",
+    "Toggle loading shows skeleton and disables CTAs; toggle failure shows retryable toast and falls back to cached prices",
+    "Desktop shows 3-column grid and comparison matrix; tablet and mobile follow responsive rules with no horizontal scroll",
+    "CTAs have correct actions: Start free opens signup flow; Contact sales opens modal and submits to API with validation",
+    "Figma handoff includes components with variants, tokens, spacing specs, exportable SVGs, and notes for dev (ARIA labels, reduced-motion)"
+  ]
+}
