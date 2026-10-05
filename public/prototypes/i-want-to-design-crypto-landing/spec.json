@@ -1,0 +1,60 @@
+{
+  "feature": "Crypto Landing Page — conversion-focused marketing page for a crypto product (exchange/wallet/portfolio). Goals: communicate trust, explain value, drive sign-ups (primary CTA), and showcase product features & real-time price snapshot.",
+  "screens": [
+    "Hero (Email/Wallet CTA) — large headline, subhead, primary CTA + secondary CTA, live price ticker strip, hero illustration/device mockup, social proof logos",
+    "How it Works — 3-step horizontal cards with icons and CTAs",
+    "Features & Benefits — alternating feature blocks with interactive micro-demo (small chart + toggles)",
+    "Security & Trust — credentials, audits, SOC logos, two-factor flow diagram, insurance coverage callout",
+    "Pricing / Plans (if applicable) — 3 column comparison with feature checklist and CTA per plan",
+    "Live Market Snapshot — responsive table of top 10 cryptos, sparkline, 24h % change, filter & search",
+    "FAQ & Risk Notice — accordion list with prominent compliance/legal note",
+    "Footer + Secondary Sign-up — links, newsletter, social, legal, language selector"
+  ],
+  "components": [
+    "Header: logo (left), nav (center: Products, Markets, Learn, Pricing), Sign In (text) and Primary CTA (Sign Up) on right. Sticky with subtle shadow on scroll.",
+    "Hero CTA: Primary (Solid, filled) 56x44px min, Secondary (Outline). Both accessible labels and keyboard focus.",
+    "Live Price Ticker: horizontal marquee style with pause on hover, semantic list with aria-live=\"polite\" for updates.",
+    "Feature Cards: icon (SVG), title, 2–3 line description, small CTA. Cards use 16px body, 20px title, 24px icon, 24px padding.",
+    "Interactive Micro-demo: small responsive chart (canvas/SVG), toggle state (USD/BTC), play/pause micro-anim.",
+    "Market Table Row: left: rank+symbol with favicon, middle: price + sparkline (svg, aria-hidden), right: 24h change (color-coded) and action button (Add to Watchlist). Rows keyboard-focusable.",
+    "Accordion (FAQ): grouped region with aria-controls, aria-expanded, keyboard support (Enter/Space).",
+    "Trust Badges: accessible images with alt text and tooltip for details.",
+    "Newsletter Modal: email input with visible label, validation, success state, recaptcha placeholder.",
+    "Back-to-top floating button: 56px circular, high-contrast, respects prefers-reduced-motion."
+  ],
+  "interactions": [
+    "Hero CTA click -> open Sign-up modal or route to sign-up page; focus moves into first input; ESC closes (return focus to CTA).",
+    "Price ticker updates via WebSocket/Server-Sent Events; new items announce via aria-live. Pause on hover and on reduced-motion.",
+    "Market table sorting: click header toggles asc/desc; keyboard users can sort via enter on header button.",
+    "Feature cards reveal micro-animations on scroll (fade+translate Y 20px, 240ms, ease-out). Respect prefers-reduced-motion by disabling translation.",
+    "Interactive chart toggles datapoints; hovering shows tooltip with formatted values; for touch, tap opens tooltip as persistent overlay.",
+    "Accordion: only one open at a time (optional), arrow rotates 180deg; animation 160ms; disable animations for prefers-reduced-motion.",
+    "Newsletter modal input shows inline validation (email format), server errors shown in error summary above field.",
+    "Responsive nav: mobile hamburger opens full-screen sheet with large tap targets (>=44px)."
+  ],
+  "states": [
+    "Loading: skeletons for hero mockup, market table rows, and feature cards. Use gray-100 boxes and shimmer only if not reduced-motion.",
+    "Empty: market table shows inline empty state with CTA to add markets or refresh.",
+    "Error: global banner for data fetch errors with retry button; form fields show red outline + helper text; both accessible via aria-live=\"assertive\".",
+    "Success: newsletter signup shows inline success message and CTA to continue, modal closes after confirmation (animated).",
+    "Disabled: CTA disabled state when input invalid (opacity 0.6, cursor not-allowed) with aria-disabled=\"true\"."
+  ],
+  "responsive": "Mobile-first. Breakpoints: base (≤640px), tablet (641–1024px), desktop (≥1025px). Layout rules: single-column stacking on mobile; hero image hidden/stacked under headline; market table compresses to list cards with essential columns; feature grid: 1 column mobile, 2 columns tablet, 3 columns desktop. Nav collapses to hamburger under 768px. All touch targets >=44px; 16px base font-size, scale up 18–20px for desktop titles.",
+  "design_system": "Proposed tokens (if no existing DS): palette — primary: #0B63FF (CTA), accent: #7A5CFF, neutral-900: #0B1220, neutral-100: #F6F7FB, success: #00B37E, danger: #FF4D4F. Typography — Inter (variable) for UI: H1 40/48 (desktop) / 28/36 (mobile), H2 28/36, Body 16/24. Spacing scale: 4,8,16,24,32,48,64. Elevation: subtle shadows for sticky header and cards. Accessibility: contrast ratios >=4.5:1 for body text; focus ring 3px offset using primary-500; provide semantic HTML + ARIA. Motion: durations 120–320ms, easing cubic-bezier(0.2,0.8,0.2,1).",
+  "api_needs": [
+    "Public market feed (WebSocket or SSE) endpoint streaming price, 24h change, market cap, sparkline data for top N assets.",
+    "Trust metadata endpoint: audit reports, insurance coverage, certification logos.",
+    "Newsletter subscription API (POST) with 200/4xx/5xx responses; rate-limit headers and error codes.",
+    "Sign-up endpoint (POST) and validation endpoints (email uniqueness).",
+    "Watchlist API to add/remove assets (authenticated).",
+    "Feature demo data endpoints (sample portfolio / simulated trades) for micro-demo."
+  ],
+  "acceptance_criteria": [
+    "Header & hero render correctly across breakpoints and hero CTA opens sign-up modal with focus management.",
+    "Live price ticker updates within 2s of server push and announces changes to screen readers.",
+    "Market table supports sorting and keyboard navigation; sparkline present and rows are focusable.",
+    "Forms validate inline and show accessible error messages; newsletter submission shows success state.",
+    "All interactive animations respect prefers-reduced-motion and keyboard users can operate all controls.",
+    "Contrast ratios for text meet WCAG AA (4.5:1 for body) and focus indicators visible. Automated responsive QA shows no horizontal scroll at any breakpoint."
+  ]
+}
