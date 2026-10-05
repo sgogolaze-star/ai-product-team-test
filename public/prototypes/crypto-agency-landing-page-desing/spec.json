@@ -1,0 +1,60 @@
+{
+  "feature": "Crypto agency marketing landing page — clear conversion funnel for services (token launches, smart contracts, audits, Web3 strategy), lead capture, social proof, and portfolio highlights.",
+  "screens": [
+    "Hero with primary CTA and brief value prop",
+    "Services overview (cards)",
+    "Case studies / portfolio strip with filters",
+    "Pricing & packages (tiered)",
+    "Team & credibility (partners, logos, certifications)",
+    "Contact / Request a Proposal form (lead capture modal)",
+    "Footer with quick links, newsletter signup, legal"
+  ],
+  "components": [
+    "Top navigation: left logo (SVG) + right nav links + primary CTA button (Hire Us) — sticky with 4px subtle shadow on scroll",
+    "Hero: two-column grid — left: headline (H1), subhead, 2 CTAs (Primary: Request Proposal, Secondary: Explore Cases), trust bar (logos, 3 items); right: device mockup or animated token orb (SVG) inside accessible figure with alt",
+    "Service cards: 3–4 cards with icon (decorative aria-hidden), title, 1-line summary, CTA link; cards have 16px padding, 8px gap, 8px border-radius, focus ring",
+    "Case study carousel: horizontal scroll with snap, each slide has image, 2-line summary, KPI badges; keyboard and swipe enabled",
+    "Pricing: tier cards (Starter, Growth, Enterprise) with monthly/annual toggle (aria-pressed) and feature lists with check icons",
+    "Contact form modal: fields Name, Company, Email (type=email), Budget (select), Message (textarea), file upload optional; client-side validation and server response states",
+    "Newsletter signup: single-line email input + submit button with inline validation and success microcopy",
+    "Footer: sitemap, socials, legal links, small copyright",
+    "Microcopy elements: tooltips, helper text, success/error banners"
+  ],
+  "interactions": [
+    "Sticky header: becomes 56px compact at scroll >64px, animate height with transform + opacity (reduced-motion respect)",
+    "Hero CTA click: primary opens contact modal; secondary scrolls to Case Studies with smooth scroll (prefers-reduced-motion support)",
+    "Service card hover: elevation + scale 1.02 with 120ms ease; on keyboard focus show 2px outline color token",
+    "Case carousel: swipe + drag on touch, keyboard arrow navigation, pagination dots (aria-controls) and snap-to-slide behavior",
+    "Pricing toggle: instant UI update with aria-live region announcing selected billing period",
+    "Form submit: optimistic loader (spinner inside button), disable on submit, show inline field errors and top-level error summary with focus management",
+    "Newsletter: debounce input, validate, then show inline success message without page reload",
+    "Modal: trap focus, ESC closes, return focus to triggering element"
+  ],
+  "states": [
+    "Default, Hover, Focus, Active for buttons/links",
+    "Disabled states for form submit and CTAs when required fields invalid",
+    "Loading state for async content (skeleton cards for services and cases)",
+    "Success and Error banners for forms (informative copy, 4.5:1 contrast)",
+    "Empty state for Case Studies filter (illustration + action to reset filter)",
+    "Reduced-motion mode: all non-essential animations disabled"
+  ],
+  "responsive": "Mobile-first. Breakpoints: 0–599px (mobile single column), 600–959px (tablet: two columns stack), 960–1279px (desktop medium: two-column hero with smaller gaps), >=1280px (wide desktop: increased container max-width 1280px). Navigation collapses into accessible hamburger at <960px. Touch targets >=44×44px. Images lazy-loaded, CSS grid/flex with no fixed px overflow. Hero image scales fluidly (max-width 560px).",
+  "design_system": "Primary tokens (proposed): --color-bg: #0F1724 (deep navy); --color-surface: #0B1220; --color-accent: #00D1B2 (teal); --color-accent-600: #00BFA0; --color-cta-text: #04202A; --color-text: #E6F0F6; --color-muted: #9AA8B3; --color-danger: #FF6B6B. Accessibility: text contrast >=4.5:1 for body, >=3:1 for muted. Typography: Inter (variable) for UI, GT Sectra or Merriweather for display if needed. Scale: H1:48/56, H2:32/40, H3:24/32, body:16/24. Spacing scale: 8/16/24/32/48/64. Radius: 8px default. Elevation: surface layers with subtle blur (backdrop-filter optional) and color-anchored shadows. Icons: outline system, SVG sprites, decorative marked aria-hidden. Motion: durations 120ms/200ms/320ms, easing: cubic-bezier(0.2,0.8,0.2,1). Dark-first palette; provide light-mode inversion if required. Tokenized CSS variables and Figma styles ready for handoff.",
+  "api_needs": [
+    "POST /leads — payload {name,company,email,budget,message,attachments}, returns 201 + leadId",
+    "POST /newsletter-subscribe — {email}, returns 200/409 (already subscribed)",
+    "GET /cases?featured=true&filter=... — paginated case list with images and KPIs",
+    "GET /partners — logos and links",
+    "Analytics events: track CTA clicks, form submit success/failure, case view (send to GA4/Segment)"
+  ],
+  "acceptance_criteria": [
+    "Hero loads within 1s (image optimized, lazy load non-critical) and linkable via anchor",
+    "Primary CTA opens contact modal and focus is trapped; form validation prevents submit when required fields missing; successful submit returns 201 and shows success banner",
+    "Navigation accessible: keyboard tab order logical, hamburger labelled, ARIA on menus, focus visible",
+    "All images have alt text; decorative SVGs marked aria-hidden",
+    "Color contrast meets WCAG AA (4.5:1) for body text and AA Large for headings; testing checklist included",
+    "Responsive: layout does not horizontal-scroll at any breakpoint and touch targets >=44×44px",
+    "Case carousel keyboard and swipe operable and provides visible focus and aria-live updates for slide changes",
+    "Design tokens exported to Figma: colors, typography, spacing, elevation, and component variants for buttons, cards, forms"
+  ]
+}
