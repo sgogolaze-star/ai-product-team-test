@@ -1,0 +1,846 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Crypto Landing — Prototype</title>
+  <style>
+    /* Design tokens (from HANDOFF.design_system) */
+    :root{
+      --color-primary: #0B63FF;
+      --color-accent: #7A5CFF;
+      --color-neutral-900: #0B1220;
+      --color-neutral-100: #F6F7FB;
+      --color-success: #00B37E;
+      --color-danger: #FF4D4F;
+      --bg: var(--color-neutral-100);
+      --text: var(--color-neutral-900);
+      --muted: #5B6B7A;
+      --card-bg: #ffffff;
+      --shadow: 0 6px 18px rgba(11,18,32,0.06);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --space-1: 4px; --space-2:8px; --space-3:16px; --space-4:24px; --space-5:32px; --space-6:48px;
+      --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      --h1-mobile: 28px; --h1-mobile-lh:36px; --h1-desktop:40px; --h1-desktop-lh:48px;
+      --h2:28px; --body:16px; --body-lh:24px;
+    }
+    /* Reduced motion preference handling */
+    @media (prefers-reduced-motion: reduce){
+      :root{ --reduce-motion: 1; }
+    }
+    @media (prefers-reduced-motion: no-preference){
+      :root{ --reduce-motion: 0; }
+    }
+
+    /* Base styles */
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:var(--font-sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-size:16px;line-height:1.5}
+    a{color:var(--color-primary);text-decoration:none}
+    img{max-width:100%;display:block}
+
+    /* Utility */
+    .container{max-width:1100px;margin:0 auto;padding:0 var(--space-3)}
+    .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap}
+
+    /* Header */
+    header{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,rgba(255,255,255,0.9),rgba(255,255,255,0.85));backdrop-filter:blur(4px);box-shadow:var(--shadow)}
+    .nav{display:flex;align-items:center;gap:16px;padding:12px 0}
+    .logo{font-weight:700;color:var(--color-primary);font-size:18px}
+    nav ul{display:flex;gap:16px;list-style:none;padding:0;margin:0}
+    nav a{padding:8px 10px;border-radius:8px;color:var(--muted);font-weight:600}
+    nav a:focus-visible,nav a:hover{outline:none;box-shadow:0 0 0 3px rgba(11,99,255,0.12);background:transparent}
+    .nav-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border-radius:10px;border:0;cursor:pointer;font-weight:700}
+    .btn-primary{background:var(--color-primary);color:#fff;box-shadow:0 6px 18px rgba(11,99,255,0.14)}
+    .btn-outline{background:transparent;border:1px solid rgba(11,18,32,0.06);color:var(--text)}
+    .hamburger{display:none;background:transparent;border:0;padding:10px;border-radius:8px}
+
+    /* Header mobile */
+    @media (max-width:767px){
+      nav ul{display:none}
+      .hamburger{display:inline-flex}
+      .nav-right .btn:not(.btn-primary){display:none}
+    }
+
+    /* Hero */
+    .hero{display:grid;grid-template-columns:1fr 420px;gap:28px;align-items:center;padding:48px 0}
+    .hero-left{max-width:640px}
+    .eyebrow{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(122,92,255,0.08);color:var(--color-accent);font-weight:700;margin-bottom:16px}
+    h1{font-size:var(--h1-mobile);line-height:var(--h1-mobile-lh);margin:0 0 16px}
+    @media (min-width:1025px){h1{font-size:var(--h1-desktop);line-height:var(--h1-desktop-lh)}}
+    p.lead{color:var(--muted);margin:0 0 20px}
+    .cta-row{display:flex;gap:12px;align-items:center}
+    .cta-primary{min-width:56px;min-height:44px}
+    .cta-secondary{background:transparent;border:1px solid rgba(11,18,32,0.06);}
+
+    /* Hero right mockup */
+    .mockup{background:linear-gradient(180deg,#fff,#f8fbff);border-radius:14px;padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px}
+    .mockup .ticker-mini{display:flex;gap:8px;align-items:center}
+    .device{background:linear-gradient(180deg,#ffffff,#f4f7ff);height:260px;border-radius:12px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(11,18,32,0.04)}
+    .social-proofs{display:flex;gap:12px;align-items:center}
+    .logo-badge{height:20px;color:var(--muted)}
+
+    /* Ticker strip (main) */
+    .ticker{display:flex;align-items:center;gap:12px;overflow:hidden;border-radius:8px;padding:6px 8px;background:#fff;border:1px solid rgba(11,18,32,0.04)}
+    .ticker-list{display:flex;gap:18px;animation:marquee 14s linear infinite}
+    .ticker-item{display:flex;gap:8px;align-items:center;font-weight:700;color:var(--muted)}
+    .ticker:hover .ticker-list, .ticker.pause .ticker-list{animation-play-state:paused}
+    @keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+    @media (prefers-reduced-motion: reduce){.ticker-list{animation:none}}
+
+    /* Sections */
+    section{padding:36px 0}
+    .how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .card{background:var(--card-bg);padding:16px;border-radius:12px;box-shadow:var(--shadow)}
+    .card h3{margin:8px 0 6px}
+    .card p{color:var(--muted);margin:0}
+
+    /* Features alternate */
+    .feature{display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:center}
+    .feature.alt{grid-template-columns:360px 1fr}
+    .feature-demo{background:#081a33;border-radius:10px;padding:12px;color:#fff}
+    .demo-controls{display:flex;gap:8px;align-items:center;margin-top:8px}
+
+    /* Security */
+    .trust-grid{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+    .trust-badge{background:#fff;padding:8px;border-radius:8px;box-shadow:var(--shadow)}
+
+    /* Pricing */
+    .pricing-grid{display:grid;grid-template-columns:1fr;gap:12px}
+    .plan{background:var(--card-bg);padding:16px;border-radius:12px;box-shadow:var(--shadow)}
+    @media (min-width:768px){.pricing-grid{grid-template-columns:repeat(3,1fr)}}
+
+    /* Market table */
+    .market-actions{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+    .market-table{background:var(--card-bg);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:12px 16px;text-align:left;border-bottom:1px solid rgba(11,18,32,0.04)}
+    th{background:transparent;position:sticky;top:0}
+    th button.sort{background:transparent;border:0;cursor:pointer;font-weight:700}
+    tr.row{background:#fff}
+    tr.row:focus-within, tr.row:focus{outline:3px solid rgba(11,99,255,0.12)}
+    .spark{height:30px;width:120px}
+    .pct-positive{color:var(--color-success);font-weight:700}
+    .pct-negative{color:var(--color-danger);font-weight:700}
+
+    /* Responsive compress to cards under 640 */
+    @media (max-width:640px){
+      .hero{grid-template-columns:1fr;gap:18px}
+      .mockup{order:2}
+      .feature{grid-template-columns:1fr}
+      .feature.alt{grid-template-columns:1fr}
+      .how-grid{grid-template-columns:1fr}
+      .market-table{display:block}
+      table,thead,tbody,tr,th,td{display:block}
+      tr{margin-bottom:12px}
+      th{display:none}
+      td{border:1px solid rgba(11,18,32,0.04);border-radius:10px;margin:0 0 8px 0}
+    }
+
+    /* FAQ Accordion */
+    .accordion{max-width:900px}
+    .acc-item{background:var(--card-bg);border-radius:10px;margin-bottom:8px;padding:12px;box-shadow:var(--shadow)}
+    .acc-trigger{display:flex;align-items:center;justify-content:space-between;width:100%;background:transparent;border:0;padding:8px;cursor:pointer}
+    .acc-content{max-height:0;overflow:hidden;transition:max-height 160ms ease,opacity 160ms ease;padding:0 8px}
+    .acc-content.open{padding-top:8px;opacity:1}
+    .acc-icon{transition:transform 160ms ease}
+    @media (prefers-reduced-motion: reduce){.acc-content,.acc-icon{transition:none}}
+
+    /* Footer */
+    footer{border-top:1px solid rgba(11,18,32,0.04);padding:24px 0;color:var(--muted)}
+    .footer-grid{display:flex;gap:24px;flex-wrap:wrap}
+
+    /* Modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,0.6);display:none;align-items:center;justify-content:center;z-index:60}
+    .modal{background:var(--card-bg);border-radius:12px;padding:20px;width:min(540px,96vw);box-shadow:0 30px 80px rgba(11,18,32,0.3)}
+    .modal.open{display:block}
+    .field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+    input[type=email]{padding:12px;border-radius:8px;border:1px solid rgba(11,18,32,0.08);font-size:16px}
+    input[type=email]:focus{outline:3px solid rgba(11,99,255,0.12)}
+    .error{color:var(--color-danger);font-size:14px}
+    .success{color:var(--color-success);font-weight:700}
+
+    /* Back to top */
+    .back-to-top{position:fixed;right:18px;bottom:18px;width:56px;height:56px;border-radius:50%;background:var(--card-bg);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);cursor:pointer}
+    .state-switcher{position:fixed;right:18px;bottom:86px;background:#fff;padding:8px;border-radius:10px;box-shadow:var(--shadow);z-index:80}
+    .state-switcher button{display:block;margin-bottom:6px;width:120px}
+
+    /* Loading skeleton */
+    .skeleton{background:linear-gradient(90deg,#eee #f6f6f6 #eee);background-size:200% 100%;animation:shimmer 1.6s linear infinite;border-radius:8px}
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    @media (prefers-reduced-motion: reduce){.skeleton{animation:none}}
+
+    /* Small helpers */
+    .muted{color:var(--muted)}
+    .pill{padding:6px 10px;border-radius:999px;background:#fff}
+    .kbd{background:#f2f4f7;border-radius:6px;padding:4px 6px;font-weight:700}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav" role="navigation" aria-label="Main navigation">
+      <div class="logo" id="brand">CoinNest</div>
+      <nav aria-label="Primary">
+        <ul>
+          <li><a href="#products">Products</a></li>
+          <li><a href="#markets">Markets</a></li>
+          <li><a href="#learn">Learn</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+        </ul>
+      </nav>
+      <button class="hamburger" id="navToggle" aria-expanded="false" aria-controls="mobileSheet" aria-label="Open menu">☰</button>
+      <div class="nav-right">
+        <a href="#signin" class="muted">Sign In</a>
+        <button class="btn btn-primary" id="signupHeader" aria-haspopup="dialog">Sign Up</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile sheet -->
+  <div id="mobileSheet" style="display:none;position:fixed;inset:0;background:rgba(2,6,23,0.6);z-index:70">
+    <div style="background:#fff;height:100%;padding:24px;display:flex;flex-direction:column">
+      <button id="closeSheet" style="align-self:flex-end">Close</button>
+      <nav style="margin-top:20px">
+        <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:12px">
+          <li><a href="#products">Products</a></li>
+          <li><a href="#markets">Markets</a></li>
+          <li><a href="#learn">Learn</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+        </ul>
+      </nav>
+      <div style="margin-top:auto">
+        <button class="btn btn-primary" id="signupMobile">Create account</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="container" id="main">
+
+    <!-- Global error banner (for Error state) -->
+    <div id="globalError" role="status" aria-live="assertive" style="display:none;margin-top:12px;padding:12px;border-radius:10px;background:linear-gradient(90deg,#FFECE8,#FFF3F2);color:var(--color-danger);font-weight:700">Unable to load market data. <button id="retryBtn" style="margin-left:12px;padding:6px 10px;border-radius:8px;border:0;background:var(--color-primary);color:#fff">Retry</button></div>
+
+    <!-- HERO -->
+    <section id="hero">
+      <div class="hero">
+        <div class="hero-left">
+          <div class="eyebrow">Trusted by pro traders</div>
+          <h1>Own your crypto. Trade with confidence.</h1>
+          <p class="lead">Secure, insured custody, real-time markets and an effortless experience to buy, sell and manage your crypto portfolio.</p>
+          <div class="cta-row" role="group" aria-label="Primary actions">
+            <button class="btn btn-primary cta-primary" id="ctaSignUp">Get started</button>
+            <button class="btn btn-outline" id="ctaSecondary">See demo</button>
+            <span class="muted" style="margin-left:8px">No credit card required</span>
+          </div>
+
+          <div style="margin-top:20px;">
+            <div class="ticker" id="liveTicker" aria-live="polite" tabindex="0">
+              <div class="ticker-list" id="tickerList" aria-hidden="false"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mockup" aria-hidden="false">
+          <div class="ticker-mini" aria-hidden="true">
+            <div class="pill">Live prices</div>
+            <div class="muted">Top movers</div>
+          </div>
+          <div class="device" id="heroDevice">
+            <!-- device mockup with sparkline -->
+            <svg width="220" height="160" viewBox="0 0 220 160" aria-hidden="true">
+              <rect x="0" y="0" width="220" height="160" rx="12" fill="#0B1220" opacity="0.06"></rect>
+              <g transform="translate(8,8)">
+                <rect width="204" height="120" rx="8" fill="#fff"></rect>
+                <text x="12" y="26" fill="#0B1220" font-weight="700" font-size="14">Portfolio</text>
+                <text x="12" y="48" fill="#7A5CFF" font-weight="700" font-size="20">$12,482.34</text>
+                <polyline points="12,90 40,70 70,80 100,50 130,60 160,40 192,48" fill="none" stroke="#0B63FF" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"></polyline>
+              </g>
+            </svg>
+          </div>
+          <div class="social-proofs" aria-hidden="true">
+            <div class="logo-badge">Trusted by</div>
+            <svg class="logo-badge" width="64" height="20" viewBox="0 0 64 20" aria-hidden><rect width="64" height="20" fill="#F2F4F7" rx="4"></rect></svg>
+            <svg class="logo-badge" width="64" height="20" viewBox="0 0 64 20" aria-hidden><rect width="64" height="20" fill="#F2F4F7" rx="4"></rect></svg>
+            <svg class="logo-badge" width="64" height="20" viewBox="0 0 64 20" aria-hidden><rect width="64" height="20" fill="#F2F4F7" rx="4"></rect></svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it Works -->
+    <section id="how">
+      <h2>How it works</h2>
+      <div class="how-grid" id="howGrid">
+        <div class="card">
+          <svg width="24" height="24" aria-hidden><circle cx="12" cy="12" r="10" fill="var(--color-primary)"></circle></svg>
+          <h3>Connect Wallet</h3>
+          <p>Securely connect or create a wallet in seconds with seed phrase encryption.</p>
+          <button class="btn btn-outline" aria-label="Learn more">Learn</button>
+        </div>
+        <div class="card">
+          <svg width="24" height="24" aria-hidden><rect x="2" y="2" width="20" height="20" fill="var(--color-accent)" rx="4"></rect></svg>
+          <h3>Trade Instantly</h3>
+          <p>Low fees, deep liquidity, and instant settlement across major pairs.</p>
+          <button class="btn btn-outline">Start trading</button>
+        </div>
+        <div class="card">
+          <svg width="24" height="24" aria-hidden><path d="M2 20 L12 2 L22 20 Z" fill="#F0B90B"></path></svg>
+          <h3>Manage Portfolio</h3>
+          <p>Track performance, set alerts, and rebalance with our smart tools.</p>
+          <button class="btn btn-outline">Explore</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features & Micro-demo -->
+    <section id="features">
+      <h2>Features & Benefits</h2>
+      <div class="feature">
+        <div>
+          <h3>Advanced Charting</h3>
+          <p class="muted">Interactive micro-demo shows price movements with toggles for USD/BTC.</p>
+          <ul>
+            <li>Fast, responsive visuals</li>
+            <li>On-hover tooltips</li>
+            <li>Toggle currency</li>
+          </ul>
+        </div>
+        <div class="feature-demo" id="microDemo" aria-label="Micro demo">
+          <svg viewBox="0 0 300 120" class="spark" id="microSpark" aria-hidden="true" style="width:100%;height:120px;display:block"></svg>
+          <div class="demo-controls">
+            <button class="btn btn-outline" id="toggleCurrency" aria-pressed="false">USD</button>
+            <button class="btn btn-outline" id="playPauseDemo" aria-pressed="false">Pause</button>
+            <div class="muted" style="margin-left:auto">Hover for tooltips</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature alt" style="margin-top:16px">
+        <div class="feature-demo">
+          <svg width="100%" height="120" viewBox="0 0 300 120" aria-hidden="true">
+            <rect x="0" y="0" width="300" height="120" rx="8" fill="#081A33"></rect>
+            <text x="20" y="26" fill="#fff" font-weight="700">Security features</text>
+            <text x="20" y="48" fill="#9FB8D6">Multi-sig, hardware support & insurance</text>
+          </svg>
+        </div>
+        <div>
+          <h3>Built for security</h3>
+          <p class="muted">Cold storage options, audited smart contracts and continuous monitoring.</p>
+          <button class="btn btn-outline">Read audits</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Security & Trust -->
+    <section id="security">
+      <h2>Security & Trust</h2>
+      <div class="trust-grid">
+        <div class="trust-badge" title="Audited">Audit: SecureLabs</div>
+        <div class="trust-badge" title="SOC2">SOC2 compliant</div>
+        <div class="trust-badge" title="Insurance">$200M Insurance</div>
+      </div>
+      <div style="margin-top:16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+        <div style="flex:1;min-width:260px">
+          <h3>Two-factor flow</h3>
+          <svg viewBox="0 0 300 120" width="100%" height="120" aria-hidden>
+            <rect x="0" y="0" width="300" height="120" rx="8" fill="#fff" stroke="#EEF2FF"></rect>
+            <circle cx="40" cy="60" r="20" fill="#0B63FF"></circle>
+            <text x="70" y="66" fill="#0B1220">Login</text>
+            <path d="M60 66 H220" stroke="#DDEBFF" stroke-width="2"></path>
+            <circle cx="260" cy="60" r="20" fill="#00B37E"></circle>
+          </svg>
+        </div>
+        <div style="flex:1;min-width:240px">
+          <h3>Insurance coverage</h3>
+          <p class="muted">We maintain coverage for custodial assets up to $200M through leading underwriters.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing -->
+    <section id="pricing">
+      <h2>Pricing</h2>
+      <div class="pricing-grid">
+        <div class="plan">
+          <h3>Starter</h3>
+          <p class="muted">$0 / month</p>
+          <ul class="muted"><li>Limited trades</li><li>Email support</li></ul>
+          <button class="btn btn-outline">Choose</button>
+        </div>
+        <div class="plan">
+          <h3>Pro</h3>
+          <p class="muted">$19 / month</p>
+          <ul class="muted"><li>Priority matching</li><li>Advanced charts</li></ul>
+          <button class="btn btn-primary">Choose</button>
+        </div>
+        <div class="plan">
+          <h3>Institutional</h3>
+          <p class="muted">Contact us</p>
+          <ul class="muted"><li>Dedicated account</li><li>Custom SLA</li></ul>
+          <button class="btn btn-outline">Contact</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Market Snapshot -->
+    <section id="markets">
+      <h2>Live Market Snapshot</h2>
+      <div class="market-actions">
+        <input id="marketSearch" type="search" placeholder="Search markets (e.g. BTC)" aria-label="Search markets" style="padding:8px;border-radius:8px;border:1px solid rgba(11,18,32,0.06)" />
+        <button id="refreshMarkets" class="btn btn-outline">Refresh</button>
+        <div style="margin-left:auto" class="muted">Top 10 markets</div>
+      </div>
+
+      <div class="market-table" id="marketTable" role="table" aria-label="Markets">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col"><button class="sort" data-sort="rank" aria-label="Sort by rank">#</button></th>
+              <th scope="col"><button class="sort" data-sort="symbol" aria-label="Sort by symbol">Pair</button></th>
+              <th scope="col"><button class="sort" data-sort="price" aria-label="Sort by price">Price</button></th>
+              <th scope="col"><button class="sort" data-sort="change" aria-label="Sort by 24 hour change">24h</button></th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="marketBody">
+            <!-- rows injected by JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- FAQ & Risk -->
+    <section id="faq">
+      <h2>FAQ & Risk Notice</h2>
+      <div class="accordion" role="region" aria-label="Frequently asked questions">
+        <div class="acc-item">
+          <button class="acc-trigger" aria-expanded="false" aria-controls="acc1">What is custodial insurance?<span class="acc-icon">▸</span></button>
+          <div id="acc1" class="acc-content" role="region">We partner with insurers to provide coverage for assets held in custody. Coverage varies by region and asset.</div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-trigger" aria-expanded="false" aria-controls="acc2">How do I enable 2FA?<span class="acc-icon">▸</span></button>
+          <div id="acc2" class="acc-content" role="region">Go to Security settings and follow the steps to add an authenticator app or SMS verification.</div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-trigger" aria-expanded="false" aria-controls="acc3">Are there trading fees?<span class="acc-icon">▸</span></button>
+          <div id="acc3" class="acc-content" role="region">Yes, fees depend on your plan. Pro and institutional plans have reduced maker/taker rates.</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding:12px;border-radius:8px;background:#FFF4E6;color:#663C00">Risk notice: Cryptocurrency investments are volatile. This is not financial advice. Please trade responsibly.</div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-grid">
+        <div>
+          <div style="font-weight:700">CoinNest</div>
+          <div class="muted">Built with security-first design</div>
+        </div>
+        <div class="muted">© 2026 CoinNest. <a href="#legal">Legal</a></div>
+        <div style="margin-left:auto">
+          <label for="lang" class="muted">Language</label>
+          <select id="lang" style="padding:6px;border-radius:6px;margin-left:8px">
+            <option>English</option>
+            <option>Español</option>
+          </select>
+        </div>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- Newsletter / Sign-up modal -->
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal" role="document">
+      <button id="modalClose" aria-label="Close" style="float:right;background:transparent;border:0">✕</button>
+      <h3 id="modalTitle">Create your account</h3>
+      <p class="muted">Sign up to unlock all features and access live markets.</p>
+      <form id="signupForm">
+        <div id="formError" role="status" aria-live="assertive" style="display:none" class="error"></div>
+        <div class="field">
+          <label for="email">Email address</label>
+          <input id="email" type="email" required aria-required="true" />
+          <div id="emailError" class="error" aria-live="polite" style="display:none"></div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button type="submit" class="btn btn-primary" id="submitSignup">Create account</button>
+          <button type="button" class="btn btn-outline" id="demoClose">Maybe later</button>
+        </div>
+      </form>
+      <div id="signupSuccess" style="display:none;margin-top:12px" class="success">Thanks! Check your email to verify. <button id="continueBtn" class="btn btn-primary" style="margin-left:12px">Continue</button></div>
+    </div>
+  </div>
+
+  <!-- Back to top & state switcher -->
+  <button class="back-to-top" id="backToTop" aria-label="Back to top">↑</button>
+  <div class="state-switcher" role="region" aria-label="Prototype states">
+    <div style="font-weight:700;margin-bottom:6px">State</div>
+    <button id="stateDefault">Default</button>
+    <button id="stateLoading">Loading</button>
+    <button id="stateEmpty">Empty</button>
+    <button id="stateError">Error</button>
+    <button id="stateSuccess">Success</button>
+    <button id="stateDisabled">Disabled</button>
+  </div>
+
+  <script>
+    // Prototype JS — no external calls. Implements behavior from HANDOFF.
+    (function(){
+      // Utilities
+      const q = s => document.querySelector(s);
+      const qa = s => Array.from(document.querySelectorAll(s));
+
+      const state = {mode:'default'};
+
+      // Mobile sheet
+      const navToggle = q('#navToggle');
+      const mobileSheet = q('#mobileSheet');
+      const closeSheet = q('#closeSheet');
+      navToggle.addEventListener('click',()=>{
+        const open = mobileSheet.style.display === 'block';
+        mobileSheet.style.display = open ? 'none':'block';
+        navToggle.setAttribute('aria-expanded', String(!open));
+        if(!open) closeSheet.focus();
+      });
+      closeSheet.addEventListener('click',()=>{mobileSheet.style.display='none';navToggle.focus();});
+
+      // Modal behavior
+      const modalBackdrop = q('#modalBackdrop');
+      const signupForm = q('#signupForm');
+      const emailInput = q('#email');
+      const emailError = q('#emailError');
+      const formError = q('#formError');
+      const signupSuccess = q('#signupSuccess');
+      const continueBtn = q('#continueBtn');
+      const ctaSignUp = q('#ctaSignUp');
+      const signupHeader = q('#signupHeader');
+      const signupMobile = q('#signupMobile');
+      const modalClose = q('#modalClose');
+      let lastActive = null;
+
+      function openModal(trigger){
+        lastActive = trigger || document.activeElement;
+        modalBackdrop.style.display = 'flex';
+        emailInput.value = '';
+        emailError.style.display='none';
+        formError.style.display='none';
+        signupSuccess.style.display='none';
+        setTimeout(()=>emailInput.focus(),10);
+        document.body.style.overflow='hidden';
+        trapFocus(modalBackdrop);
+      }
+      function closeModal(){
+        modalBackdrop.style.display = 'none';
+        document.body.style.overflow='';
+        releaseFocusTrap();
+        if(lastActive) lastActive.focus();
+      }
+      ctaSignUp.addEventListener('click',()=>openModal(ctaSignUp));
+      signupHeader.addEventListener('click',()=>openModal(signupHeader));
+      signupMobile && signupMobile.addEventListener('click',()=>{openModal(signupMobile); mobileSheet.style.display='none';});
+      modalClose.addEventListener('click',closeModal);
+      q('#demoClose').addEventListener('click',closeModal);
+
+      // ESC closes modal
+      document.addEventListener('keydown', (e)=>{
+        if(e.key==='Escape'){
+          if(modalBackdrop.style.display==='flex') closeModal();
+        }
+      });
+
+      // Focus trap implementation (simple)
+      let focusableEls = [];
+      let previouslyFocused = null;
+      function trapFocus(el){
+        focusableEls = Array.from(el.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')).filter(a=>!a.hasAttribute('disabled'));
+        if(focusableEls.length) focusableEls[0].focus();
+        previouslyFocused = document.activeElement;
+        el.addEventListener('keydown', handleTrap);
+      }
+      function releaseFocusTrap(){
+        modalBackdrop.removeEventListener('keydown', handleTrap);
+        previouslyFocused = null;
+      }
+      function handleTrap(e){
+        if(e.key !== 'Tab') return;
+        const first = focusableEls[0];
+        const last = focusableEls[focusableEls.length-1];
+        if(e.shiftKey){ if(document.activeElement===first){ e.preventDefault(); last.focus(); } }
+        else { if(document.activeElement===last){ e.preventDefault(); first.focus(); } }
+      }
+
+      // Email validation + fake server
+      function validateEmail(v){
+        return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v);
+      }
+      signupForm.addEventListener('submit', (e)=>{
+        e.preventDefault();
+        const val = emailInput.value.trim();
+        if(!validateEmail(val)){
+          emailError.textContent = 'Please enter a valid email address.';
+          emailError.style.display='block';
+          emailInput.setAttribute('aria-invalid','true');
+          // In Error state show form-level error
+          if(state.mode==='error'){ formError.textContent = 'Server error: rate limited. Please try later.'; formError.style.display='block'; }
+          return;
+        }
+        emailError.style.display='none';
+        emailInput.removeAttribute('aria-invalid');
+        // Simulate server latency and possible error
+        const submitBtn = q('#submitSignup');
+        submitBtn.disabled = true; submitBtn.setAttribute('aria-disabled','true');
+        setTimeout(()=>{
+          if(state.mode==='error'){
+            formError.textContent = 'Server error: unable to save. Try again.'; formError.style.display='block';
+            submitBtn.disabled = false; submitBtn.removeAttribute('aria-disabled');
+            return;
+          }
+          // success
+          signupSuccess.style.display='block';
+          signupForm.style.display='none';
+          // auto-close after short delay
+          setTimeout(()=>{ closeModal(); signupForm.style.display='block'; signupSuccess.style.display='none'; }, 2200);
+          submitBtn.disabled = false; submitBtn.removeAttribute('aria-disabled');
+        },900);
+      });
+
+      continueBtn.addEventListener('click', closeModal);
+
+      // Live price ticker: simulate SSE / WebSocket feed
+      const tickerList = q('#tickerList');
+      const liveTicker = q('#liveTicker');
+      let tickerPaused = false;
+      const sample = [
+        {pair:'BTC/USD',price: '$60,124',chg:'+2.3%'},
+        {pair:'ETH/USD',price:'$4,102',chg:'+1.8%'},
+        {pair:'SOL/USD',price:'$110',chg:'-0.5%'},
+        {pair:'XRP/USD',price:'$0.86',chg:'+0.6%'}
+      ];
+      function renderTicker(items){
+        tickerList.innerHTML = '';
+        const doubled = items.concat(items);
+        doubled.forEach(it=>{
+          const el = document.createElement('div'); el.className='ticker-item'; el.textContent = `${it.pair} ${it.price} ${it.chg}`; tickerList.appendChild(el);
+        });
+      }
+      renderTicker(sample);
+      // Update ticker every 2s (simulate push updates)
+      setInterval(()=>{
+        if(tickerPaused || state.mode==='loading') return;
+        // mutate random item
+        const idx = Math.floor(Math.random()*sample.length);
+        const delta = (Math.random()*2-1).toFixed(2);
+        const sign = delta>=0?'+':'-';
+        sample[idx].chg = `${sign}${Math.abs(delta)}%`;
+        sample[idx].price = '$' + (Math.random()*70000+100).toFixed(2);
+        renderTicker(sample);
+        // announce latest update via polite aria-live by toggling aria-hidden? We'll set liveRegion text in hidden spacer
+        const liveAnn = `${sample[idx].pair} updated ${sample[idx].chg}`;
+        liveTicker.setAttribute('aria-live','polite');
+        // For screen readers, create a transient element
+        const ann = document.createElement('div'); ann.className='visually-hidden'; ann.textContent = liveAnn; liveTicker.appendChild(ann);
+        setTimeout(()=>ann.remove(),2500);
+      },2000);
+      // Pause on hover/focus
+      liveTicker.addEventListener('mouseenter', ()=>{ liveTicker.classList.add('pause'); tickerPaused=true; });
+      liveTicker.addEventListener('mouseleave', ()=>{ liveTicker.classList.remove('pause'); tickerPaused=false; });
+      liveTicker.addEventListener('focus', ()=>{ tickerPaused=true; }, true);
+      liveTicker.addEventListener('blur', ()=>{ tickerPaused=false; }, true);
+
+      // Micro-demo chart (SVG) with toggle USD/BTC and play/pause
+      const microSpark = q('#microSpark');
+      const toggleCurrency = q('#toggleCurrency');
+      const playPauseDemo = q('#playPauseDemo');
+      let demoPlaying = true;
+      let demoUsd = true;
+      function renderMicro(){
+        // generate sample points
+        const w = 300, h = 120;
+        const pts = [];
+        for(let i=0;i<30;i++){ pts.push(Math.sin(i/4 + (demoPlaying?Date.now()/1000:0))*10 + 50 + Math.random()*8); }
+        // draw polyline
+        microSpark.setAttribute('viewBox','0 0 '+w+' '+h);
+        microSpark.innerHTML = '';
+        const poly = document.createElementNS('http://www.w3.org/2000/svg','polyline');
+        poly.setAttribute('fill','none'); poly.setAttribute('stroke', demoUsd? 'var(--color-primary)':'var(--color-accent)'); poly.setAttribute('stroke-width','3');
+        const points = pts.map((v,i)=> (i*(w/29)).toFixed(1)+','+ (h - (v/100*h)).toFixed(1)).join(' ');
+        poly.setAttribute('points', points);
+        microSpark.appendChild(poly);
+        // optionally show tooltip circle on hover (handled below)
+      }
+      renderMicro();
+      let demoTimer = setInterval(()=>{ if(demoPlaying) renderMicro(); }, 600);
+      toggleCurrency.addEventListener('click', ()=>{ demoUsd = !demoUsd; toggleCurrency.setAttribute('aria-pressed', String(!demoUsd)); toggleCurrency.textContent = demoUsd?'USD':'BTC'; renderMicro(); });
+      playPauseDemo.addEventListener('click', ()=>{ demoPlaying = !demoPlaying; playPauseDemo.setAttribute('aria-pressed', String(!demoPlaying)); playPauseDemo.textContent = demoPlaying?'Pause':'Play'; if(!demoPlaying) renderMicro(); });
+
+      // Market table data and sorting
+      const marketBody = q('#marketBody');
+      const sampleMarkets = (function(){
+        const names = ['BTC','ETH','USDT','BNB','XRP','ADA','SOL','DOGE','DOT','LTC'];
+        return names.map((s,i)=>({rank:i+1,symbol:s,price:(Math.random()*60000+100).toFixed(2),change: (Math.random()*10-5).toFixed(2)}));
+      })();
+      let markets = sampleMarkets.slice();
+
+      function renderMarkets(list){
+        marketBody.innerHTML = '';
+        if(state.mode==='loading'){
+          // render skeleton rows
+          for(let i=0;i<5;i++){
+            const tr = document.createElement('tr'); tr.className='row';
+            tr.innerHTML = '<td><div class="skeleton" style="height:16px;width:24px"></div></td><td><div class="skeleton" style="height:16px;width:80px"></div></td><td><div class="skeleton" style="height:16px;width:90px"></div></td><td><div class="skeleton" style="height:16px;width:60px"></div></td><td><div class="skeleton" style="height:24px;width:80px"></div></td>';
+            marketBody.appendChild(tr);
+          }
+          return;
+        }
+        if(state.mode==='empty'){
+          const tr = document.createElement('tr'); tr.className='row';
+          tr.innerHTML = '<td colspan="5" style="padding:24px;text-align:center">No markets to display. Try <button id="addMarkets" class="btn btn-primary">Add markets</button> or <button id="refreshBtn" class="btn btn-outline">Refresh</button></td>';
+          marketBody.appendChild(tr);
+          setTimeout(()=>{ const add = q('#addMarkets'); add && add.addEventListener('click', ()=>{ state.mode='default'; updateStateUI(); renderMarkets(markets); }); const r = q('#refreshBtn'); r && r.addEventListener('click', ()=>{ renderMarkets(markets); }); },50);
+          return;
+        }
+        list.forEach(m=>{
+          const tr = document.createElement('tr'); tr.className='row'; tr.tabIndex = 0;
+          const pct = parseFloat(m.change);
+          tr.innerHTML = `
+            <td>${m.rank}</td>
+            <td><strong>${m.symbol}/USD</strong></td>
+            <td>$${m.price}</td>
+            <td class="${pct>=0?'pct-positive':'pct-negative'}">${pct>=0?'+':''}${pct}%</td>
+            <td><button class="btn btn-outline watch" data-symbol="${m.symbol}">Add to Watchlist</button></td>
+          `;
+          // add sparkline cell accessible as aria-hidden decorative
+          const sparkTd = document.createElement('td'); sparkTd.style.display='none';
+          tr.appendChild(sparkTd);
+          marketBody.appendChild(tr);
+          // row keyboard support: enter triggers watchlist action
+          tr.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ tr.querySelector('.watch').click(); } });
+        });
+      }
+      renderMarkets(markets);
+
+      // Sorting
+      qa('th button.sort').forEach(btn=>{
+        btn.addEventListener('click', ()=>{ const key = btn.getAttribute('data-sort'); sortMarkets(key); });
+        btn.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ const key = btn.getAttribute('data-sort'); sortMarkets(key); } });
+      });
+      function sortMarkets(key){
+        const direction = btnDirection[key] = !(btnDirection[key]);
+        markets.sort((a,b)=>{
+          if(key==='symbol') return direction? a.symbol.localeCompare(b.symbol) : b.symbol.localeCompare(a.symbol);
+          if(key==='rank') return direction? a.rank - b.rank : b.rank - a.rank;
+          if(key==='price') return direction? a.price - b.price : b.price - a.price;
+          if(key==='change') return direction? a.change - b.change : b.change - a.change;
+          return 0;
+        });
+        renderMarkets(markets);
+      }
+      const btnDirection = {rank:true,symbol:true,price:true,change:true};
+
+      // Search & refresh
+      q('#marketSearch').addEventListener('input', (e)=>{
+        const v = e.target.value.trim().toLowerCase();
+        const filtered = markets.filter(m=> m.symbol.toLowerCase().includes(v));
+        renderMarkets(filtered);
+      });
+      q('#refreshMarkets').addEventListener('click', ()=>{ // simulate refresh
+        markets.forEach(m=>{ m.price = (Math.random()*60000+10).toFixed(2); m.change = (Math.random()*10-5).toFixed(2); });
+        renderMarkets(markets);
+      });
+
+      // Watchlist action (toast)
+      document.addEventListener('click', (e)=>{
+        if(e.target.matches('.watch')){
+          const sym = e.target.getAttribute('data-symbol');
+          e.target.textContent = 'Added'; e.target.disabled=true; e.target.setAttribute('aria-disabled','true');
+          setTimeout(()=>{ e.target.textContent='Add to Watchlist'; e.target.disabled=false; e.target.removeAttribute('aria-disabled'); },1500);
+        }
+      });
+
+      // Accordion behavior (only one open at a time)
+      qa('.acc-trigger').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const open = btn.getAttribute('aria-expanded')==='true';
+          qa('.acc-trigger').forEach(b=>b.setAttribute('aria-expanded','false'));
+          qa('.acc-content').forEach(c=>{ c.style.maxHeight = null; c.classList.remove('open'); });
+          if(!open){ btn.setAttribute('aria-expanded','true'); const id = btn.getAttribute('aria-controls'); const c = q('#'+id); c.classList.add('open'); c.style.maxHeight = c.scrollHeight + 'px'; }
+        });
+        btn.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); btn.click(); } });
+      });
+
+      // Back to top
+      q('#backToTop').addEventListener('click', ()=>{ if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) window.scrollTo(0,0); else window.scrollTo({top:0,behavior:'smooth'}); });
+
+      // State switcher
+      const stateButtons = {
+        stateDefault: 'default', stateLoading: 'loading', stateEmpty: 'empty', stateError: 'error', stateSuccess: 'success', stateDisabled: 'disabled'
+      };
+      Object.keys(stateButtons).forEach(id=>{
+        q('#'+id).addEventListener('click', ()=>{
+          state.mode = stateButtons[id]; updateStateUI();
+        });
+      });
+
+      function updateStateUI(){
+        // Global error banner
+        if(state.mode==='error'){ q('#globalError').style.display='block'; }
+        else q('#globalError').style.display='none';
+
+        // Loading skeletons in hero mockup
+        const heroDevice = q('#heroDevice');
+        if(state.mode==='loading'){
+          heroDevice.innerHTML = '<div class="skeleton" style="width:100%;height:100%"></div>';
+        } else {
+          heroDevice.innerHTML = '<svg width="220" height="160" viewBox="0 0 220 160" aria-hidden="true">\n              <rect x="0" y="0" width="220" height="160" rx="12" fill="#0B1220" opacity="0.06"></rect>\n              <g transform="translate(8,8)">\n                <rect width="204" height="120" rx="8" fill="#fff"></rect>\n                <text x="12" y="26" fill="#0B1220" font-weight="700" font-size="14">Portfolio</text>\n                <text x="12" y="48" fill="#7A5CFF" font-weight="700" font-size="20">$12,482.34</text>\n                <polyline points="12,90 40,70 70,80 100,50 130,60 160,40 192,48" fill="none" stroke="#0B63FF" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"></polyline>\n              </g>\n            </svg>';
+        }
+
+        // Markets
+        renderMarkets(markets);
+
+        // Disabled state: CTA disabled when invalid
+        const cta = q('.cta-primary');
+        if(state.mode==='disabled'){
+          cta.disabled = true; cta.style.opacity = '0.6'; cta.setAttribute('aria-disabled','true');
+        } else { cta.disabled=false; cta.style.opacity=''; cta.removeAttribute('aria-disabled'); }
+
+        // Success state: show a subtle banner or simulate newsletter success
+        if(state.mode==='success'){
+          // show success toast via modal body for demonstration
+          openModal(q('#ctaSignUp'));
+          signupForm.style.display='none'; signupSuccess.style.display='block';
+          setTimeout(()=>{ closeModal(); signupForm.style.display='block'; signupSuccess.style.display='none'; }, 1800);
+        }
+
+        // Empty state handled in renderMarkets
+      }
+      // initial
+      updateStateUI();
+
+      // Retry button for global error
+      q('#retryBtn').addEventListener('click', ()=>{ state.mode='default'; updateStateUI(); });
+
+      // Refresh markets button
+      q('#refreshBtn') && q('#refreshBtn').addEventListener('click', ()=>{ renderMarkets(markets); });
+
+      // Accessibility: show focus outlines for keyboard users only
+      (function(){
+        let mouseDown = false;
+        document.addEventListener('mousedown', ()=> mouseDown=true);
+        document.addEventListener('keydown', (e)=>{ if(e.key==='Tab') mouseDown=false; });
+        document.addEventListener('focusin', (e)=>{ if(mouseDown) e.target.style.outline='none'; });
+      })();
+
+      // Intersection animations for feature cards (respect reduced motion)
+      if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+        const obs = new IntersectionObserver((entries)=>{ entries.forEach(ent=>{ if(ent.isIntersecting){ ent.target.style.opacity=1; ent.target.style.transform='none'; } }); },{threshold:0.2});
+        qa('.card').forEach(c=>{ c.style.opacity=0; c.style.transform='translateY(20px)'; c.style.transition='opacity 240ms ease-out, transform 240ms ease-out'; obs.observe(c); });
+      }
+
+      // Keyboard sort hint
+      qa('th button.sort').forEach(b=> b.setAttribute('title','Press Enter to sort'));
+
+    })();
+  </script>
+</body>
+</html>
