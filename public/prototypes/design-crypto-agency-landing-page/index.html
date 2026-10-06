@@ -2,875 +2,991 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>LedgerWave — Crypto Agency Prototype</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chaincraft — Crypto product design & engineering studio</title>
+  <meta name="description" content="We design, build and grow Web3 products for teams who move fast and care about trust." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Sora:wght@600;700&display=swap" rel="stylesheet">
   <style>
-    /* Design tokens (from HANDOFF.design_system) */
-    :root{
-      --color-primary:#0B63FF;
-      --color-primary-700:#0849B8;
-      --color-neutral-900:#0B1723;
-      --color-neutral-600:#586675;
-      --color-surface:#FFFFFF;
-      --color-surface-2:#F7FAFC;
-      --color-success:#00C48C;
-      --accent-gradient:linear-gradient(135deg,#0B63FF 0%,#7C4DFF 100%);
-      --font-sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;
-      --spacing-1:4px; --spacing-2:8px; --spacing-3:12px; --spacing-4:16px; --spacing-5:24px; --spacing-6:32px; --spacing-7:48px; --spacing-8:64px;
-      --radius-sm:8px; --radius-md:12px; --radius-lg:16px;
-      --shadow-8:0 6px 18px rgba(11,23,35,0.08);
-      --shadow-16:0 10px 30px rgba(11,23,35,0.12);
-      --focus-ring: 3px solid rgba(11,99,255,0.18);
-      --text-large:40px; --text-large-line:44px; --text-medium:28px; --text-medium-line:32px; --text-body:16px; --text-body-line:24px;
-    }
+    :root { --font-display: 'Sora', system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji','Segoe UI Emoji'; --font-text: 'IBM Plex Sans', system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans'; --font-weight-regular: 400; --font-weight-medium: 500; --font-weight-semibold: 600; --font-weight-bold: 700; --size-display-xxl: 64px; --lh-display-xxl: 72px; --size-display-xl: 56px; --lh-display-xl: 64px; --size-h1: 48px; --lh-h1: 56px; --size-h2: 36px; --lh-h2: 44px; --size-h3: 28px; --lh-h3: 36px; --size-h4: 22px; --lh-h4: 30px; --size-body-l: 18px; --lh-body-l: 28px; --size-body: 16px; --lh-body: 26px; --size-caption: 14px; --lh-caption: 22px; --size-micro: 12px; --lh-micro: 18px; --color-background: #F6F7F9; --color-surface: #FFFFFF; --color-text: #0B1220; --color-muted-text: #5B6678; --color-border: #E2E8F0; --color-accent: #0F766E; --color-on-accent: #FFFFFF; --color-success: #166534; --color-warning: #A16207; --color-danger: #B91C1C; --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px; --space-6: 24px; --space-7: 32px; --space-8: 40px; --space-9: 48px; --space-10: 64px; --space-11: 80px; --space-12: 96px; --space-13: 128px; --radius-1: 4px; --radius-2: 8px; --radius-3: 12px; --radius-4: 20px; --radius-pill: 999px; --shadow-low: 0 1px 2px rgba(16,24,40,0.06); --shadow-mid: 0 8px 24px rgba(16,24,40,0.08); --shadow-high: 0 16px 40px rgba(16,24,40,0.12); --duration-fast: 150ms; --duration-mid: 200ms; --duration-slow: 300ms; --easing-out: cubic-bezier(0.22,0.61,0.36,1); --easing-standard: cubic-bezier(0.4,0,0.2,1); --container-max: 1280px; --container-bleed: 1440px; --grid-gutter-desktop: 24px; --grid-gutter-tablet: 20px; --grid-gutter-mobile: 16px; --focus-ring: 0 0 0 2px var(--color-accent), 0 0 0 4px rgba(15,118,110,0.2); --tap-target: 44px; }
 
-    /* Basic reset & layout */
-    *{box-sizing:border-box}
-    html,body{height:100%;background:var(--color-surface-2);color:var(--color-neutral-900);font-family:var(--font-sans);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-    img{max-width:100%;display:block}
-    a{color:inherit}
-    main{max-width:1200px;margin:0 auto;padding:0 var(--spacing-4)}
+    /* Base */
+    html { box-sizing: border-box; }
+    *, *::before, *::after { box-sizing: inherit; }
+    html, body { height: 100%; }
+    body { margin: 0; font-family: var(--font-text); color: var(--color-text); background: var(--color-background); font-size: var(--size-body); line-height: var(--lh-body); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    img, svg { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: 6px; }
+    :focus { scroll-margin-top: 96px; }
+
+    /* Typography */
+    .display-xl { font-family: var(--font-display); font-weight: var(--font-weight-bold); font-size: clamp(40px, 6vw, var(--size-display-xl)); line-height: var(--lh-display-xl); letter-spacing: -0.01em; }
+    .h1 { font-family: var(--font-display); font-weight: var(--font-weight-semibold); font-size: clamp(32px, 4.4vw, var(--size-h1)); line-height: var(--lh-h1); }
+    .h2 { font-family: var(--font-display); font-weight: var(--font-weight-semibold); font-size: clamp(28px, 3.4vw, var(--size-h2)); line-height: var(--lh-h2); }
+    .h3 { font-family: var(--font-display); font-weight: var(--font-weight-semibold); font-size: var(--size-h3); line-height: var(--lh-h3); }
+    .h4 { font-family: var(--font-display); font-weight: var(--font-weight-semibold); font-size: var(--size-h4); line-height: var(--lh-h4); }
+    .body-l { font-size: var(--size-body-l); line-height: var(--lh-body-l); color: var(--color-muted-text); }
+    .caption { font-size: var(--size-caption); line-height: var(--lh-caption); color: var(--color-muted-text); }
+    .micro { font-size: var(--size-micro); line-height: var(--lh-micro); color: var(--color-muted-text); }
+    .numeric { font-variant-numeric: tabular-nums; }
+
+    /* Layout */
+    .container { max-width: var(--container-max); margin-inline: auto; padding-inline: var(--grid-gutter-mobile); }
+    @media (min-width: 768px) { .container { padding-inline: var(--grid-gutter-tablet); }}
+    @media (min-width: 1280px) { .container { padding-inline: var(--grid-gutter-desktop); }}
+
+    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--grid-gutter-mobile); }
+    @media (min-width: 768px) { .grid { grid-template-columns: repeat(8, 1fr); gap: var(--grid-gutter-tablet); }}
+    @media (min-width: 1280px) { .grid { grid-template-columns: repeat(12, 1fr); gap: var(--grid-gutter-desktop); }}
+
+    .section { padding-block: var(--space-11); }
+    @media (min-width: 768px) { .section { padding-block: var(--space-12); }}
+
+    .surface { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-3); box-shadow: var(--shadow-low); }
 
     /* Skip link */
-    .skip-link{position:fixed;left:12px;top:12px;background:var(--color-primary);color:#fff;padding:8px 12px;border-radius:8px;z-index:2000;transform:translateY(-120%);transition:transform .18s ease-in-out}
-    .skip-link:focus{transform:translateY(0)}
+    .skip-link { position: absolute; top: -40px; left: 16px; background: var(--color-accent); color: var(--color-on-accent); padding: 8px 12px; border-radius: var(--radius-2); transition: transform var(--duration-fast) var(--easing-out); z-index: 1000; }
+    .skip-link:focus { top: 16px; }
 
-    /* Top nav */
-    header{position:sticky;top:0;z-index:1200;background:linear-gradient(180deg,rgba(255,255,255,0.95),rgba(255,255,255,0.9));backdrop-filter:saturate(120%) blur(6px);transition:box-shadow .18s ease,height .18s ease;padding:12px 0}
-    header.scrolled{box-shadow:var(--shadow-8);}
-    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:1200px;margin:0 auto}
-    .logo{display:flex;gap:12px;align-items:center}
-    .brand{display:flex;flex-direction:column;line-height:1}
-    .brand strong{font-weight:700;font-size:18px}
-    nav.primary{display:flex;align-items:center;gap:12px}
-    .nav-links{display:none;gap:16px;align-items:center}
-    .nav-links a{padding:8px 10px;border-radius:8px;color:var(--color-neutral-600);text-decoration:none}
-    .nav-ctas{display:flex;gap:8px}
-    .btn{display:inline-flex;align-items:center;gap:8px;cursor:pointer;border:0;padding:10px 14px;border-radius:10px;font-weight:600}
-    .btn-primary{background:var(--accent-gradient);color:#fff;box-shadow:var(--shadow-8)}
-    .btn-ghost{background:transparent;border:1px solid rgba(11,23,35,0.06);color:var(--color-neutral-900)}
-    .hamburger{width:44px;height:44px;border-radius:10px;background:#fff;border:1px solid rgba(11,23,35,0.06);display:flex;align-items:center;justify-content:center}
-    .mobile-menu{position:fixed;inset:0;background:rgba(11,23,35,0.6);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:1400}
-    .mobile-menu.open{display:flex}
-    .mobile-panel{background:var(--color-surface);width:92%;max-width:420px;padding:20px;border-radius:14px;box-shadow:var(--shadow-16)}
+    /* Top utility bar */
+    .topbar { background: var(--color-background); border-bottom: 1px solid var(--color-border); }
+    .topbar-inner { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 16px; padding-block: 8px; }
+    .note { display: flex; align-items: center; gap: 10px; color: var(--color-text); }
+    .note button { background: transparent; border: none; color: var(--color-muted-text); cursor: pointer; padding: 6px; border-radius: var(--radius-2); min-height: var(--tap-target); min-width: var(--tap-target); }
+    .note button:hover { background: rgba(15,118,110,0.06); color: var(--color-text); }
+    .ticker { display: flex; gap: 8px; overflow: hidden; }
+    .ticker-track { display: flex; gap: 8px; white-space: nowrap; animation: marquee 18s linear infinite; }
+    .ticker:hover .ticker-track, .ticker:focus-within .ticker-track, .ticker.paused .ticker-track { animation-play-state: paused; }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    @media (prefers-reduced-motion: reduce) { .ticker-track { animation: none; } }
+    .chip { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: var(--radius-pill); border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text); min-height: 32px; }
+    .chip .dot-up { width: 8px; height: 8px; border-radius: 50%; background: var(--color-success); }
+    .chip .dot-flat { width: 8px; height: 8px; border-radius: 50%; background: var(--color-muted-text); }
+
+    /* Header / Nav */
+    .header { position: sticky; top: 0; z-index: 900; background: var(--color-surface); border-bottom: 1px solid transparent; transition: padding var(--duration-fast) var(--easing-out), border-color var(--duration-fast) var(--easing-out), box-shadow var(--duration-fast) var(--easing-out); }
+    .header.compact { box-shadow: var(--shadow-low); border-color: var(--color-border); }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; padding-block: 20px; transition: padding var(--duration-fast) var(--easing-out); }
+    .header.compact .nav-inner { padding-block: 12px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 700; letter-spacing: -0.01em; }
+    .brand svg { width: 28px; height: 28px; }
+    .nav { display: none; align-items: center; gap: 24px; }
+    .nav a { color: var(--color-text); padding: 8px 4px; border-radius: 6px; }
+    .nav a:hover { color: var(--color-accent); }
+    .actions { display: none; align-items: center; gap: 12px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; border-radius: var(--radius-2); border: 1px solid transparent; min-height: 44px; cursor: pointer; font-weight: var(--font-weight-medium); transition: transform var(--duration-fast) var(--easing-out), box-shadow var(--duration-mid) var(--easing-out), background-color var(--duration-mid) var(--easing-out), border-color var(--duration-mid) var(--easing-out); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary { background: var(--color-accent); color: var(--color-on-accent); box-shadow: var(--shadow-low); border-color: transparent; }
+    .btn-primary:hover { filter: brightness(0.94); box-shadow: var(--shadow-mid); transform: translateY(-1px); }
+    .btn-primary:active { filter: brightness(0.9); transform: translateY(0); }
+    .btn-ghost { background: transparent; color: var(--color-text); }
+    .btn-ghost:hover { background: rgba(15,118,110,0.06); }
+    .btn-text { background: transparent; color: var(--color-accent); padding-inline: 8px; }
+    .menu-btn { background: transparent; border: 1px solid var(--color-border); border-radius: var(--radius-2); min-height: var(--tap-target); min-width: var(--tap-target); display: inline-flex; align-items: center; justify-content: center; }
+
+    @media (min-width: 900px) { .nav { display: flex; } .actions { display: flex; } .menu-btn { display: none; } }
+
+    /* Mobile drawer */
+    .drawer-overlay { position: fixed; inset: 0; background: rgba(11,18,32,0.4); opacity: 0; pointer-events: none; transition: opacity var(--duration-mid) var(--easing-standard); }
+    .drawer { position: fixed; inset: 0 0 0 auto; width: min(88vw, 360px); background: var(--color-surface); transform: translateX(100%); transition: transform var(--duration-mid) var(--easing-standard); display: flex; flex-direction: column; padding: 24px; gap: 16px; }
+    .drawer.open { transform: translateX(0); }
+    .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer a, .drawer button { min-height: var(--tap-target); text-align: left; }
+    .drawer .drawer-close { margin-left: auto; }
 
     /* Hero */
-    .hero{display:grid;gap:20px;align-items:center;padding:48px 0 36px}
-    .hero-inner{display:flex;flex-direction:column;gap:16px}
-    h1{font-size:var(--text-large);line-height:var(--text-large-line);margin:0}
-    .lead{font-size:18px;color:var(--color-neutral-600);max-width:62ch}
-    .hero-ctas{display:flex;gap:12px;margin-top:8px}
-    /* Token grid decorative */
-    .token-grid{position:relative;width:100%;height:160px;border-radius:12px;overflow:hidden;background:linear-gradient(180deg,rgba(11,99,255,0.06),rgba(124,77,255,0.04));display:flex;align-items:center;justify-content:center}
-    .tokens{display:grid;grid-template-columns:repeat(8,48px);gap:12px;padding:12px;transform:translateY(0);transition:transform .6s ease-in-out}
-    .token{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid rgba(11,23,35,0.04);box-shadow:0 6px 12px rgba(11,23,35,0.06)}
-    .token svg{width:28px;height:28px}
-    /* reduced motion */
-    @media (prefers-reduced-motion:reduce){.tokens{transition:none}}
+    .hero { padding-block: var(--space-12) var(--space-10); }
+    .hero-grid { align-items: center; }
+    .hero-text { grid-column: 1 / -1; }
+    .hero-media { grid-column: 1 / -1; }
+    @media (min-width: 768px) { .hero-text { grid-column: 1 / 6; } .hero-media { grid-column: 6 / -1; } }
+    @media (min-width: 1280px) { .hero-text { grid-column: 2 / 7; } .hero-media { grid-column: 7 / 13; } }
+    .lead { margin-top: var(--space-4); max-width: 70ch; }
+    .hero-ctas { display: flex; gap: 12px; margin-top: var(--space-6); align-items: center; flex-wrap: wrap; }
+    .link-inline { display: inline-flex; align-items: center; gap: 8px; color: var(--color-accent); font-weight: var(--font-weight-medium); }
+    .media-card { border-radius: var(--radius-4); overflow: hidden; border: 1px solid var(--color-border); background: var(--color-surface); box-shadow: var(--shadow-low); }
+    .media-frame { aspect-ratio: 16 / 10; position: relative; display: grid; place-items: center; }
+    .media-frame img { width: 100%; height: 100%; object-fit: cover; }
+    .media-dots { position: absolute; top: 12px; left: 12px; display: inline-flex; gap: 6px; }
+    .media-dots span { width: 8px; height: 8px; border-radius: 50%; background: #E5E7EB; }
 
-    /* Services grid */
-    .services{display:grid;gap:12px;padding:28px 0}
-    .service-grid{display:grid;grid-template-columns:1fr;gap:12px}
-    .service-card{background:var(--color-surface);padding:16px;border-radius:12px;box-shadow:none;transition:transform .18s ease,box-shadow .18s ease;display:flex;flex-direction:column;gap:8px}
-    .service-card:hover{transform:translateY(-8px);box-shadow:var(--shadow-8)}
-    .service-illustration{width:48px;height:48px}
-    .service-bullets{color:var(--color-neutral-600);font-size:14px}
-    .learn-more{margin-top:auto;color:var(--color-primary);font-weight:600;text-decoration:none}
+    /* Logo wall */
+    .logo-strip { background: var(--color-surface); border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); }
+    .logo-row { display: flex; align-items: center; gap: 24px; padding-block: 18px; position: relative; }
+    .logo-track { display: flex; gap: 48px; will-change: transform; animation: logo-marquee 26s linear infinite; }
+    .logo-strip:hover .logo-track, .logo-strip:focus-within .logo-track, .logo-strip.paused .logo-track { animation-play-state: paused; }
+    @keyframes logo-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    @media (prefers-reduced-motion: reduce) { .logo-track { animation: none; } }
+    .logo-item { width: 140px; height: 28px; display: grid; place-items: center; filter: grayscale(1); opacity: 0.9; transition: filter var(--duration-mid) var(--easing-out), opacity var(--duration-mid) var(--easing-out); }
+    .logo-item:hover, .logo-item:focus { filter: grayscale(0.1); opacity: 1; }
+    .logo-ctrls { display: none; gap: 8px; margin-left: auto; }
+    .logo-row:focus-within .logo-ctrls, .logo-strip:hover .logo-ctrls { display: flex; }
 
-    /* Case studies */
-    .cases{padding:24px 0}
-    .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-    .filter-btn{padding:8px 12px;border-radius:10px;background:#fff;border:1px solid rgba(11,23,35,0.06);cursor:pointer}
-    .cases-grid{display:grid;grid-template-columns:1fr;gap:12px;overflow:hidden;transition:max-height .28s ease}
-    .case-card{display:flex;gap:12px;background:var(--color-surface);padding:12px;border-radius:12px;align-items:center}
-    .case-thumb{width:120px;height:80px;border-radius:8px;background:linear-gradient(90deg,#e6f0ff,#f7f7fb);flex-shrink:0}
-    .metric-badge{background:var(--color-primary);color:white;padding:6px 8px;border-radius:999px;font-weight:700}
-    .pill-list{display:flex;gap:6px;flex-wrap:wrap}
-    .pill{background:rgba(11,23,35,0.05);padding:6px 8px;border-radius:999px;font-size:12px}
+    /* Services */
+    .services .tile { padding: 24px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-3); transition: transform var(--duration-mid) var(--easing-out), box-shadow var(--duration-mid) var(--easing-out), border-color var(--duration-mid) var(--easing-out); height: 100%; display: flex; flex-direction: column; gap: 12px; }
+    .services .tile:hover, .services .tile:focus-within { transform: translateY(-4px); box-shadow: var(--shadow-mid); border-color: rgba(15,118,110,0.5); }
+    .tile .icon { width: 28px; height: 28px; color: var(--color-accent); }
+    .tile a { color: var(--color-accent); }
 
-    /* Process */
-    .process{padding:24px 0}
-    .steps{display:flex;gap:12px;align-items:center}
-    .step{background:var(--color-surface);padding:12px;border-radius:10px;flex:1;display:flex;gap:12px;align-items:center}
-    .step-num{width:36px;height:36px;border-radius:8px;background:var(--color-primary);color:white;display:flex;align-items:center;justify-content:center;font-weight:700}
+    /* Featured case */
+    .featured { padding-block: var(--space-12); }
+    .featured .media-bleed { width: 100%; max-width: var(--container-bleed); margin-inline: auto; border-radius: var(--radius-4); overflow: hidden; border: 1px solid var(--color-border); background: var(--color-surface); box-shadow: var(--shadow-low); }
+    .featured .media-bleed .frame { aspect-ratio: 16 / 9; position: relative; }
+    .featured .content { max-width: 960px; margin-inline: auto; margin-top: var(--space-6); padding-inline: var(--grid-gutter-mobile); }
+    @media (min-width: 768px) { .featured .content { padding-inline: var(--grid-gutter-tablet); }}
+    @media (min-width: 1280px) { .featured .content { padding-inline: var(--grid-gutter-desktop); }}
+    .bullets { margin: 0; padding-left: 18px; color: var(--color-text); }
+    .metrics { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; margin-top: var(--space-4); }
+    .metric { padding: 16px; border: 1px solid var(--color-border); border-radius: var(--radius-3); background: var(--color-surface); }
+    .metric .value { font-family: var(--font-display); font-size: var(--size-h3); line-height: var(--lh-h3); font-variant-numeric: tabular-nums; }
 
-    /* Trust & testimonials */
-    .trust{padding:20px 0;display:flex;flex-direction:column;gap:12px}
-    .partners{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-    .partner{width:96px;height:40px;background:linear-gradient(90deg,#fff,#f6f9ff);display:flex;align-items:center;justify-content:center;border-radius:8px;filter:grayscale(100%);opacity:0.8}
-    .testimonial{background:var(--color-surface);padding:16px;border-radius:12px;box-shadow:var(--shadow-8)}
-    .carousel{position:relative}
-    .carousel-controls{display:flex;gap:8px;position:absolute;right:8px;top:8px}
+    /* Signature block confirmation */
+    .confirm { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(246,247,249,0.88); border-top: 1px solid var(--color-border); padding: 10px 12px; display: flex; align-items: center; gap: 12px; backdrop-filter: blur(4px); }
+    .progress { position: relative; height: 6px; background: #E5E7EB; border-radius: 999px; overflow: hidden; flex: 1; }
+    .bar { position: absolute; left: 0; top: 0; bottom: 0; width: 0%; background: var(--color-accent); transition: width 280ms var(--easing-out); }
+    .status-label { min-width: 100px; font-size: var(--size-caption); color: var(--color-muted-text); }
+    .check-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: var(--radius-pill); background: rgba(15,118,110,0.1); color: var(--color-accent); border: 1px solid rgba(15,118,110,0.25); transform: translateY(6px); opacity: 0; transition: transform var(--duration-mid) var(--easing-out), opacity var(--duration-mid) var(--easing-out); }
+    .check-chip.show { transform: translateY(0); opacity: 1; }
 
-    /* Pricing */
-    .pricing{padding:24px 0;display:grid;gap:12px}
-    .pricing-grid{display:grid;grid-template-columns:1fr;gap:12px}
-    .price-card{background:var(--color-surface);padding:16px;border-radius:12px}
-    .check{color:var(--color-success);font-weight:700}
+    /* Case grid */
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: var(--space-6); }
+    .filter-chip { padding: 8px 12px; border-radius: var(--radius-pill); border: 1px solid var(--color-border); background: var(--color-surface); cursor: pointer; min-height: var(--tap-target); }
+    .filter-chip[aria-pressed="true"] { background: var(--color-accent); color: var(--color-on-accent); border-color: transparent; }
+    .cards { display: grid; grid-template-columns: 1fr; gap: 20px; }
+    @media (min-width: 768px) { .cards { grid-template-columns: repeat(2, 1fr); gap: 24px; } }
+    @media (min-width: 1280px) { .cards { grid-template-columns: repeat(3, 1fr); gap: 24px; } }
+    .card { border: 1px solid var(--color-border); border-radius: var(--radius-3); overflow: hidden; background: var(--color-surface); transition: transform var(--duration-mid) var(--easing-out), border-color var(--duration-mid) var(--easing-out), box-shadow var(--duration-mid) var(--easing-out); display: flex; flex-direction: column; }
+    .card:hover, .card:focus-within { transform: translateY(-4px); border-color: rgba(15,118,110,0.5); box-shadow: var(--shadow-mid); }
+    .card-media { aspect-ratio: 16 / 9; overflow: hidden; position: relative; }
+    .card-media img { width: 100%; height: 100%; object-fit: cover; transform: scale(1); transition: transform 240ms var(--easing-out); }
+    .card:hover .card-media img { transform: scale(1.04); }
+    .tag-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .tag { font-size: var(--size-micro); padding: 4px 8px; border-radius: var(--radius-pill); background: #F1F5F9; color: var(--color-text); border: 1px solid var(--color-border); }
+    .card-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .metric-chip { align-self: start; font-variant-numeric: tabular-nums; padding: 6px 10px; border-radius: var(--radius-pill); border: 1px solid var(--color-border); background: #F8FAFC; }
+    .card-link { display: inline-flex; align-items: center; gap: 6px; color: var(--color-accent); font-weight: var(--font-weight-medium); text-decoration: underline transparent; transition: text-decoration-color var(--duration-mid) var(--easing-out); }
+    .card:hover .card-link { text-decoration-color: currentColor; }
 
-    /* Contact & Modal */
-    .contact{padding:24px 0}
-    form .field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
-    input[type="text"],input[type="email"],select,textarea{padding:10px;border-radius:8px;border:1px solid rgba(11,23,35,0.08);font-size:15px}
-    textarea{min-height:120px}
-    .error{color:#B00020;font-size:13px}
-    .error-summary{background:#fff5f5;border:1px solid #ffd6d6;padding:12px;border-radius:8px;color:#8a1f1f}
+    /* Approach */
+    .approach .steps { position: relative; display: grid; grid-template-columns: 1fr; gap: 16px; }
+    @media (min-width: 900px) { .approach .steps { grid-template-columns: repeat(3, 1fr); } }
+    .step { position: relative; padding: 20px; border: 1px solid var(--color-border); border-radius: var(--radius-3); background: var(--color-surface); }
+    .step-index { width: 28px; height: 28px; border-radius: 50%; background: #ECFDF5; color: var(--color-accent); display: grid; place-items: center; font-weight: 600; margin-bottom: 8px; }
+    .connector { display: none; }
+    @media (min-width: 900px) { .connector { display: block; position: absolute; top: 42px; left: 0; right: 0; height: 2px; background: var(--color-border); z-index: -1; } }
 
-    /* Modal */
-    .modal-backdrop{position:fixed;inset:0;background:rgba(11,23,35,0.5);display:none;align-items:center;justify-content:center;z-index:1600}
-    .modal-backdrop.open{display:flex}
-    .modal{background:var(--color-surface);width:94%;max-width:640px;padding:20px;border-radius:12px;box-shadow:var(--shadow-16);}
+    /* Testimonials */
+    .testimonials .carousel { position: relative; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-3); background: var(--color-surface); }
+    .track { display: flex; transition: transform 280ms var(--easing-standard); will-change: transform; }
+    .slide { flex: 0 0 100%; padding: 24px; display: grid; gap: 16px; }
+    @media (min-width: 768px) { .slide { grid-template-columns: 1fr auto; align-items: center; } }
+    .quote { font-size: var(--size-body-l); line-height: var(--lh-body-l); }
+    .person { display: flex; align-items: center; gap: 12px; }
+    .avatar { width: 36px; height: 36px; border-radius: 50%; background: #E2E8F0; display: grid; place-items: center; font-weight: 600; }
+    .carousel-ctrls { position: absolute; inset: auto 8px 8px auto; display: flex; gap: 8px; }
 
-    /* Accordion */
-    .faq{padding:24px 0}
-    .accordion-item{background:var(--color-surface);border-radius:10px;margin-bottom:8px}
-    .accordion-summary{display:flex;justify-content:space-between;align-items:center;padding:12px;cursor:pointer}
-    .accordion-panel{padding:12px;border-top:1px solid rgba(11,23,35,0.04);display:none}
-    .accordion-item.open .accordion-panel{display:block}
+    .dots { display: flex; gap: 6px; margin-top: 10px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #CBD5E1; }
+    .dot[aria-current="true"] { background: var(--color-accent); }
+
+    /* Insights + Newsletter */
+    .insights .cards { margin-top: var(--space-6); }
+    .article .card-body { gap: 6px; }
+    .rtime { color: var(--color-muted-text); font-size: var(--size-micro); }
+    .newsletter { margin-top: var(--space-8); padding: 16px; border: 1px solid var(--color-border); border-radius: var(--radius-3); background: var(--color-surface); display: grid; gap: 12px; }
+    .input-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* Form / CTA */
+    .cta-split { display: grid; grid-template-columns: 1fr; gap: 24px; }
+    @media (min-width: 900px) { .cta-split { grid-template-columns: 1fr 1fr; } }
+    .form { display: grid; gap: 14px; }
+    .field { display: grid; gap: 6px; }
+    label { font-weight: var(--font-weight-medium); }
+    input[type="text"], input[type="email"], select, textarea { padding: 10px 12px; border-radius: var(--radius-2); border: 1px solid var(--color-border); background: var(--color-surface); min-height: 44px; transition: border-color var(--duration-mid) var(--easing-out), box-shadow var(--duration-mid) var(--easing-out); }
+    textarea { min-height: 120px; resize: vertical; }
+    input:hover, select:hover, textarea:hover { border-color: #CBD5E1; }
+    input:focus, select:focus, textarea:focus { box-shadow: var(--focus-ring); outline: none; border-color: var(--color-accent); }
+    .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip-select { padding: 8px 12px; border-radius: var(--radius-pill); border: 1px solid var(--color-border); background: var(--color-surface); cursor: pointer; min-height: var(--tap-target); }
+    .chip-select[aria-pressed="true"] { background: rgba(15,118,110,0.08); border-color: rgba(15,118,110,0.5); color: var(--color-accent); }
+    .helper, .error { font-size: var(--size-caption); line-height: var(--lh-caption); }
+    .error { color: var(--color-danger); }
+    .consent { display: flex; align-items: flex-start; gap: 8px; }
+    .notice { border-left: 3px solid var(--color-accent); background: #ECFDF5; padding: 10px 12px; border-radius: 6px; }
+
+    /* FAQ */
+    .faq .item { border: 1px solid var(--color-border); border-radius: var(--radius-3); background: var(--color-surface); overflow: hidden; }
+    .faq button.q { width: 100%; text-align: left; padding: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: transparent; border: 0; cursor: pointer; }
+    .faq .a { padding: 0 16px 16px; color: var(--color-muted-text); display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--duration-mid) var(--easing-out), opacity var(--duration-mid) var(--easing-out), transform var(--duration-mid) var(--easing-out); opacity: 0.7; transform: translateY(-4px); }
+    .faq .a > div { overflow: hidden; }
+    .faq .item[open] .a { grid-template-rows: 1fr; opacity: 1; transform: translateY(0); }
+    .chev { width: 18px; height: 18px; transition: transform var(--duration-mid) var(--easing-out); }
+    .faq .item[open] .chev { transform: rotate(180deg); }
 
     /* Footer */
-    footer{padding:24px 0;border-top:1px solid rgba(11,23,35,0.04);margin-top:24px}
-    .footer-grid{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+    .footer { background: var(--color-surface); border-top: 1px solid var(--color-border); }
+    .footer .cols { display: grid; grid-template-columns: 1fr; gap: 24px; padding-block: var(--space-10); }
+    @media (min-width: 900px) { .footer .cols { grid-template-columns: 2fr 1fr 1fr 1fr; } }
+    .footer a { color: var(--color-muted-text); }
+    .footer a:hover { color: var(--color-text); }
+    .foot-bottom { display: grid; grid-template-columns: 1fr; gap: 12px; padding-block: 16px 32px; border-top: 1px solid var(--color-border); color: var(--color-muted-text); }
+    @media (min-width: 900px) { .foot-bottom { grid-template-columns: 1fr auto; align-items: center; } }
+
+    /* Controls generic */
+    .ctrl { border: 1px solid var(--color-border); background: var(--color-surface); min-height: var(--tap-target); min-width: var(--tap-target); display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius-2); cursor: pointer; }
+    .ctrl:hover { background: rgba(15,118,110,0.06); }
+
+    /* Skeletons */
+    .skeleton { position: relative; overflow: hidden; background: #E5E7EB; border-radius: 6px; }
+    .skeleton::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent); animation: shimmer 1.2s infinite; }
+    @keyframes shimmer { 100% { transform: translateX(100%); } }
+    @media (prefers-reduced-motion: reduce) { .skeleton::after { animation: none; } }
+
+    /* Toast */
+    .toast { position: fixed; left: 16px; bottom: 16px; background: #ECFDF5; color: var(--color-text); border-left: 3px solid var(--color-accent); padding: 10px 12px; border-radius: 8px; box-shadow: var(--shadow-mid); display: none; z-index: 999; }
+    .toast.show { display: block; }
 
     /* State switcher */
-    .state-switcher{position:fixed;right:16px;bottom:16px;background:#0B1723;color:#fff;padding:8px;border-radius:10px;z-index:2000;font-size:13px}
-    .state-switcher select{margin-left:8px;padding:6px;border-radius:6px;border:0}
-
-    /* Focus visible */
-    :focus{outline-offset:4px}
-    :focus-visible{outline:var(--focus-ring)}
-
-    /* Responsive */
-    @media(min-width:641px){
-      .service-grid{grid-template-columns:repeat(2,1fr)}
-      .cases-grid{grid-template-columns:repeat(2,1fr)}
-      .pricing-grid{grid-template-columns:repeat(2,1fr)}
-      .nav-links{display:flex}
-    }
-    @media(min-width:1025px){
-      main{padding:0 var(--spacing-8)}
-      .hero{grid-template-columns:1fr 440px;align-items:center}
-      .token-grid{height:220px}
-      .service-grid{grid-template-columns:repeat(3,1fr)}
-      .cases-grid{grid-template-columns:repeat(3,1fr)}
-      .pricing-grid{grid-template-columns:repeat(3,1fr)}
-    }
+    .state-switcher { position: fixed; right: 16px; bottom: 16px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-3); box-shadow: var(--shadow-low); padding: 8px 10px; display: flex; align-items: center; gap: 8px; z-index: 950; }
+    .state-switcher select { border: 1px solid var(--color-border); border-radius: var(--radius-2); padding: 6px 10px; }
 
     /* Utility */
-    .muted{color:var(--color-neutral-600)}
-    .center{display:flex;align-items:center;justify-content:center}
-    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-
+    .muted { color: var(--color-muted-text); }
+    .hidden { display: none !important; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
   </style>
 </head>
-<body>
+<body data-state="default">
   <a class="skip-link" href="#main">Skip to content</a>
 
-  <header id="site-header" aria-label="Primary" role="banner">
-    <div class="nav-inner" style="padding:0 12px;">
-      <div class="logo" aria-hidden="false">
-        <!-- inline SVG logo -->
-        <svg width="44" height="44" viewBox="0 0 24 24" aria-hidden="true">
-          <defs>
-            <linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#0B63FF"/><stop offset="1" stop-color="#7C4DFF"/></linearGradient>
-          </defs>
-          <rect width="24" height="24" rx="6" fill="url(#g1)" />
-          <path d="M6 12l4 4 8-8" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-        <div class="brand">
-          <strong>LedgerWave</strong>
-          <span class="muted" style="font-size:12px">Crypto strategy & engineering</span>
+  <!-- Top utility bar -->
+  <div class="topbar" aria-label="Utility bar">
+    <div class="container topbar-inner">
+      <div class="note" id="availability-note">
+        <span class="micro">Now booking Q4 builds — limited slots.</span>
+        <button type="button" class="ctrl" aria-label="Dismiss note" id="dismiss-note" title="Dismiss">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="ticker" role="region" aria-label="Market ticker">
+        <div class="ticker-track" aria-live="off">
+          <span tabindex="0" class="chip" aria-label="ETH price and gas">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l7 12-7 8-7-8 7-12z"/></svg>
+            <span class="micro">ETH</span>
+            <span class="micro numeric" id="eth-val">$3,482</span>
+            <span class="dot-up" aria-hidden="true"></span>
+            <span class="micro numeric" id="gas-val">Gas 24 gwei</span>
+          </span>
+          <span tabindex="0" class="chip" aria-label="BTC price">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9 8h5a2 2 0 110 4H9zm0 0V6m0 6v6m5-2H9"/></svg>
+            <span class="micro">BTC</span>
+            <span class="micro numeric" id="btc-val">$62,140</span>
+            <span class="dot-flat" aria-hidden="true"></span>
+          </span>
+          <!-- duplicate for seamless -->
+          <span tabindex="0" class="chip" aria-label="ETH price and gas duplicate" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l7 12-7 8-7-8 7-12z"/></svg>
+            <span class="micro">ETH</span>
+            <span class="micro numeric">$3,482</span>
+            <span class="dot-up"></span>
+            <span class="micro numeric">Gas 24 gwei</span>
+          </span>
+          <span tabindex="0" class="chip" aria-label="BTC price duplicate" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 8h5a2 2 0 110 4H9zm0 0V6m0 6v6m5-2H9"/></svg>
+            <span class="micro">BTC</span>
+            <span class="micro numeric">$62,140</span>
+            <span class="dot-flat"></span>
+          </span>
         </div>
       </div>
+    </div>
+  </div>
 
-      <nav class="primary" role="navigation" aria-label="Main navigation">
-        <div class="nav-links" id="nav-links">
-          <a href="#services">Services</a>
-          <a href="#cases">Case Studies</a>
-          <a href="#process">How We Work</a>
-          <a href="#team">Team</a>
-          <a href="#pricing">Pricing</a>
-          <a href="#contact">Contact</a>
-        </div>
-
-        <div class="nav-ctas">
-          <button class="btn btn-ghost" id="audit-btn">Get Audit</button>
-          <button class="btn btn-primary" id="contact-btn">Contact</button>
-          <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">☰</button>
-        </div>
+  <!-- Header / Nav -->
+  <header class="header" id="site-header">
+    <div class="container nav-inner">
+      <a href="#" class="brand" aria-label="Chaincraft home">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12a7 7 0 007 7 7 7 0 000-14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Chaincraft</span>
+      </a>
+      <nav class="nav" aria-label="Primary">
+        <a href="#work">Work</a>
+        <a href="#services">Services</a>
+        <a href="#approach">Approach</a>
+        <a href="#insights">Insights</a>
       </nav>
+      <div class="actions">
+        <a class="btn btn-primary" href="#contact" id="cta-book-desktop">Book discovery call</a>
+        <a class="btn btn-ghost" href="mailto:hello@chaincraft.studio" aria-label="Email hello at chaincraft dot studio">hello@chaincraft.studio</a>
+      </div>
+      <button class="menu-btn" id="open-drawer" aria-label="Open menu" aria-haspopup="true" aria-controls="drawer">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
     </div>
   </header>
+  <div class="drawer-overlay" id="drawer-overlay" aria-hidden="true"></div>
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Mobile navigation">
+    <button class="ctrl drawer-close" id="close-drawer" aria-label="Close menu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+    <a href="#work" class="h4">Work</a>
+    <a href="#services" class="h4">Services</a>
+    <a href="#approach" class="h4">Approach</a>
+    <a href="#insights" class="h4">Insights</a>
+    <hr style="border:none;border-top:1px solid var(--color-border)">
+    <a class="btn btn-primary" href="#contact">Book discovery call</a>
+    <a class="btn btn-ghost" href="mailto:hello@chaincraft.studio">hello@chaincraft.studio</a>
+    <div style="margin-top:auto" class="micro muted">© Chaincraft</div>
+  </aside>
 
-  <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
-    <div class="mobile-panel" role="dialog" aria-modal="true" aria-label="Mobile menu">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div style="display:flex;gap:10px;align-items:center"><svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="#0B63FF"/></svg><strong>LedgerWave</strong></div>
-        <button id="mobile-close" class="hamburger" aria-label="Close menu">✕</button>
-      </div>
-      <nav style="display:flex;flex-direction:column;gap:8px">
-        <a href="#services" class="filter-link">Services</a>
-        <a href="#cases" class="filter-link">Case Studies</a>
-        <a href="#process">How We Work</a>
-        <a href="#team">Team</a>
-        <a href="#pricing">Pricing</a>
-        <a href="#contact">Contact</a>
-        <div style="margin-top:12px;display:flex;gap:8px">
-          <button class="btn btn-ghost" id="mobile-audit">Get Audit</button>
-          <button class="btn btn-primary" id="mobile-contact">Contact</button>
-        </div>
-      </nav>
-    </div>
-  </div>
-
-  <main id="main" tabindex="-1">
-    <section class="hero" id="hero">
-      <div class="hero-inner">
-        <h1>We design and ship token economies your users love.</h1>
-        <p class="lead">We blend product-first strategy, bulletproof tokenomics, and on-chain engineering to help projects scale TVL, users, and utility.</p>
-        <div class="hero-ctas">
-          <button class="btn btn-primary" id="hero-cta">Get a free audit</button>
-          <button class="btn btn-ghost" id="hero-cta-secondary">Book a demo</button>
-        </div>
-        <div style="margin-top:12px;color:var(--color-neutral-600);font-size:14px">Trusted by builders across DeFi and NFTs</div>
-      </div>
-
-      <div aria-hidden="true">
-        <div class="token-grid" id="token-grid" role="img" aria-hidden="true" title="Decorative tokens">
-          <div class="tokens" id="tokens">
-            <!-- decorative tokens as inline svgs -->
-            <div class="token"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="url(#g1)"/></svg></div>
-            <div class="token"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="6" fill="#7C4DFF"/></svg></div>
-            <div class="token"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12" stroke="#0B63FF" stroke-width="2" stroke-linecap="round"/></svg></div>
-            <div class="token"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#fff" stroke="#0B63FF"/></svg></div>
-            <div class="token"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12,4 20,20 4,20" fill="#7C4DFF"/></svg></div>
-            <div class="token"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="4" fill="#0B63FF"/></svg></div>
-            <div class="token"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6" fill="#7C4DFF"/></svg></div>
-            <div class="token"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 16l4-8 4 8" stroke="#0B63FF" stroke-width="1.6" fill="none"/></svg></div>
+  <main id="main">
+    <!-- Hero -->
+    <section class="hero container">
+      <div class="grid hero-grid">
+        <div class="hero-text">
+          <h1 class="display-xl">Ship credibly in crypto.</h1>
+          <p class="body-l lead">We design, build and grow Web3 products for teams who move fast and care about trust.</p>
+          <div class="hero-ctas">
+            <a class="btn btn-primary" href="#contact" id="cta-hero">Book discovery call</a>
+            <a class="link-inline" href="#work" id="see-work">See our work
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </a>
           </div>
         </div>
-      </div>
-
-    </section>
-
-    <section id="services" class="services" aria-labelledby="services-title">
-      <h2 id="services-title">Services</h2>
-      <p class="muted">End-to-end product & engineering for token-led growth</p>
-      <div class="service-grid" id="service-grid">
-        <article class="service-card" data-service="Strategy" tabindex="0">
-          <div style="display:flex;gap:12px;align-items:center">
-            <div class="service-illustration" aria-hidden="true">
-              <svg width="48" height="48" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#0B63FF"/></svg>
-            </div>
-            <div>
-              <strong>Strategy</strong>
-              <div class="muted" style="font-size:13px">Positioning, token utility & runway</div>
+        <div class="hero-media">
+          <div class="media-card">
+            <div class="media-frame" aria-label="Featured work previews">
+              <div class="media-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+              <!-- rotating thumbnails -->
+              <img id="hero-thumb" loading="lazy" width="1200" height="750" alt="Dashboard preview" />
             </div>
           </div>
-          <ul class="service-bullets">
-            <li>Product-market fit for tokens</li>
-            <li>Economics & incentive design</li>
-            <li>Go-to-market playbook</li>
-          </ul>
-          <a class="learn-more" href="#" data-service-link>Learn more →</a>
-        </article>
-
-        <article class="service-card" data-service="Tokenomics" tabindex="0">
-          <div style="display:flex;gap:12px;align-items:center">
-            <div class="service-illustration" aria-hidden="true">
-              <svg width="48" height="48" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="6" fill="#7C4DFF"/></svg>
-            </div>
-            <div>
-              <strong>Tokenomics</strong>
-              <div class="muted" style="font-size:13px">Modeling, emissions, vesting</div>
-            </div>
-          </div>
-          <ul class="service-bullets">
-            <li>Simulations & stress tests</li>
-            <li>Emission schedules</li>
-            <li>Governance design</li>
-          </ul>
-          <a class="learn-more" href="#" data-service-link>Learn more →</a>
-        </article>
-
-        <article class="service-card" data-service="Smart Contracts" tabindex="0">
-          <div style="display:flex;gap:12px;align-items:center">
-            <div class="service-illustration" aria-hidden="true">
-              <svg width="48" height="48" viewBox="0 0 24 24"><path d="M4 6h16v12H4z" fill="#0B63FF"/></svg>
-            </div>
-            <div>
-              <strong>Smart Contracts</strong>
-              <div class="muted" style="font-size:13px">Audits, builds, integrations</div>
-            </div>
-          </div>
-          <ul class="service-bullets">
-            <li>Security-first implementations</li>
-            <li>Comprehensive audits</li>
-          </ul>
-          <a class="learn-more" href="#" data-service-link>Learn more →</a>
-        </article>
-
-        <article class="service-card" data-service="Launch" tabindex="0">
-          <div style="display:flex;gap:12px;align-items:center">
-            <div class="service-illustration" aria-hidden="true">
-              <svg width="48" height="48" viewBox="0 0 24 24"><path d="M12 2l4 10-4 2-4-2z" fill="#7C4DFF"/></svg>
-            </div>
-            <div>
-              <strong>Launch & Growth</strong>
-              <div class="muted" style="font-size:13px">Onchain growth and ops</div>
-            </div>
-          </div>
-          <ul class="service-bullets">
-            <li>Incentive campaigns</li>
-            <li>Partnerships & liquidity</li>
-            <li>Analytics & iteration</li>
-          </ul>
-          <a class="learn-more" href="#" data-service-link>Learn more →</a>
-        </article>
+        </div>
       </div>
     </section>
 
-    <section id="cases" class="cases" aria-labelledby="cases-title">
-      <h2 id="cases-title">Case Studies</h2>
-      <div class="filters" role="toolbar" aria-label="Filter case studies">
-        <button class="filter-btn" data-filter="all">All</button>
-        <button class="filter-btn" data-filter="Strategy">Strategy</button>
-        <button class="filter-btn" data-filter="Tokenomics">Tokenomics</button>
-        <button class="filter-btn" data-filter="Smart Contracts">Smart Contracts</button>
-        <button class="filter-btn" data-filter="Launch">Launch</button>
+    <!-- Logo wall -->
+    <section class="logo-strip" aria-label="Trusted by Web3 teams across chains">
+      <div class="container logo-row">
+        <span class="micro muted">Trusted by Web3 teams across chains</span>
+        <div class="logo-track" id="logo-track" aria-hidden="false">
+          <!-- 12+ logos (duplicated for seamless loop) -->
+          <button class="logo-item ctrl" aria-label="Perimeter Protocol" tabindex="0"> 
+            <svg viewBox="0 0 160 32" aria-hidden="true"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Perimeter</text></svg>
+          </button>
+          <button class="logo-item ctrl" aria-label="Orbital Labs"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Orbital</text></svg></button>
+          <button class="logo-item ctrl" aria-label="Nexus Chain"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Nexus</text></svg></button>
+          <button class="logo-item ctrl" aria-label="Delta Exchange"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Delta</text></svg></button>
+          <button class="logo-item ctrl" aria-label="Foundry"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Foundry</text></svg></button>
+          <button class="logo-item ctrl" aria-label="Anchor"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Anchor</text></svg></button>
+          <button class="logo-item ctrl" aria-label="Covalent"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Covalent</text></svg></button>
+          <button class="logo-item ctrl" aria-label="Threshold"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Threshold</text></svg></button>
+          <button class="logo-item ctrl" aria-label="Relay"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Relay</text></svg></button>
+          <button class="logo-item ctrl" aria-label="Mosaic"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Mosaic</text></svg></button>
+          <button class="logo-item ctrl" aria-label="Layer Labs"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Layer</text></svg></button>
+          <button class="logo-item ctrl" aria-label="Ledgerly"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Ledgerly</text></svg></button>
+          <!-- duplicate the same to enable loop -->
+          <button class="logo-item ctrl" aria-label="Perimeter Protocol" aria-hidden="true"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Perimeter</text></svg></button>
+          <button class="logo-item ctrl" aria-label="Orbital Labs" aria-hidden="true"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Orbital</text></svg></button>
+          <button class="logo-item ctrl" aria-label="Nexus Chain" aria-hidden="true"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Nexus</text></svg></button>
+          <button class="logo-item ctrl" aria-label="Delta Exchange" aria-hidden="true"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Delta</text></svg></button>
+        </div>
+        <div class="logo-ctrls" aria-hidden="true">
+          <button class="ctrl" id="logo-prev" aria-label="Previous logos"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <button class="ctrl" id="logo-next" aria-label="Next logos"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services -->
+    <section class="section container" id="services">
+      <h2 class="h2">What we do</h2>
+      <div class="grid services" style="margin-top: var(--space-6);">
+        <div class="tile" tabindex="0" style="grid-column: span 4;" role="group" aria-labelledby="svc-1">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h18M12 3v18" opacity=".3"/><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>
+          <h3 id="svc-1" class="h3">Strategy</h3>
+          <p>Protocol and product strategy, token and growth mechanics, audits that find what others miss.</p>
+          <a href="#" class="link-inline">Explore service <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        </div>
+        <div class="tile" tabindex="0" style="grid-column: span 4;" role="group" aria-labelledby="svc-2">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18M7 15h4"/></svg>
+          <h3 id="svc-2" class="h3">Product Design</h3>
+          <p>UX that converts, UI that builds trust, design systems that scale with your roadmap.</p>
+          <a href="#" class="link-inline">Explore service <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        </div>
+        <div class="tile" tabindex="0" style="grid-column: span 4;" role="group" aria-labelledby="svc-3">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/><path d="M8 7v10M16 7v10" opacity=".3"/></svg>
+          <h3 id="svc-3" class="h3">Engineering</h3>
+          <p>Senior Solidity, Typescript and Rust teams shipping secure, gas-efficient code.</p>
+          <a href="#" class="link-inline">Explore service <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        </div>
+        <div class="tile" tabindex="0" style="grid-column: span 4;" role="group" aria-labelledby="svc-4">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17s3-3 9-3 9 3 9 3"/><circle cx="12" cy="8" r="3"/></svg>
+          <h3 id="svc-4" class="h3">Growth</h3>
+          <p>Launch playbooks, partnerships and performance creative that compound.</p>
+          <a href="#" class="link-inline">Explore service <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured case -->
+    <section class="featured" id="work">
+      <div class="media-bleed" aria-labelledby="feat-title">
+        <div class="frame">
+          <img id="featured-img" loading="lazy" width="1440" height="810" alt="Case study preview: DEX metrics" srcset="" sizes="100vw" />
+          <!-- Signature confirmation -->
+          <div class="confirm" aria-live="polite" aria-atomic="true">
+            <span class="status-label" id="confirm-status">Mempool</span>
+            <div class="progress" aria-hidden="true"><div class="bar" id="confirm-bar"></div></div>
+            <span class="check-chip" id="confirm-chip">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+              Confirmed
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="caption">Case study — DeFi</div>
+        <h3 id="feat-title" class="h2" style="margin-top:8px;">0→$120M TVL in 90 days for a new L2 DEX</h3>
+        <ul class="bullets">
+          <li>Onboarded 65k wallets</li>
+          <li>Slashed swap latency by 42%</li>
+          <li>Passed audit with zero criticals.</li>
+        </ul>
+        <div class="metrics">
+          <div class="metric"><div class="caption">TVL</div><div class="value numeric" id="metric-tvl">$0M</div></div>
+          <div class="metric"><div class="caption">Conversion</div><div class="value numeric" id="metric-cvr">0%</div></div>
+          <div class="metric"><div class="caption">Time to ship</div><div class="value numeric" id="metric-tts">—</div></div>
+        </div>
+        <div style="margin-top: var(--space-6); display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+          <a href="#" class="btn btn-primary">Read case study</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Case grid with filters -->
+    <section class="section container" aria-labelledby="cases-title">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <h2 id="cases-title" class="h2">More work</h2>
+        <div class="filters" role="toolbar" aria-label="Filter cases">
+          <button class="filter-chip" data-filter="all" aria-pressed="true">All</button>
+          <button class="filter-chip" data-filter="DeFi">DeFi</button>
+          <button class="filter-chip" data-filter="Infra">Infra</button>
+          <button class="filter-chip" data-filter="NFT">NFT</button>
+          <button class="filter-chip" data-filter="Exchange">Exchange</button>
+        </div>
       </div>
       <div id="cases-live" class="sr-only" aria-live="polite"></div>
-      <div class="cases-grid" id="cases-grid" style="max-height:2000px">
-        <!-- case cards -->
-        <article class="case-card" data-services="Tokenomics Launch">
-          <div class="case-thumb" aria-hidden="true"></div>
-          <div>
-            <div style="display:flex;align-items:center;gap:8px;justify-content:space-between">
-              <div><strong>Protocol X</strong><div class="muted" style="font-size:13px">DeFi protocol — AMM</div></div>
-              <div class="metric-badge">+250% TVL</div>
-            </div>
-            <p class="muted" style="margin:6px 0">Launched emissions redesign, increased retention and liquidity.</p>
-            <div class="pill-list"><span class="pill">Solidity</span><span class="pill">Subgraph</span></div>
-          </div>
-        </article>
-
-        <article class="case-card" data-services="Strategy Tokenomics">
-          <div class="case-thumb" aria-hidden="true"></div>
-          <div>
-            <div style="display:flex;align-items:center;gap:8px;justify-content:space-between">
-              <div><strong>Collective A</strong><div class="muted" style="font-size:13px">NFT community</div></div>
-              <div class="metric-badge">+18k users</div>
-            </div>
-            <p class="muted" style="margin:6px 0">Designed token utility & access layers to grow DAU.</p>
-            <div class="pill-list"><span class="pill">IPFS</span><span class="pill">Oracle</span></div>
-          </div>
-        </article>
-
-        <article class="case-card" data-services="Smart Contracts">
-          <div class="case-thumb" aria-hidden="true"></div>
-          <div>
-            <div style="display:flex;align-items:center;gap:8px;justify-content:space-between">
-              <div><strong>BridgeCo</strong><div class="muted" style="font-size:13px">Cross-chain infra</div></div>
-              <div class="metric-badge">$10M secured</div>
-            </div>
-            <p class="muted" style="margin:6px 0">Built audited bridge contracts and relayers.</p>
-            <div class="pill-list"><span class="pill">Rust</span><span class="pill">Audit</span></div>
-          </div>
-        </article>
+      <div class="cards" id="case-cards">
+        <!-- Cards injected by JS for statefulness and skeletons -->
+      </div>
+      <div id="cases-empty" class="hidden" style="margin-top:16px;">
+        <div class="notice">No case studies to show. Send your brief — we’ll share relevant work.</div>
+      </div>
+      <div id="cases-error" class="hidden" style="margin-top:16px;">
+        <div class="notice" style="border-left-color: var(--color-danger); background:#FEF2F2;">Couldn’t load cases. Please refresh or <a class="link-inline" href="#contact">send your brief</a>.</div>
       </div>
     </section>
 
-    <section id="process" class="process" aria-labelledby="process-title">
-      <h2 id="process-title">How We Work</h2>
-      <p class="muted">A tight, three-step process to ship impact fast</p>
-      <div class="steps" role="list">
-        <div class="step" role="listitem">
-          <div class="step-num">1</div>
-          <div>
-            <strong>Discover & model</strong>
-            <div class="muted">Research, assumptions & token modeling</div>
-          </div>
-        </div>
-        <div class="step" role="listitem">
-          <div class="step-num">2</div>
-          <div>
-            <strong>Build & audit</strong>
-            <div class="muted">Contracts, integrations & tests</div>
-          </div>
-        </div>
-        <div class="step" role="listitem">
-          <div class="step-num">3</div>
-          <div>
-            <strong>Launch & iterate</strong>
-            <div class="muted">Ops, incentives & analytics</div>
-          </div>
-        </div>
-      </div>
-      <div style="margin-top:12px"><button class="btn btn-primary" id="process-cta">Work with us</button></div>
-    </section>
-
-    <section id="team" class="trust" aria-labelledby="team-title">
-      <h2 id="team-title">Team & Trust</h2>
-      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-        <div style="display:flex;gap:12px;align-items:center">
-          <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect width='64' height='64' rx='12' fill='%230B63FF'/><text x='32' y='36' font-size='20' fill='white' text-anchor='middle' font-family='Arial'>AW</text></svg>" width="64" height="64" alt="Founder's avatar">
-          <div>
-            <strong>Ava Winters</strong>
-            <div class="muted" style="font-size:13px">Founder • ex-ProtocolX</div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:12px;align-items:center">
-          <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect width='64' height='64' rx='12' fill='%237C4DFF'/><text x='32' y='36' font-size='20' fill='white' text-anchor='middle' font-family='Arial'>MK</text></svg>" width="64" height="64" alt="Co-founder avatar">
-          <div>
-            <strong>Marcus Lee</strong>
-            <div class="muted" style="font-size:13px">Head of Engineering • audited $1B+</div>
-          </div>
-        </div>
-      </div>
-
-      <div style="margin-top:12px">
-        <div class="partners" id="partners">
-          <!-- placeholders for lazy loaded logos -->
-          <div class="partner" data-src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='40'><rect width='96' height='40' rx='8' fill='%23e8f0ff'/><text x='48' y='24' font-size='12' fill='%230B1723' text-anchor='middle'>ProtocolX</text></svg>">Loading...</div>
-          <div class="partner" data-src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='40'><rect width='96' height='40' rx='8' fill='%23f6f0ff'/><text x='48' y='24' font-size='12' fill='%230B1723' text-anchor='middle'>BridgeCo</text></svg>">Loading...</div>
-          <div class="partner" data-src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='40'><rect width='96' height='40' rx='8' fill='%23f0fff6'/><text x='48' y='24' font-size='12' fill='%230B1723' text-anchor='middle'>Collective A</text></svg>">Loading...</div>
-        </div>
-      </div>
-
-      <div style="margin-top:12px">
-        <div class="carousel" aria-roledescription="carousel" aria-label="Testimonials">
-          <div class="carousel-controls">
-            <button class="btn" id="prev-test" aria-label="Previous testimonial">◀</button>
-            <button class="btn" id="next-test" aria-label="Next testimonial">▶</button>
-          </div>
-          <div id="testimonial-live" class="sr-only" aria-live="polite"></div>
-          <div class="testimonial" id="testimonial-1" tabindex="0">"LedgerWave redesigned our token emissions — TVL more than doubled in 3 months" — Lead @ ProtocolX</div>
-        </div>
-      </div>
-    </section>
-
-    <section id="pricing" class="pricing" aria-labelledby="pricing-title">
-      <h2 id="pricing-title">Pricing & Packages</h2>
-      <p class="muted">Flexible engagement for startups and enterprises</p>
-      <div class="pricing-grid">
-        <div class="price-card">
-          <strong>Starter</strong>
-          <div class="muted">Audit & token advisory</div>
-          <div style="font-size:20px;margin:12px 0">$8k+</div>
-          <ul>
-            <li><span class="check">✓</span> Token health audit</li>
-            <li><span class="check">✓</span> Emissions model</li>
+    <!-- Approach -->
+    <section class="section container" id="approach">
+      <h2 class="h2">Our way to mainnet</h2>
+      <div class="steps" style="margin-top: var(--space-6);">
+        <div class="connector" aria-hidden="true"></div>
+        <div class="step">
+          <div class="step-index">1</div>
+          <div class="h4">Discover</div>
+          <p class="muted">Brief, audits, stakeholder interviews. We map value, risk and lift.</p>
+          <ul class="micro muted" style="padding-left:18px; margin:0;">
+            <li>Protocol + product audit</li>
+            <li>Competitive mapping</li>
+            <li>Risk + lift report</li>
           </ul>
-          <div style="margin-top:12px"><button class="btn btn-primary price-cta">Contact</button></div>
         </div>
-
-        <div class="price-card">
-          <strong>Scale</strong>
-          <div class="muted">End-to-end token design & build</div>
-          <div style="font-size:20px;margin:12px 0">$25k+</div>
-          <ul>
-            <li><span class="check">✓</span> Full tokenomics</li>
-            <li><span class="check">✓</span> Contracts & audits</li>
+        <div class="step">
+          <div class="step-index">2</div>
+          <div class="h4">Build</div>
+          <p class="muted">Design sprints, dev sprints, weekly ship cadence.</p>
+          <ul class="micro muted" style="padding-left:18px; margin:0;">
+            <li>Design system</li>
+            <li>Contracts + clients</li>
+            <li>Security reviews</li>
           </ul>
-          <div style="margin-top:12px"><button class="btn btn-primary price-cta">Contact</button></div>
         </div>
-
-        <div class="price-card">
-          <strong>Enterprise</strong>
-          <div class="muted">Custom engagements</div>
-          <div style="font-size:20px;margin:12px 0">Custom</div>
-          <ul>
-            <li><span class="check">✓</span> Dedicated team</li>
-            <li><span class="check">✓</span> SLA & oncall</li>
+        <div class="step">
+          <div class="step-index">3</div>
+          <div class="h4">Prove</div>
+          <p class="muted">Launch, measure, iterate. Growth creative, on-chain analytics.</p>
+          <ul class="micro muted" style="padding-left:18px; margin:0;">
+            <li>Launch playbook</li>
+            <li>Attribution setup</li>
+            <li>Optimization loops</li>
           </ul>
-          <div style="margin-top:12px"><button class="btn btn-primary price-cta">Contact</button></div>
         </div>
+      </div>
+      <div style="margin-top: var(--space-6);">
+        <a href="#" class="link-inline">See our process <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
       </div>
     </section>
 
-    <section id="contact" class="contact" aria-labelledby="contact-title">
-      <h2 id="contact-title">Contact</h2>
-      <p class="muted">Tell us about your project — or book time.</p>
-      <form id="lead-form" novalidate>
-        <div id="form-error-summary" aria-live="assertive" style="display:none"></div>
-        <div class="field">
-          <label for="name">Name</label>
-          <input id="name" name="name" type="text" required aria-required="true" />
-          <div class="error" id="error-name" role="alert" aria-live="assertive"></div>
+    <!-- Testimonials + metrics -->
+    <section class="section container" aria-labelledby="testi-title">
+      <h2 id="testi-title" class="h2">What our partners say</h2>
+      <div class="testimonials" style="margin-top: var(--space-6);">
+        <div class="carousel" id="carousel" aria-roledescription="carousel" aria-label="Testimonials">
+          <div class="track" id="track" role="group" aria-live="polite">
+            <article class="slide" tabindex="0" aria-label="Slide 1 of 3">
+              <p class="quote">“Chaincraft shipped in weeks what took others months — and it just worked.”</p>
+              <div class="person">
+                <div class="avatar" aria-hidden="true">MR</div>
+                <div>
+                  <div class="micro">Maya R., Head of Product — Perimeter Protocol</div>
+                </div>
+              </div>
+            </article>
+            <article class="slide" tabindex="0" aria-label="Slide 2 of 3">
+              <p class="quote">“Design quality and engineering rigor in one team. Our conversion jumped immediately.”</p>
+              <div class="person"><div class="avatar">JP</div><div class="micro">Jon P., GM — Delta Exchange</div></div>
+            </article>
+            <article class="slide" tabindex="0" aria-label="Slide 3 of 3">
+              <p class="quote">“Security-first approach without slowing us down. Best vendor we’ve worked with.”</p>
+              <div class="person"><div class="avatar">LK</div><div class="micro">Lina K., CTO — Nexus Chain</div></div>
+            </article>
+          </div>
+          <div class="carousel-ctrls">
+            <button class="ctrl" id="prev-slide" aria-controls="track" aria-label="Previous testimonial"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <button class="ctrl" id="next-slide" aria-controls="track" aria-label="Next testimonial"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+          </div>
         </div>
-        <div class="field">
-          <label for="company">Company</label>
-          <input id="company" name="company" type="text" />
-          <div class="error" id="error-company"></div>
+        <div class="dots" role="tablist" aria-label="Testimonial pagination" style="margin-top:10px;">
+          <button class="dot" data-index="0" role="tab" aria-selected="true" aria-current="true" aria-controls="track"></button>
+          <button class="dot" data-index="1" role="tab" aria-selected="false" aria-controls="track"></button>
+          <button class="dot" data-index="2" role="tab" aria-selected="false" aria-controls="track"></button>
         </div>
-        <div class="field">
-          <label for="email">Work email</label>
-          <input id="email" name="email" type="email" required aria-required="true" />
-          <div class="error" id="error-email" role="alert" aria-live="assertive"></div>
+      </div>
+      <div class="grid" style="margin-top: var(--space-8);">
+        <div class="metric surface" style="grid-column: span 4;"><div class="caption">Projects shipped</div><div class="value numeric">120+</div></div>
+        <div class="metric surface" style="grid-column: span 4;"><div class="caption">Chains supported</div><div class="value numeric">12</div></div>
+        <div class="metric surface" style="grid-column: span 4;"><div class="caption">Avg time to launch</div><div class="value numeric">6 weeks</div></div>
+      </div>
+    </section>
+
+    <!-- Insights + Newsletter -->
+    <section class="section container insights" id="insights">
+      <h2 class="h2">Fresh insights</h2>
+      <div class="cards" id="insight-cards" style="margin-top: var(--space-6);"></div>
+      <form class="newsletter" id="newsletter" novalidate aria-labelledby="nl-label">
+        <div class="h4" id="nl-label">Get new posts in your inbox</div>
+        <div class="input-row">
+          <label class="sr-only" for="nl-email">Work email</label>
+          <input id="nl-email" type="email" placeholder="Work email" aria-describedby="nl-help" required />
+          <button class="btn btn-primary" type="submit" id="nl-submit">Subscribe</button>
         </div>
-        <div class="field">
-          <label for="budget">Budget</label>
-          <select id="budget" name="budget">
-            <option value="<$10k">&lt;$10k</option>
-            <option value="$10k-$50k">$10k–$50k</option>
-            <option value=">$50k">&gt;$50k</option>
-          </select>
-          <div class="error" id="error-budget"></div>
-        </div>
-        <div class="field">
-          <label for="message">Message</label>
-          <textarea id="message" name="message"></textarea>
-          <div class="error" id="error-message"></div>
-        </div>
-        <div class="field">
-          <label for="file">Attach file <span class="muted" style="font-size:12px">(optional)</span></label>
-          <input id="file" name="file" type="file" aria-describedby="file-desc" />
-          <div id="file-desc" class="muted" style="font-size:12px">Max 5MB. We accept PDFs and docs.</div>
-        </div>
-        <div class="field">
-          <label><input type="checkbox" id="recaptcha-fallback" /> I'm not a robot (fallback)</label>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <button class="btn btn-primary" id="form-submit" type="submit">Send</button>
-          <div id="form-status" class="muted" aria-live="polite"></div>
-        </div>
+        <div class="micro muted" id="nl-help">We’ll send 1–2 emails a month. No spam.</div>
+        <div class="error" id="nl-error" role="alert" aria-live="polite" style="display:none;">Enter a valid work email.</div>
       </form>
     </section>
 
-    <section id="faq" class="faq" aria-labelledby="faq-title">
-      <h2 id="faq-title">FAQ</h2>
-      <div class="accordion">
-        <div class="accordion-item" data-idx="0">
-          <div class="accordion-summary" tabindex="0" role="button" aria-expanded="false">What is an audit? <span aria-hidden="true">+</span></div>
-          <div class="accordion-panel">A security review of smart contracts and economic attack vectors.</div>
+    <!-- Lead capture / CTA -->
+    <section class="section container" id="contact">
+      <div class="cta-split">
+        <div>
+          <h2 class="h2">Tell us what you’re building.</h2>
+          <p class="body-l">Share your goals. We’ll reply with a plan and timelines — no spam, no pressure.</p>
         </div>
-        <div class="accordion-item" data-idx="1">
-          <div class="accordion-summary" tabindex="0" role="button" aria-expanded="false">How long does a token design take? <span aria-hidden="true">+</span></div>
-          <div class="accordion-panel">Typically 2–6 weeks depending on scope and integrations.</div>
-        </div>
-        <div class="accordion-item" data-idx="2">
-          <div class="accordion-summary" tabindex="0" role="button" aria-expanded="false">Do you perform audits? <span aria-hidden="true">+</span></div>
-          <div class="accordion-panel">Yes — we both build and audit; we also partner with specialist firms.</div>
-        </div>
+        <form class="form" id="brief-form" novalidate>
+          <div class="field"><label for="name">Your name</label><input id="name" type="text" required /><div class="error" id="err-name" style="display:none;">Please enter your name.</div></div>
+          <div class="field"><label for="email">Work email</label><input id="email" type="email" required /><div class="error" id="err-email" style="display:none;">Enter a valid work email.</div></div>
+          <div class="field"><label for="company">Company</label><input id="company" type="text" required /><div class="error" id="err-company" style="display:none;">Please enter your company.</div></div>
+          <div class="field">
+            <label>What you need</label>
+            <div class="chips" role="group" aria-label="What you need">
+              <button type="button" class="chip-select" data-need="Strategy" aria-pressed="false">Strategy</button>
+              <button type="button" class="chip-select" data-need="Product design" aria-pressed="false">Product design</button>
+              <button type="button" class="chip-select" data-need="Engineering" aria-pressed="false">Engineering</button>
+              <button type="button" class="chip-select" data-need="Growth" aria-pressed="false">Growth</button>
+            </div>
+            <div class="error" id="err-needs" style="display:none;">Select at least one need.</div>
+          </div>
+          <div class="field"><label for="budget">Budget range</label>
+            <select id="budget" required>
+              <option value="" disabled selected>Select</option>
+              <option>&lt;$25k</option>
+              <option>$25–100k</option>
+              <option>$100–300k</option>
+              <option>$300k+</option>
+            </select>
+            <div class="error" id="err-budget" style="display:none;">Choose a budget range.</div>
+          </div>
+          <div class="field"><label for="message">Project details</label><textarea id="message" placeholder="Goals, timeline, links…"></textarea></div>
+          <div class="consent"><input id="consent" type="checkbox" required aria-describedby="consent-help" /> <label for="consent" style="font-weight:400;">I agree to the privacy policy.</label></div>
+          <div class="error" id="err-consent" style="display:none;">Please agree to the privacy policy.</div>
+          <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+            <button class="btn btn-primary" type="submit" id="submit-brief"><span id="submit-label">Send brief</span><span id="submit-spinner" class="hidden" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-9-9"/></svg>
+            </span></button>
+            <span class="micro muted">Response within 1–2 days</span>
+          </div>
+          <div id="form-success" class="notice hidden" role="status" aria-live="polite">
+            <strong>Brief received</strong><div>Thanks — want to book time now? <a href="#calendar" class="link-inline">Grab a slot that works</a>.</div>
+          </div>
+        </form>
       </div>
     </section>
 
-    <footer>
-      <div class="footer-grid">
-        <div>
-          <strong>LedgerWave</strong>
-          <div class="muted">© <span id="year"></span> LedgerWave — All rights reserved</div>
-        </div>
-        <div style="margin-left:auto;display:flex;gap:12px;align-items:center">
-          <a href="#" class="muted">Terms</a>
-          <a href="#" class="muted">Privacy</a>
-          <form id="newsletter-form" style="display:flex;gap:8px;align-items:center">
-            <label for="newsletter" class="sr-only">Subscribe to newsletter</label>
-            <input id="newsletter" type="email" placeholder="Your email" aria-label="Your email" />
-            <button class="btn btn-primary" type="submit">Subscribe</button>
-          </form>
-        </div>
+    <!-- FAQ -->
+    <section class="section container faq" aria-labelledby="faq-title">
+      <h2 id="faq-title" class="h2">Questions, answered</h2>
+      <div class="grid" style="margin-top: var(--space-6); gap: 16px;">
+        <details class="item" role="group" style="grid-column: span 12;">
+          <summary><button class="q" aria-expanded="false"><span>What budgets do you work with?</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button></summary>
+          <div class="a"><div>We scope outcomes to your stage. Most engagements range from $25k–$500k depending on scope and speed.</div></div>
+        </details>
+        <details class="item" role="group" style="grid-column: span 12;">
+          <summary><button class="q" aria-expanded="false"><span>How fast can you start?</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button></summary>
+          <div class="a"><div>We keep 1–2 build slots open each quarter. If you’re a fit, we can start within 2–3 weeks.</div></div>
+        </details>
+        <details class="item" role="group" style="grid-column: span 12;">
+          <summary><button class="q" aria-expanded="false"><span>Which chains do you work with?</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button></summary>
+          <div class="a"><div>We’re chain-agnostic and have shipped across L1s and L2s. We’ll recommend the best fit for your goals.</div></div>
+        </details>
+        <details class="item" role="group" style="grid-column: span 12;">
+          <summary><button class="q" aria-expanded="false"><span>Do you run audits?</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button></summary>
+          <div class="a"><div>Yes — our security team runs protocol and front-end audits. We also partner with tier-one firms when needed.</div></div>
+        </details>
+        <details class="item" role="group" style="grid-column: span 12;">
+          <summary><button class="q" aria-expanded="false"><span>Engagement models?</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button></summary>
+          <div class="a"><div>Fixed-scope projects, monthly retainers, and dedicated squads. We co-own outcomes either way.</div></div>
+        </details>
+        <details class="item" role="group" style="grid-column: span 12;">
+          <summary><button class="q" aria-expanded="false"><span>How do you price?</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button></summary>
+          <div class="a"><div>Transparent rate cards with weekly burn mapping. We price on scope, speed, and seniority required.</div></div>
+        </details>
       </div>
-    </footer>
+    </section>
   </main>
 
-  <!-- Modal -->
-  <div class="modal-backdrop" id="modal-backdrop" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-      <button id="modal-close" class="hamburger" style="float:right" aria-label="Close">✕</button>
-      <h3 id="modal-title">Start your audit</h3>
-      <form id="modal-form" novalidate>
-        <div id="modal-error" class="error-summary" style="display:none" aria-live="assertive"></div>
-        <div class="field"><label for="m-name">Name</label><input id="m-name" type="text" required></div>
-        <div class="field"><label for="m-email">Email</label><input id="m-email" type="email" required></div>
-        <div class="field"><label for="m-budget">Budget</label><select id="m-budget"><option>$10k–$50k</option><option>&gt;$50k</option></select></div>
-        <div style="display:flex;gap:8px;align-items:center"><button class="btn btn-primary" id="modal-submit">Request audit</button><div id="modal-status" class="muted" aria-live="polite"></div></div>
-      </form>
+  <!-- Footer -->
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="cols">
+        <div>
+          <div class="brand" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M5 12a7 7 0 007 7 7 7 0 000-14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Chaincraft</span>
+          </div>
+          <p class="muted" style="max-width:60ch; margin-top:12px;">We build products people trust — on-chain and off.</p>
+        </div>
+        <div>
+          <div class="h4">Services</div>
+          <ul class="micro" style="list-style:none; padding:0; margin:8px 0 0; display:grid; gap:8px;">
+            <li><a href="#services">Strategy</a></li>
+            <li><a href="#services">Product Design</a></li>
+            <li><a href="#services">Engineering</a></li>
+            <li><a href="#services">Growth</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="h4">Work</div>
+          <ul class="micro" style="list-style:none; padding:0; margin:8px 0 0; display:grid; gap:8px;">
+            <li><a href="#work">Case studies</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="h4">Company</div>
+          <ul class="micro" style="list-style:none; padding:0; margin:8px 0 0; display:grid; gap:8px;">
+            <li><a href="#approach">About</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="mailto:hello@chaincraft.studio">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <div class="micro">© <span id="year"></span> Chaincraft — Market data is informational only and not investment advice.</div>
+        <div class="micro"><a href="#">Terms</a> • <a href="#">Privacy</a> • Global</div>
+      </div>
     </div>
-  </div>
+  </footer>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <!-- State switcher -->
-  <div class="state-switcher" aria-hidden="false">
-    State:
-    <select id="state-selector" aria-label="Prototype state selector">
-      <option value="default">Default</option>
-      <option value="nav-scrolled">Nav: Scrolled</option>
-      <option value="nav-mobile">Nav: Mobile Open</option>
-      <option value="hero-loading">Hero CTA: Loading</option>
-      <option value="form-submitting">Form: Submitting</option>
-      <option value="form-success">Form: Success</option>
-      <option value="carousel-paused">Carousel: Paused</option>
+  <div class="state-switcher" aria-label="Prototype state">
+    <span class="micro muted">State</span>
+    <select id="state-select" aria-label="Select state">
+      <option value="default" selected>default</option>
+      <option value="loading">loading</option>
+      <option value="empty">empty</option>
+      <option value="error">error</option>
+      <option value="success">success</option>
     </select>
   </div>
 
   <script>
     (function(){
-      // Utilities
-      const $ = s => document.querySelector(s);
-      const $$ = s => Array.from(document.querySelectorAll(s));
-      const now = () => new Date().getTime();
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const qs = (s, el=document) => el.querySelector(s);
+      const qsa = (s, el=document) => Array.from(el.querySelectorAll(s));
+      const on = (el, ev, fn, opts) => el.addEventListener(ev, fn, opts);
 
-      // Header sticky shadow on scroll
-      const header = $('#site-header');
-      function handleScroll(){
-        if(window.scrollY > 40) header.classList.add('scrolled'); else header.classList.remove('scrolled');
+      // SVG/data-URI generators (declared before first use)
+      function makeSVGThumb(accent){
+        const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='750' viewBox='0 0 1200 750'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='#F8FAFC'/><stop offset='1' stop-color='#EEF2F7'/></linearGradient></defs><rect width='1200' height='750' fill='url(#g)'/><rect x='60' y='60' width='1080' height='500' rx='16' fill='white' stroke='#E2E8F0'/><rect x='90' y='100' width='200' height='14' rx='7' fill='#CBD5E1'/><rect x='90' y='140' width='500' height='260' rx='8' fill='${accent}' opacity='0.14'/><rect x='620' y='140' width='460' height='40' rx='6' fill='#E5E7EB'/><rect x='620' y='190' width='300' height='40' rx='6' fill='#E5E7EB'/><rect x='620' y='240' width='420' height='40' rx='6' fill='#E5E7EB'/><rect x='60' y='590' width='1080' height='40' rx='8' fill='#F1F5F9'/></svg>`;
+        return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
       }
-      handleScroll();
-      window.addEventListener('scroll', handleScroll, {passive:true});
+      function makeCardSVG(i){ const hue = [180,210,220,200,190,170][i%6]; const fill = `hsl(${hue} 40% 45%)`; const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675' viewBox='0 0 1200 675'><rect width='1200' height='675' fill='#F8FAFC'/><rect x='40' y='40' width='1120' height='460' rx='18' fill='${fill}' opacity='.12'/><rect x='80' y='100' width='320' height='28' rx='6' fill='#CBD5E1'/><rect x='80' y='150' width='680' height='18' rx='5' fill='#E2E8F0'/><rect x='80' y='180' width='680' height='18' rx='5' fill='#E2E8F0'/><rect x='80' y='210' width='540' height='18' rx='5' fill='#E2E8F0'/></svg>`; return 'data:image/svg+xml;utf8,'+encodeURIComponent(svg); }
+      function makeArticleSVG(i){ const hue = [160,180,200][i%3]; const fill = `hsl(${hue} 50% 45%)`; const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675' viewBox='0 0 1200 675'><rect width='1200' height='675' fill='#ffffff'/><rect x='60' y='80' width='1080' height='420' rx='18' fill='${fill}' opacity='.1'/><rect x='100' y='520' width='260' height='20' rx='5' fill='#CBD5E1'/><rect x='100' y='555' width='880' height='16' rx='4' fill='#E2E8F0'/></svg>`; return 'data:image/svg+xml;utf8,'+encodeURIComponent(svg); }
 
-      // Mobile menu
-      const hamburger = $('#hamburger');
-      const mobileMenu = $('#mobile-menu');
-      const mobileClose = $('#mobile-close');
-      const mobileOpenButtons = [$('#mobile-audit'), $('#mobile-contact')];
+      // Timer cleanup management
+      let heroTimerId = null;
+      let marketTimerId = null;
+      function clearTimers(){ if(heroTimerId){ clearInterval(heroTimerId); heroTimerId = null; } if(marketTimerId){ clearInterval(marketTimerId); marketTimerId = null; } }
+      window.addEventListener('beforeunload', clearTimers);
+      window.addEventListener('pagehide', clearTimers);
 
-      function openMobile(){
-        mobileMenu.classList.add('open');
-        hamburger.setAttribute('aria-expanded','true');
-        mobileMenu.setAttribute('aria-hidden','false');
-        document.body.style.overflow='hidden';
-        // focus trap: focus first link
-        mobileMenu.querySelector('a,button').focus();
+      // Year
+      qs('#year').textContent = new Date().getFullYear();
+
+      // Dismiss top note
+      on(qs('#dismiss-note'), 'click', () => qs('#availability-note').classList.add('hidden'));
+
+      // Sticky header compact on scroll
+      const header = qs('#site-header');
+      const onScroll = () => { if (window.scrollY > 8) header.classList.add('compact'); else header.classList.remove('compact'); };
+      on(window, 'scroll', onScroll, {passive:true}); onScroll();
+
+      // Mobile drawer
+      const drawer = qs('#drawer'); const overlay = qs('#drawer-overlay');
+      const openDrawer = ()=>{ drawer.classList.add('open'); overlay.classList.add('open'); overlay.setAttribute('aria-hidden','false'); qs('#close-drawer').focus(); };
+      const closeDrawer = ()=>{ drawer.classList.remove('open'); overlay.classList.remove('open'); overlay.setAttribute('aria-hidden','true'); qs('#open-drawer').focus(); };
+      on(qs('#open-drawer'), 'click', openDrawer);
+      on(qs('#close-drawer'), 'click', closeDrawer);
+      on(overlay, 'click', closeDrawer);
+      on(window, 'keydown', (e)=>{ if(e.key==='Escape' && overlay.classList.contains('open')) closeDrawer(); });
+
+      // Hero thumbnails (data URI SVGs), cycle
+      const svgThumbs = [
+        makeSVGThumb('#0F766E'), makeSVGThumb('#334155'), makeSVGThumb('#1E293B')
+      ];
+      const heroImg = qs('#hero-thumb');
+      let heroIndex = 0; function setHero(i){ const src = svgThumbs[i%svgThumbs.length]; heroImg.src = src; heroImg.srcset = src + ' 800w, ' + src + ' 1200w'; }
+      setHero(heroIndex);
+      heroTimerId = setInterval(()=>{ heroIndex++; setHero(heroIndex); }, 3500);
+
+      // Market ticker simulated
+      const ethVal = qs('#eth-val'); const btcVal = qs('#btc-val'); const gasVal = qs('#gas-val');
+      marketTimerId = setInterval(()=>{
+        const eth = 3482 + (Math.random()*10-5); const btc = 62140 + (Math.random()*50-25); const gas = 22 + Math.round(Math.random()*6);
+        ethVal.textContent = '$' + Math.round(eth).toLocaleString();
+        btcVal.textContent = '$' + Math.round(btc).toLocaleString();
+        gasVal.textContent = 'Gas ' + gas + ' gwei';
+      }, 4000);
+
+      // Logo marquee controls (pause + manual scroll for a11y)
+      const logoStrip = document.querySelector('.logo-strip');
+      const logoTrack = document.getElementById('logo-track');
+      on(qs('#logo-prev'), 'click', ()=>{ logoStrip.classList.add('paused'); logoTrack.scrollLeft = (logoTrack.scrollLeft||0) - 240; });
+      on(qs('#logo-next'), 'click', ()=>{ logoStrip.classList.add('paused'); logoTrack.scrollLeft = (logoTrack.scrollLeft||0) + 240; });
+      if (prefersReduced) { logoStrip.classList.add('paused'); }
+
+      // Cases data (local)
+      const CASES = [
+        { id:'c1', title:'Bringing institutional-grade custody UX on mobile', result:'Increased funded accounts by 28% in 6 weeks.', metric:'+28%', chain:'Arbitrum', service:'Product Design', category:'DeFi' },
+        { id:'c2', title:'Bridgeless L2 deposits with native ramps', result:'Cut drop-off by 31% for first-time buyers.', metric:'-31% drop-off', chain:'Base', service:'Engineering', category:'Infra' },
+        { id:'c3', title:'NFT claims at scale for fandom launches', result:'Processed 1.4M claims with 0 fraud flags.', metric:'1.4M claims', chain:'Polygon', service:'Growth', category:'NFT' },
+        { id:'c4', title:'Maker UX for pro desk liquidity', result:'Improved retention by 19% MoM.', metric:'+19% retention', chain:'Ethereum', service:'Product Design', category:'Exchange' },
+        { id:'c5', title:'Gasless swaps for new wallets', result:'First-swap success up 23%.', metric:'+23% success', chain:'Optimism', service:'Engineering', category:'DeFi' },
+        { id:'c6', title:'Realtime on-chain risk scoring', result:'Flagged 98.4% of risky routes pre-trade.', metric:'98.4% flagged', chain:'Avalanche', service:'Strategy', category:'Infra' },
+      ];
+
+      const caseContainer = qs('#case-cards');
+      function caseSVG(i){ return makeCardSVG(i); }
+      function renderCases(items){
+        caseContainer.innerHTML = '';
+        items.forEach((c, idx)=>{
+          const card = document.createElement('article');
+          card.className = 'card article';
+          card.setAttribute('data-category', c.category);
+          card.innerHTML = `
+            <div class="card-media"><img loading="lazy" width="800" height="450" alt="${escapeHtml(c.title)} preview" srcset="${caseSVG(idx)} 800w, ${caseSVG(idx)} 1200w" sizes="(max-width: 768px) 100vw, 33vw"/></div>
+            <div class="card-body">
+              <div class="tag-row">
+                <span class="tag">Chain: ${c.chain}</span>
+                <span class="tag">Service: ${c.service}</span>
+              </div>
+              <div class="h4" style="margin-top:4px;">${escapeHtml(c.title)}</div>
+              <p class="muted">${escapeHtml(c.result)}</p>
+              <span class="metric-chip numeric">${escapeHtml(c.metric)}</span>
+              <a href="#" class="card-link">Open case <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+            </div>`;
+          caseContainer.appendChild(card);
+        });
       }
-      function closeMobile(){
-        mobileMenu.classList.remove('open');
-        hamburger.setAttribute('aria-expanded','false');
-        mobileMenu.setAttribute('aria-hidden','true');
-        document.body.style.overflow='';
-        hamburger.focus();
-      }
-      hamburger.addEventListener('click', ()=>{ if(mobileMenu.classList.contains('open')) closeMobile(); else openMobile();});
-      mobileClose.addEventListener('click', closeMobile);
-      mobileMenu.addEventListener('click', (e)=>{ if(e.target===mobileMenu) closeMobile(); });
 
-      // Hero tokens animation (decorative)
-      const tokens = $('#tokens');
-      let tokenPos = 0;
-      let tokenAnim;
-      function animateTokens(){
-        if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        tokenAnim = setInterval(()=>{
-          tokenPos = (tokenPos - 12) % 96;
-          tokens.style.transform = `translateY(${(Math.sin(Date.now()/1500))*6}px) translateX(${tokenPos}px)`;
-        }, 600);
-      }
-      animateTokens();
-
-      // CTA -> opens modal
-      const heroCTA = $('#hero-cta');
-      const modalBackdrop = $('#modal-backdrop');
-      const modalClose = $('#modal-close');
-      const modalForm = $('#modal-form');
-      const modalSubmit = $('#modal-submit');
-      const modalStatus = $('#modal-status');
-
-      let lastFocusedBeforeModal = null;
-
-      function openModal(){
-        lastFocusedBeforeModal = document.activeElement;
-        modalBackdrop.classList.add('open');
-        modalBackdrop.setAttribute('aria-hidden','false');
-        document.body.style.overflow='hidden';
-        $('#m-name').focus();
-        trapFocus(modalBackdrop);
-      }
-      function closeModal(){
-        modalBackdrop.classList.remove('open');
-        modalBackdrop.setAttribute('aria-hidden','true');
-        document.body.style.overflow='';
-        releaseTrap();
-        if(lastFocusedBeforeModal) lastFocusedBeforeModal.focus();
-      }
-      heroCTA.addEventListener('click', ()=>{
-        setButtonLoading(heroCTA, true);
-        setTimeout(()=>{ setButtonLoading(heroCTA,false); openModal(); }, 700);
-      });
-      $('#contact-btn').addEventListener('click', openModal);
-      $('#audit-btn').addEventListener('click', openModal);
-      modalClose.addEventListener('click', closeModal);
-      modalBackdrop.addEventListener('click', (e)=>{ if(e.target===modalBackdrop) closeModal(); });
-      window.addEventListener('keydown',(e)=>{ if(e.key==='Escape'){ if(modalBackdrop.classList.contains('open')) closeModal(); if(mobileMenu.classList.contains('open')) closeMobile(); } });
-
-      // Button pressed/loading states
-      function setButtonLoading(btn, loading){
-        if(loading){
-          btn.disabled = true;
-          btn.setAttribute('aria-busy','true');
-          btn.dataset.prevText = btn.innerHTML;
-          btn.innerHTML = 'Loading…';
-        } else {
-          btn.disabled = false;
-          btn.removeAttribute('aria-busy');
-          if(btn.dataset.prevText) btn.innerHTML = btn.dataset.prevText;
+      // Skeleton while loading
+      function renderCaseSkeleton(count=3){
+        caseContainer.innerHTML='';
+        for(let i=0;i<count;i++){
+          const s = document.createElement('div');
+          s.className = 'card';
+          s.innerHTML = `
+            <div class="card-media skeleton"></div>
+            <div class="card-body">
+              <div class="tag-row"><span class="tag skeleton" style="width:100px; height:20px;"></span><span class="tag skeleton" style="width:140px; height:20px;"></span></div>
+              <div class="skeleton" style="height:22px; margin-top:8px; border-radius:6px;"></div>
+              <div class="skeleton" style="height:16px; width:80%;"></div>
+              <span class="metric-chip skeleton" style="height:28px; width:110px;"></span>
+            </div>`;
+          caseContainer.appendChild(s);
         }
       }
 
-      // Modal form submit
-      modalForm.addEventListener('submit', (e)=>{ e.preventDefault(); submitModal(); });
-      function submitModal(){
-        modalStatus.textContent = '';
-        modalSubmit.disabled = true; modalSubmit.textContent='Sending…';
-        setTimeout(()=>{ modalSubmit.disabled=false; modalSubmit.textContent='Request audit'; modalStatus.textContent='Request received — we will follow up by email.'; // success
-          // keep modal open but show success state
-        }, 1200);
+      // Filters
+      const filterChips = qsa('.filter-chip');
+      let activeFilter = 'all';
+      function applyFilter(f){
+        activeFilter = f;
+        filterChips.forEach(ch=> ch.setAttribute('aria-pressed', String(ch.dataset.filter===f)) );
+        const items = CASES.filter(c => f==='all' || c.category===f);
+        renderCases(items);
+        announceCases(`${items.length} case${items.length!==1?'s':''} shown for ${f}`);
       }
+      filterChips.forEach(ch => on(ch, 'click', ()=> applyFilter(ch.dataset.filter)) );
+      function announceCases(msg){ const live = qs('#cases-live'); live.textContent = msg; }
 
-      // Form validation for lead form
-      const leadForm = $('#lead-form');
-      const formStatus = $('#form-status');
-      function validateField(el){
-        const id = el.id; const val = el.value.trim();
-        const errEl = $('#error-'+id.replace('m-','').replace('error-','')) || $('#error-'+id);
-        if(el.required && !val){ if(errEl) errEl.textContent = 'This field is required.'; return false; }
-        if(el.type==='email' && val){ const ok = /\S+@\S+\.\S+/.test(val); if(!ok){ if(errEl) errEl.textContent = 'Enter a valid email.'; return false; } }
-        if(errEl) errEl.textContent = '';
-        return true;
-      }
-
-      leadForm.querySelectorAll('input,textarea,select').forEach(inp=>{
-        inp.addEventListener('blur', ()=>{ validateField(inp); });
-      });
-
-      leadForm.addEventListener('submit',(e)=>{
-        e.preventDefault();
-        submitLeadForm();
-      });
-
-      function submitLeadForm(){
-        const fields = Array.from(leadForm.querySelectorAll('input,textarea,select')).filter(f=>f.type!=='file');
-        let valid=true; let errors=[];
-        fields.forEach(f=>{ const ok = validateField(f); if(!ok) { valid=false; errors.push(f.name||f.id);} });
-        const summary = $('#form-error-summary');
-        if(!valid){ summary.style.display='block'; summary.textContent = 'Please fix the highlighted fields.'; summary.className='error-summary'; summary.focus(); return; }
-        summary.style.display='none';
-        // simulate submit
-        $('#form-submit').disabled = true; $('#form-submit').textContent='Sending…'; formStatus.textContent='';
-        setTimeout(()=>{
-          $('#form-submit').disabled = false; $('#form-submit').textContent='Send';
-          // simulate success 201
-          leadForm.innerHTML = '<div style="padding:20px;border-radius:8px;background:linear-gradient(90deg, #f0fff6, #fff)"><strong>Thanks — we received your message.</strong><p class="muted">A member of our team will contact you shortly. <button id="book-call" class="btn btn-ghost">Book a call</button></p></div>';
-          $('#book-call')?.addEventListener('click', ()=>{ alert('Open scheduler (prototype)'); });
-        }, 1100);
-      }
-
-      // Case study filters
-      const filterBtns = $$('.filter-btn');
-      const caseCards = $$('.case-card');
-      const casesLive = $('#cases-live');
-      filterBtns.forEach(btn=>btn.addEventListener('click', ()=>{
-        const f = btn.dataset.filter;
-        let count=0;
-        caseCards.forEach(card=>{
-          if(f==='all' || card.dataset.services.includes(f)){
-            card.style.display='flex'; card.setAttribute('aria-hidden','false'); count++; }
-          else { card.style.display='none'; card.setAttribute('aria-hidden','true'); }
+      // Featured confirmation animation
+      const confirmStatus = qs('#confirm-status');
+      const confirmBar = qs('#confirm-bar');
+      const confirmChip = qs('#confirm-chip');
+      const metricTVL = qs('#metric-tvl');
+      const metricCVR = qs('#metric-cvr');
+      const metricTTS = qs('#metric-tts');
+      let confirmed = false;
+      const featObserver = new IntersectionObserver((entries)=>{
+        entries.forEach(e=>{
+          if (e.isIntersecting && !confirmed) runConfirmation();
         });
-        // announce
-        casesLive.textContent = `${count} results for ${f}`;
-        // animate height: measure container
-        const grid = $('#cases-grid');
-        grid.style.transition='max-height .28s ease';
-        // set explicit max-height to allow animation (we just keep large enough)
-      }));
+      }, { threshold: 0.4 });
+      featObserver.observe(qs('.featured .frame'));
 
-      // Services card touch persistent expanded state
-      const serviceCards = $$('.service-card');
-      serviceCards.forEach(card=>{
-        let touchTimer;
-        card.addEventListener('touchstart', ()=>{ serviceCards.forEach(c=>c.classList.remove('expanded')); card.classList.add('expanded'); });
-        card.addEventListener('mouseenter', ()=> card.classList.add('hover'))
-        card.addEventListener('mouseleave', ()=> card.classList.remove('hover'))
-      });
-
-      // Partners lazy load when in view
-      const partners = $$('#partners .partner');
-      const obs = new IntersectionObserver(entries=>{
-        entries.forEach(en=>{
-          if(en.isIntersecting){ const el = en.target; const src = el.dataset.src; if(src){ el.innerHTML=''; const img = document.createElement('img'); img.alt = el.textContent.trim() || ''; img.src = src; img.width=96; img.height=40; img.style.filter='grayscale(100%)'; el.appendChild(img); el.dataset.src=''; obs.unobserve(el); } }
-        });
-      },{threshold:0.2});
-      partners.forEach(p=>obs.observe(p));
-
-      // Testimonials carousel autoplay 6s, pause on hover/focus
-      const testimonials = [ '"LedgerWave redesigned our token emissions — TVL more than doubled in 3 months" — Lead @ ProtocolX', '"They surfaced key attack vectors before launch — saved us time and capital" — Founder @ BridgeCo', '"Excellent strategic guidance and hands-on engineering" — COO @ Collective A' ];
-      let tIndex=0; let tTimer=null; const tEl = $('#testimonial-1'); const tLive = $('#testimonial-live');
-      function showTest(i){ tIndex = (i+testimonials.length)%testimonials.length; tEl.textContent = testimonials[tIndex]; tLive.textContent = `Showing testimonial ${tIndex+1} of ${testimonials.length}`; }
-      function startCarousel(){ tTimer = setInterval(()=>{ showTest(tIndex+1); }, 6000); }
-      function stopCarousel(){ clearInterval(tTimer); tTimer=null; }
-      showTest(0); startCarousel();
-      $('#prev-test').addEventListener('click', ()=>{ stopCarousel(); showTest(tIndex-1); });
-      $('#next-test').addEventListener('click', ()=>{ stopCarousel(); showTest(tIndex+1); });
-      tEl.addEventListener('mouseenter', ()=>{ stopCarousel(); }); tEl.addEventListener('focus', ()=>{ stopCarousel(); }); tEl.addEventListener('mouseleave', ()=>{ startCarousel(); });
-
-      // Pricing card contact buttons open modal
-      $$('.price-cta').forEach(b=>b.addEventListener('click', openModal));
-
-      // Accordion: single-expand, keyboard support
-      const accordions = $$('.accordion-item');
-      accordions.forEach(item=>{
-        const summary = item.querySelector('.accordion-summary');
-        summary.addEventListener('click', ()=> toggleAccordion(item));
-        summary.addEventListener('keydown',(e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); toggleAccordion(item); } if(e.key==='ArrowDown'){ const next = item.nextElementSibling; next?.querySelector('.accordion-summary')?.focus(); } if(e.key==='ArrowUp'){ const prev = item.previousElementSibling; prev?.querySelector('.accordion-summary')?.focus(); } });
-      });
-      function toggleAccordion(item){ const was = item.classList.contains('open'); accordions.forEach(i=>{ i.classList.remove('open'); i.querySelector('.accordion-summary').setAttribute('aria-expanded','false'); }); if(!was){ item.classList.add('open'); item.querySelector('.accordion-summary').setAttribute('aria-expanded','true'); } }
-
-      // Newsletter form
-      $('#newsletter-form').addEventListener('submit',(e)=>{ e.preventDefault(); const email = $('#newsletter').value.trim(); if(!/\S+@\S+\.\S+/.test(email)){ alert('Please enter a valid email'); return; } alert('Subscribed: ' + email); $('#newsletter').value=''; });
-
-      // Modal/trap focus utilities
-      let focusable = []; let prevActive=null;
-      function trapFocus(container){ prevActive = document.activeElement; focusable = Array.from(container.querySelectorAll('a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])')).filter(el=>!el.hasAttribute('disabled')); const first = focusable[0]; const last = focusable[focusable.length-1]; container.addEventListener('keydown', handleTrap);
-        function handleTrap(e){ if(e.key!=='Tab') return; if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); } else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); } }
-        container._handleTrap = handleTrap;
-      }
-      function releaseTrap(){ if(modalBackdrop && modalBackdrop._handleTrap) modalBackdrop.removeEventListener('keydown', modalBackdrop._handleTrap); }
-
-      // State switcher (prototype control)
-      const stateSelector = $('#state-selector');
-      stateSelector.addEventListener('change',(e)=> applyState(e.target.value));
-      function applyState(s){ // reset
-        header.classList.remove('scrolled'); mobileMenu.classList.remove('open'); tokens.style.opacity=1; stopCarousel(); startCarousel(); // defaults
-        // reset forms
-        // apply
-        if(s==='nav-scrolled'){ header.classList.add('scrolled'); window.scrollTo({top:80,behavior:'smooth'}); }
-        if(s==='nav-mobile'){ openMobile(); }
-        if(s==='hero-loading'){ setButtonLoading(heroCTA, true); setTimeout(()=>setButtonLoading(heroCTA,false),2000); }
-        if(s==='form-submitting'){ // simulate pressing send
-          $('#form-submit').disabled=true; $('#form-submit').textContent='Sending…'; setTimeout(()=>{ $('#form-submit').disabled=false; $('#form-submit').textContent='Send'; },2000)
+      function runConfirmation(){
+        confirmed = true;
+        if (prefersReduced) {
+          confirmStatus.textContent = 'Confirmed';
+          confirmBar.style.width = '100%';
+          confirmChip.classList.add('show');
+          tickMetricsInstant();
+          return;
         }
-        if(s==='form-success'){ // replace contact form with success state
-          leadForm.innerHTML = '<div style="padding:20px;border-radius:8px;background:linear-gradient(90deg, #f0fff6, #fff)"><strong>Thanks — we received your message.</strong><p class="muted">A member of our team will contact you shortly.</p></div>';
-        }
-        if(s==='carousel-paused'){ stopCarousel(); }
+        // staged
+        let stage = 0; const stages = [
+          { label: 'Mempool', width: '12%'},
+          { label: 'Pending', width: '60%'},
+          { label: 'Confirmed', width: '100%'}
+        ];
+        const iv = setInterval(()=>{
+          const s = stages[stage];
+          confirmStatus.textContent = s.label;
+          confirmBar.style.width = s.width;
+          if (stage===2) { confirmChip.classList.add('show'); tickMetrics(); clearInterval(iv); }
+          stage++;
+        }, 320);
       }
 
-      // Accessibility and initial states
-      document.getElementById('year').textContent = new Date().getFullYear();
+      function tickMetrics(){ animateNumber(metricTVL, 0, 120, 900, v=>`$${v}M`); animateNumber(metricCVR, 0, 38, 900, v=>`${v}%`); setTimeout(()=> metricTTS.textContent = '6 weeks', 700); }
+      function tickMetricsInstant(){ metricTVL.textContent = '$120M'; metricCVR.textContent = '38%'; metricTTS.textContent = '6 weeks'; }
 
-      // Ensure no horizontal scroll
-      const checkOverflow = ()=>{ if(document.body.scrollWidth>window.innerWidth){ document.body.style.overflowX='hidden'; } };
-      window.addEventListener('resize', checkOverflow); checkOverflow();
+      function animateNumber(el, from, to, dur, fmt){
+        const start = performance.now();
+        function frame(t){ const p = Math.min(1, (t-start)/dur); const val = Math.round(from + (to-from)*p); el.textContent = fmt(val); if (p<1) requestAnimationFrame(frame); }
+        requestAnimationFrame(frame);
+      }
 
-      // Keyboard focus outlines for all interactive elements (already covered by :focus-visible)
+      // Carousel
+      const track = qs('#track'); const slides = qsa('.slide');
+      let idx = 0; function go(i){ idx = (i+slides.length)%slides.length; track.style.transform = `translateX(-${idx*100}%)`; updateDots(); }
+      function updateDots(){ qsa('.dot').forEach((d,di)=>{ d.setAttribute('aria-current', di===idx?'true':'false'); d.setAttribute('aria-selected', di===idx?'true':'false');}); }
+      on(qs('#prev-slide'),'click',()=>go(idx-1)); on(qs('#next-slide'),'click',()=>go(idx+1));
+      qsa('.dot').forEach(d=> on(d,'click',()=>go(parseInt(d.dataset.index))) );
+      on(track,'keydown',(e)=>{ if(e.key==='ArrowRight') go(idx+1); if(e.key==='ArrowLeft') go(idx-1); });
+      let startX=0; on(track,'touchstart',e=>{ startX=e.touches[0].clientX; },{passive:true}); on(track,'touchmove',e=>{ const dx=e.touches[0].clientX-startX; if(Math.abs(dx)>40){ go(idx+(dx<0?1:-1)); startX=e.touches[0].clientX; } },{passive:true});
 
-      // final small enhancements: allow service 'Learn more' to open modal with prefilled service
-      $$('[data-service-link]').forEach(link=>{
-        link.addEventListener('click',(e)=>{ e.preventDefault(); const s = e.target.closest('[data-service]')?.dataset.service || ''; openModal(); setTimeout(()=>{$('#m-message')?.value = `Inquiry about ${s}`;},200);
-        });
+      // Insights
+      const INSIGHTS = [
+        { id:'i1', cat:'Product', title:'Designing trustworthy KYC in Web3 without killing conversion', excerpt:'Practical patterns for regulated flows that users actually complete.', mins:7, author:'AC' },
+        { id:'i2', cat:'Engineering', title:'Safeguarding bridges: patterns for secure cross-chain UX', excerpt:'Minimize user error and isolate blast radius when things go wrong.', mins:6, author:'BK' },
+        { id:'i3', cat:'Growth', title:'On-chain onboarding loops that compound', excerpt:'From first intent to first on-chain action in under 90 seconds.', mins:5, author:'MS' },
+      ];
+      const insightWrap = qs('#insight-cards');
+      function renderInsights(list){ insightWrap.innerHTML=''; list.forEach((a,idx)=>{ const el=document.createElement('article'); el.className='card article'; el.innerHTML=`
+          <div class='card-media'><img loading='lazy' width='800' height='450' alt='${escapeHtml(a.title)} cover' srcset='${makeArticleSVG(idx)} 800w, ${makeArticleSVG(idx)} 1200w' sizes='(max-width: 768px) 100vw, 33vw' /></div>
+          <div class='card-body'>
+            <span class='tag'>${a.cat}</span>
+            <div class='h4' style='margin-top:4px;'>${escapeHtml(a.title)}</div>
+            <p class='muted'>${escapeHtml(a.excerpt)}</p>
+            <div class='rtime'>${a.mins} min read • <span class='avatar' style='width:24px;height:24px;display:inline-grid;place-items:center;'>${a.author}</span></div>
+            <a href='#' class='card-link' style='margin-top:6px;'>Read <svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12h14M13 5l7 7-7 7'/></svg></a>
+          </div>`; insightWrap.appendChild(el); }); }
+      function renderInsightSkeleton(count=3){ insightWrap.innerHTML=''; for(let i=0;i<count;i++){ const s=document.createElement('div'); s.className='card'; s.innerHTML=`<div class='card-media skeleton'></div><div class='card-body'><div class='skeleton' style='width:80px;height:20px;'></div><div class='skeleton' style='height:22px;margin-top:8px;'></div><div class='skeleton' style='height:16px;width:70%;'></div></div>`; insightWrap.appendChild(s);} }
+
+      // Newsletter
+      const nlForm = qs('#newsletter'); const nlEmail = qs('#nl-email'); const nlErr = qs('#nl-error');
+      on(nlForm,'submit',(e)=>{ e.preventDefault(); if(!validEmail(nlEmail.value)){ showNlError('Enter a valid work email.'); return; } disable(nlForm,true); setTimeout(()=>{ disable(nlForm,false); showToast('Subscribed. Welcome.'); nlForm.reset(); }, 900); });
+      function showNlError(msg){ nlErr.textContent = msg; nlErr.style.display='block'; setTimeout(()=> nlErr.style.display='none', 2000); }
+
+      // Form
+      const form = qs('#brief-form'); const submitBtn = qs('#submit-brief'); const submitLabel = qs('#submit-label'); const submitSpinner = qs('#submit-spinner'); const successNotice = qs('#form-success');
+      on(form,'submit',(e)=>{ e.preventDefault(); const v = validateForm(); if(!v.ok) return; setLoading(true); setTimeout(()=>{ setLoading(false); successNotice.classList.remove('hidden'); showToast('Brief received. We’ll reply soon.'); }, 1200); });
+      function setLoading(is){ if(is){ submitSpinner.classList.remove('hidden'); submitLabel.textContent='Sending…'; disable(form,true);} else { submitSpinner.classList.add('hidden'); submitLabel.textContent='Send brief'; disable(form,false);} }
+      function disable(scope, d){ qsa('input,select,textarea,button', scope).forEach(el=> el.disabled = d); }
+      function validateForm(){ let ok=true; const name=qs('#name'); const email=qs('#email'); const company=qs('#company'); const budget=qs('#budget'); const consent=qs('#consent');
+        toggleErr('name', !name.value.trim()); toggleErr('email', !validEmail(email.value)); toggleErr('company', !company.value.trim()); toggleErr('budget', !budget.value); toggleErr('consent', !consent.checked);
+        const anyNeed = qsa('.chip-select[aria-pressed="true"]').length>0; if(!anyNeed){ qs('#err-needs').style.display='block'; ok=false; } else { qs('#err-needs').style.display='none'; }
+        if(!name.value.trim()||!validEmail(email.value)||!company.value.trim()||!budget.value||!consent.checked) ok=false; return {ok}; }
+      function toggleErr(id, show){ const el=qs('#err-'+id); if(el) el.style.display = show?'block':'none'; }
+      qsa('.chip-select').forEach(btn=> on(btn,'click',()=> btn.setAttribute('aria-pressed', String(btn.getAttribute('aria-pressed')!=='true'))));
+
+      // FAQ accessibility: toggle aria-expanded
+      qsa('.faq details').forEach(d=>{
+        const btn = d.querySelector('button.q');
+        on(d,'toggle',()=> btn.setAttribute('aria-expanded', d.open?'true':'false'));
       });
 
-      // Simulate lazy-load of case thumbnails: small delay
-      $$('.case-thumb').forEach((thumb,i)=>{
-        thumb.style.background = 'linear-gradient(120deg,#eef6ff,#fafbff)';
-        setTimeout(()=>{ thumb.style.background = 'linear-gradient(90deg,#e6f0ff,#f7f7fb)'; }, 500 + i*200);
-      });
+      // Toast
+      const toast = qs('#toast'); let toastTimer;
+      function showToast(msg){ clearTimeout(toastTimer); toast.textContent = msg; toast.classList.add('show'); toastTimer = setTimeout(()=> toast.classList.remove('show'), 2200); }
 
-      // Ensure interactive targets >=44px
-      $$('button, .filter-btn, .hamburger, .btn').forEach(el=>{ el.style.minWidth='44px'; el.style.minHeight='44px'; });
+      // State switcher
+      const stateSelect = qs('#state-select');
+      on(stateSelect,'change',()=> applyState(stateSelect.value));
+      function applyState(state){ document.body.dataset.state = state; // cases
+        if(state==='loading'){ renderCaseSkeleton(6); renderInsightSkeleton(3); hide('#cases-empty','#cases-error'); }
+        else if(state==='empty'){ caseContainer.innerHTML=''; qs('#cases-empty').classList.remove('hidden'); qs('#cases-error').classList.add('hidden'); insightWrap.innerHTML=''; }
+        else if(state==='error'){ caseContainer.innerHTML=''; qs('#cases-empty').classList.add('hidden'); qs('#cases-error').classList.remove('hidden'); insightWrap.innerHTML=''; }
+        else { // default & success
+          qs('#cases-empty').classList.add('hidden'); qs('#cases-error').classList.add('hidden'); applyFilter(activeFilter); renderInsights(INSIGHTS); if(state==='success'){ successNotice.classList.remove('hidden'); showToast('Success state'); }
+        }
+      }
+      function hide(){ for(const s of arguments){ qs(s).classList.add('hidden'); } }
 
-      // Announce initial state
-      setTimeout(()=>{ casesLive.textContent = caseCards.length + ' case studies'; }, 300);
+      // Initial data paint
+      renderCaseSkeleton(6); renderInsightSkeleton(3); // simulate loading
+      setTimeout(()=>{ applyFilter('all'); renderInsights(INSIGHTS); }, 600);
+
+      // Helpers
+      function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v||''); }
+      function escapeHtml(s){ return (s+"").replace(/[&<>"]+/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[m])); }
+
+      // Featured image
+      const featImgSrc = makeSVGThumb('#0F766E');
+      const featImg = qs('#featured-img'); featImg.src = featImgSrc; featImg.srcset = featImgSrc + ' 1200w, ' + featImgSrc + ' 1440w';
+
+      // Global keyboard: Space/Enter toggles chips and filters accessibility
+      qsa('.filter-chip').forEach(ch=> on(ch,'keydown',(e)=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); ch.click(); } }));
+      qsa('.chip-select').forEach(ch=> on(ch,'keydown',(e)=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); ch.click(); } }));
 
     })();
   </script>
