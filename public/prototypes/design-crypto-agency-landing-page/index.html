@@ -15,8 +15,12 @@
     html { box-sizing: border-box; }
     *, *::before, *::after { box-sizing: inherit; }
     html, body { height: 100%; }
+    html, body { overflow-x: clip; }
+    h1, h2, h3, h4, p { margin: 0; }
+    p + p { margin-top: var(--space-3); }
     body { margin: 0; font-family: var(--font-text); color: var(--color-text); background: var(--color-background); font-size: var(--size-body); line-height: var(--lh-body); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
     img, svg { display: block; max-width: 100%; }
+    button, input, select, textarea { font: inherit; color: inherit; }
     a { color: inherit; text-decoration: none; }
     a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: 6px; }
     :focus { scroll-margin-top: 96px; }
@@ -47,8 +51,8 @@
     .surface { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-3); box-shadow: var(--shadow-low); }
 
     /* Skip link */
-    .skip-link { position: absolute; top: -40px; left: 16px; background: var(--color-accent); color: var(--color-on-accent); padding: 8px 12px; border-radius: var(--radius-2); transition: transform var(--duration-fast) var(--easing-out); z-index: 1000; }
-    .skip-link:focus { top: 16px; }
+    .skip-link { position: absolute; top: 16px; transform: translateY(-200%); left: 16px; background: var(--color-accent); color: var(--color-on-accent); padding: 8px 12px; border-radius: var(--radius-2); transition: transform var(--duration-fast) var(--easing-out); z-index: 1000; }
+    .skip-link:focus { transform: translateY(0); }
 
     /* Top utility bar */
     .topbar { background: var(--color-background); border-bottom: 1px solid var(--color-border); }
@@ -56,7 +60,9 @@
     .note { display: flex; align-items: center; gap: 10px; color: var(--color-text); }
     .note button { background: transparent; border: none; color: var(--color-muted-text); cursor: pointer; padding: 6px; border-radius: var(--radius-2); min-height: var(--tap-target); min-width: var(--tap-target); }
     .note button:hover { background: rgba(15,118,110,0.06); color: var(--color-text); }
-    .ticker { display: flex; gap: 8px; overflow: hidden; }
+    .ticker { display: none; gap: 8px; overflow: hidden; max-width: 520px; mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent); }
+    @media (min-width: 720px) { .ticker { display: flex; } }
+    .note .micro { color: var(--color-text); }
     .ticker-track { display: flex; gap: 8px; white-space: nowrap; animation: marquee 18s linear infinite; }
     .ticker:hover .ticker-track, .ticker:focus-within .ticker-track, .ticker.paused .ticker-track { animation-play-state: paused; }
     @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
@@ -89,9 +95,9 @@
     @media (min-width: 900px) { .nav { display: flex; } .actions { display: flex; } .menu-btn { display: none; } }
 
     /* Mobile drawer */
-    .drawer-overlay { position: fixed; inset: 0; background: rgba(11,18,32,0.4); opacity: 0; pointer-events: none; transition: opacity var(--duration-mid) var(--easing-standard); }
-    .drawer { position: fixed; inset: 0 0 0 auto; width: min(88vw, 360px); background: var(--color-surface); transform: translateX(100%); transition: transform var(--duration-mid) var(--easing-standard); display: flex; flex-direction: column; padding: 24px; gap: 16px; }
-    .drawer.open { transform: translateX(0); }
+    .drawer-overlay { position: fixed; z-index: 999; inset: 0; background: rgba(11,18,32,0.4); opacity: 0; pointer-events: none; transition: opacity var(--duration-mid) var(--easing-standard); }
+    .drawer { position: fixed; z-index: 1000; visibility: hidden; inset: 0 0 0 auto; width: min(88vw, 360px); background: var(--color-surface); transform: translateX(100%); transition: transform var(--duration-mid) var(--easing-standard), visibility 0s linear var(--duration-mid); display: flex; flex-direction: column; padding: 24px; gap: 16px; }
+    .drawer.open { transform: translateX(0); visibility: visible; transition: transform var(--duration-mid) var(--easing-standard); }
     .drawer-overlay.open { opacity: 1; pointer-events: auto; }
     .drawer a, .drawer button { min-height: var(--tap-target); text-align: left; }
     .drawer .drawer-close { margin-left: auto; }
@@ -114,39 +120,52 @@
 
     /* Logo wall */
     .logo-strip { background: var(--color-surface); border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); }
-    .logo-row { display: flex; align-items: center; gap: 24px; padding-block: 18px; position: relative; }
-    .logo-track { display: flex; gap: 48px; will-change: transform; animation: logo-marquee 26s linear infinite; }
+    .logo-row { display: flex; align-items: center; gap: 32px; padding-block: 20px; position: relative; }
+    .logo-label { flex: 0 0 auto; max-width: 180px; color: var(--color-muted-text); }
+    .logo-viewport { flex: 1 1 auto; min-width: 0; overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 48px, #000 calc(100% - 48px), transparent); }
+    @media (max-width: 767px) { .logo-row { flex-direction: column; align-items: flex-start; gap: 12px; } .logo-label { max-width: none; } .logo-viewport { width: 100%; } }
+    .logo-track { display: flex; gap: 48px; width: max-content; will-change: transform; animation: logo-marquee 36s linear infinite; }
     .logo-strip:hover .logo-track, .logo-strip:focus-within .logo-track, .logo-strip.paused .logo-track { animation-play-state: paused; }
     @keyframes logo-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
     @media (prefers-reduced-motion: reduce) { .logo-track { animation: none; } }
-    .logo-item { width: 140px; height: 28px; display: grid; place-items: center; filter: grayscale(1); opacity: 0.9; transition: filter var(--duration-mid) var(--easing-out), opacity var(--duration-mid) var(--easing-out); }
-    .logo-item:hover, .logo-item:focus { filter: grayscale(0.1); opacity: 1; }
-    .logo-ctrls { display: none; gap: 8px; margin-left: auto; }
-    .logo-row:focus-within .logo-ctrls, .logo-strip:hover .logo-ctrls { display: flex; }
+    .logo-item { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 10px; height: 32px; font-family: var(--font-display); font-weight: 600; font-size: 18px; letter-spacing: -0.01em; color: #475569; filter: grayscale(1); opacity: 0.85; transition: filter var(--duration-mid) var(--easing-out), opacity var(--duration-mid) var(--easing-out); }
+    .logo-item svg { width: 22px; height: 22px; color: var(--color-accent); }
+    .logo-strip:hover .logo-item { opacity: 1; }
+    .logo-pause { flex: 0 0 auto; }
+    @media (max-width: 767px) { .logo-row .logo-pause { display: none; } }
 
     /* Services */
     .services .tile { padding: 24px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-3); transition: transform var(--duration-mid) var(--easing-out), box-shadow var(--duration-mid) var(--easing-out), border-color var(--duration-mid) var(--easing-out); height: 100%; display: flex; flex-direction: column; gap: 12px; }
     .services .tile:hover, .services .tile:focus-within { transform: translateY(-4px); box-shadow: var(--shadow-mid); border-color: rgba(15,118,110,0.5); }
     .tile .icon { width: 28px; height: 28px; color: var(--color-accent); }
+    .services .tile { grid-column: span 4; }
+    @media (min-width: 1280px) { .services .tile { grid-column: span 3; } }
+    .services .tile .link-inline { margin-top: auto; padding-top: 8px; }
+    .services .tile p { color: var(--color-muted-text); }
     .tile a { color: var(--color-accent); }
 
     /* Featured case */
     .featured { padding-block: var(--space-12); }
-    .featured .media-bleed { width: 100%; max-width: var(--container-bleed); margin-inline: auto; border-radius: var(--radius-4); overflow: hidden; border: 1px solid var(--color-border); background: var(--color-surface); box-shadow: var(--shadow-low); }
+    .featured .media-bleed { width: calc(100% - 2 * var(--grid-gutter-mobile)); max-width: var(--container-bleed); margin-inline: auto; border-radius: var(--radius-4); overflow: hidden; border: 1px solid var(--color-border); background: var(--color-surface); box-shadow: var(--shadow-low); }
+    .featured .media-bleed { max-width: 1200px; }
     .featured .media-bleed .frame { aspect-ratio: 16 / 9; position: relative; }
-    .featured .content { max-width: 960px; margin-inline: auto; margin-top: var(--space-6); padding-inline: var(--grid-gutter-mobile); }
+    .featured .media-bleed .frame img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+    .featured .content { max-width: 960px; margin-inline: auto; margin-top: var(--space-8); display: grid; gap: var(--space-4); padding-inline: var(--grid-gutter-mobile); }
     @media (min-width: 768px) { .featured .content { padding-inline: var(--grid-gutter-tablet); }}
     @media (min-width: 1280px) { .featured .content { padding-inline: var(--grid-gutter-desktop); }}
-    .bullets { margin: 0; padding-left: 18px; color: var(--color-text); }
-    .metrics { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; margin-top: var(--space-4); }
+    .bullets { margin: 0; padding-left: 18px; color: var(--color-text); display: grid; gap: 4px; }
+    .metrics { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; }
+    @media (max-width: 520px) { .metrics { grid-template-columns: 1fr; } }
     .metric { padding: 16px; border: 1px solid var(--color-border); border-radius: var(--radius-3); background: var(--color-surface); }
+    .stats { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    @media (min-width: 768px) { .stats { grid-template-columns: repeat(3, 1fr); } }
     .metric .value { font-family: var(--font-display); font-size: var(--size-h3); line-height: var(--lh-h3); font-variant-numeric: tabular-nums; }
 
     /* Signature block confirmation */
     .confirm { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(246,247,249,0.88); border-top: 1px solid var(--color-border); padding: 10px 12px; display: flex; align-items: center; gap: 12px; backdrop-filter: blur(4px); }
     .progress { position: relative; height: 6px; background: #E5E7EB; border-radius: 999px; overflow: hidden; flex: 1; }
     .bar { position: absolute; left: 0; top: 0; bottom: 0; width: 0%; background: var(--color-accent); transition: width 280ms var(--easing-out); }
-    .status-label { min-width: 100px; font-size: var(--size-caption); color: var(--color-muted-text); }
+    .status-label { min-width: 88px; font-weight: 600; font-size: var(--size-caption); color: var(--color-muted-text); }
     .check-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: var(--radius-pill); background: rgba(15,118,110,0.1); color: var(--color-accent); border: 1px solid rgba(15,118,110,0.25); transform: translateY(6px); opacity: 0; transition: transform var(--duration-mid) var(--easing-out), opacity var(--duration-mid) var(--easing-out); }
     .check-chip.show { transform: translateY(0); opacity: 1; }
 
@@ -163,40 +182,46 @@
     .card-media img { width: 100%; height: 100%; object-fit: cover; transform: scale(1); transition: transform 240ms var(--easing-out); }
     .card:hover .card-media img { transform: scale(1.04); }
     .tag-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-    .tag { font-size: var(--size-micro); padding: 4px 8px; border-radius: var(--radius-pill); background: #F1F5F9; color: var(--color-text); border: 1px solid var(--color-border); }
-    .card-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .tag { align-self: flex-start; font-size: var(--size-micro); padding: 4px 8px; border-radius: var(--radius-pill); background: #F1F5F9; color: var(--color-text); border: 1px solid var(--color-border); }
+    .card-body { padding: 20px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
     .metric-chip { align-self: start; font-variant-numeric: tabular-nums; padding: 6px 10px; border-radius: var(--radius-pill); border: 1px solid var(--color-border); background: #F8FAFC; }
-    .card-link { display: inline-flex; align-items: center; gap: 6px; color: var(--color-accent); font-weight: var(--font-weight-medium); text-decoration: underline transparent; transition: text-decoration-color var(--duration-mid) var(--easing-out); }
+    .card-link { margin-top: auto; display: inline-flex; align-items: center; gap: 6px; color: var(--color-accent); font-weight: var(--font-weight-medium); text-decoration: underline transparent; transition: text-decoration-color var(--duration-mid) var(--easing-out); }
     .card:hover .card-link { text-decoration-color: currentColor; }
 
     /* Approach */
     .approach .steps { position: relative; display: grid; grid-template-columns: 1fr; gap: 16px; }
     @media (min-width: 900px) { .approach .steps { grid-template-columns: repeat(3, 1fr); } }
-    .step { position: relative; padding: 20px; border: 1px solid var(--color-border); border-radius: var(--radius-3); background: var(--color-surface); }
-    .step-index { width: 28px; height: 28px; border-radius: 50%; background: #ECFDF5; color: var(--color-accent); display: grid; place-items: center; font-weight: 600; margin-bottom: 8px; }
+    .step { position: relative; display: grid; gap: 8px; align-content: start; padding: 24px; border: 1px solid var(--color-border); border-radius: var(--radius-3); background: var(--color-surface); }
+    .step-index { width: 32px; height: 32px; border-radius: 50%; background: var(--color-accent); color: var(--color-on-accent); display: grid; place-items: center; font-weight: 600; font-family: var(--font-display); box-shadow: 0 0 0 6px var(--color-surface); }
+    .step ul { color: var(--color-muted-text); }
     .connector { display: none; }
-    @media (min-width: 900px) { .connector { display: block; position: absolute; top: 42px; left: 0; right: 0; height: 2px; background: var(--color-border); z-index: -1; } }
+    @media (min-width: 900px) { .connector { display: block; position: absolute; top: 40px; left: 40px; right: 40px; height: 2px; background: linear-gradient(90deg, var(--color-accent), var(--color-border)); z-index: 0; } .step { z-index: 1; background: transparent; } .step::before { content: ''; position: absolute; inset: 0; border-radius: inherit; background: var(--color-surface); z-index: -1; } }
 
     /* Testimonials */
     .testimonials .carousel { position: relative; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-3); background: var(--color-surface); }
     .track { display: flex; transition: transform 280ms var(--easing-standard); will-change: transform; }
-    .slide { flex: 0 0 100%; padding: 24px; display: grid; gap: 16px; }
-    @media (min-width: 768px) { .slide { grid-template-columns: 1fr auto; align-items: center; } }
-    .quote { font-size: var(--size-body-l); line-height: var(--lh-body-l); }
+    .slide { flex: 0 0 100%; padding: 32px; display: grid; gap: 20px; }
+    .person .name { font-weight: 600; }
+    .person .role { font-size: var(--size-caption); color: var(--color-muted-text); }
+    .quote { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: clamp(20px, 2.4vw, 26px); line-height: 1.35; letter-spacing: -0.01em; max-width: 46ch; }
     .person { display: flex; align-items: center; gap: 12px; }
     .avatar { width: 36px; height: 36px; border-radius: 50%; background: #E2E8F0; display: grid; place-items: center; font-weight: 600; }
-    .carousel-ctrls { position: absolute; inset: auto 8px 8px auto; display: flex; gap: 8px; }
+    .carousel-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; }
+    .carousel-ctrls { display: flex; gap: 8px; }
 
-    .dots { display: flex; gap: 6px; margin-top: 10px; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: #CBD5E1; }
-    .dot[aria-current="true"] { background: var(--color-accent); }
-
+    .dots { display: flex; gap: 4px; }
+    .dot { width: 24px; height: 24px; padding: 0; border: 0; background: transparent; cursor: pointer; display: grid; place-items: center; }
+    .dot::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #CBD5E1; transition: width var(--duration-mid) var(--easing-out); }
+    .dot[aria-current="true"]::before { width: 20px; border-radius: 999px; background: var(--color-accent); }
+    
     /* Insights + Newsletter */
     .insights .cards { margin-top: var(--space-6); }
     .article .card-body { gap: 6px; }
     .rtime { color: var(--color-muted-text); font-size: var(--size-micro); }
     .newsletter { margin-top: var(--space-8); padding: 16px; border: 1px solid var(--color-border); border-radius: var(--radius-3); background: var(--color-surface); display: grid; gap: 12px; }
     .input-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .input-row input { flex: 1 1 260px; max-width: 420px; }
+    .newsletter { padding: 24px; }
 
     /* Form / CTA */
     .cta-split { display: grid; grid-template-columns: 1fr; gap: 24px; }
@@ -213,13 +238,19 @@
     .chip-select[aria-pressed="true"] { background: rgba(15,118,110,0.08); border-color: rgba(15,118,110,0.5); color: var(--color-accent); }
     .helper, .error { font-size: var(--size-caption); line-height: var(--lh-caption); }
     .error { color: var(--color-danger); }
+    [aria-invalid="true"] { border-color: var(--color-danger) !important; }
+    .field-label { font-weight: var(--font-weight-medium); }
     .consent { display: flex; align-items: flex-start; gap: 8px; }
     .notice { border-left: 3px solid var(--color-accent); background: #ECFDF5; padding: 10px 12px; border-radius: 6px; }
 
     /* FAQ */
     .faq .item { border: 1px solid var(--color-border); border-radius: var(--radius-3); background: var(--color-surface); overflow: hidden; }
-    .faq button.q { width: 100%; text-align: left; padding: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: transparent; border: 0; cursor: pointer; }
-    .faq .a { padding: 0 16px 16px; color: var(--color-muted-text); display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--duration-mid) var(--easing-out), opacity var(--duration-mid) var(--easing-out), transform var(--duration-mid) var(--easing-out); opacity: 0.7; transform: translateY(-4px); }
+    .faq summary { list-style: none; width: 100%; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; font-weight: var(--font-weight-semibold); min-height: var(--tap-target); }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary:hover { color: var(--color-accent); }
+    .faq summary:focus-visible { outline: none; box-shadow: inset var(--focus-ring); border-radius: var(--radius-3); }
+    .faq-list { display: grid; gap: 12px; margin-top: var(--space-6); max-width: 880px; }
+    .faq .a { padding: 0 20px 18px; color: var(--color-muted-text); display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--duration-mid) var(--easing-out), opacity var(--duration-mid) var(--easing-out), transform var(--duration-mid) var(--easing-out); opacity: 0.7; transform: translateY(-4px); }
     .faq .a > div { overflow: hidden; }
     .faq .item[open] .a { grid-template-rows: 1fr; opacity: 1; transform: translateY(0); }
     .chev { width: 18px; height: 18px; transition: transform var(--duration-mid) var(--easing-out); }
@@ -230,6 +261,8 @@
     .footer .cols { display: grid; grid-template-columns: 1fr; gap: 24px; padding-block: var(--space-10); }
     @media (min-width: 900px) { .footer .cols { grid-template-columns: 2fr 1fr 1fr 1fr; } }
     .footer a { color: var(--color-muted-text); }
+    .footer .h4 { font-size: var(--size-caption); line-height: var(--lh-caption); text-transform: uppercase; letter-spacing: .08em; color: var(--color-muted-text); }
+    .footer ul.micro { font-size: var(--size-caption); line-height: var(--lh-caption); }
     .footer a:hover { color: var(--color-text); }
     .foot-bottom { display: grid; grid-template-columns: 1fr; gap: 12px; padding-block: 16px 32px; border-top: 1px solid var(--color-border); color: var(--color-muted-text); }
     @media (min-width: 900px) { .foot-bottom { grid-template-columns: 1fr auto; align-items: center; } }
@@ -245,16 +278,18 @@
     @media (prefers-reduced-motion: reduce) { .skeleton::after { animation: none; } }
 
     /* Toast */
-    .toast { position: fixed; left: 16px; bottom: 16px; background: #ECFDF5; color: var(--color-text); border-left: 3px solid var(--color-accent); padding: 10px 12px; border-radius: 8px; box-shadow: var(--shadow-mid); display: none; z-index: 999; }
+    .toast { position: fixed; left: 16px; bottom: 76px; background: #ECFDF5; color: var(--color-text); border-left: 3px solid var(--color-accent); padding: 10px 12px; border-radius: 8px; box-shadow: var(--shadow-mid); display: none; z-index: 999; }
     .toast.show { display: block; }
 
     /* State switcher */
-    .state-switcher { position: fixed; right: 16px; bottom: 16px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-3); box-shadow: var(--shadow-low); padding: 8px 10px; display: flex; align-items: center; gap: 8px; z-index: 950; }
+    .state-switcher { position: fixed; right: 16px; bottom: 16px; opacity: .9; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-3); box-shadow: var(--shadow-low); padding: 8px 10px; display: flex; align-items: center; gap: 8px; z-index: 950; }
     .state-switcher select { border: 1px solid var(--color-border); border-radius: var(--radius-2); padding: 6px 10px; }
 
     /* Utility */
     .muted { color: var(--color-muted-text); }
     .hidden { display: none !important; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin svg { animation: spin .8s linear infinite; }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
   </style>
 </head>
@@ -271,29 +306,29 @@
         </button>
       </div>
       <div class="ticker" role="region" aria-label="Market ticker">
-        <div class="ticker-track" aria-live="off">
-          <span tabindex="0" class="chip" aria-label="ETH price and gas">
+        <div class="ticker-track" aria-live="off" aria-hidden="false">
+          <span class="chip" aria-label="ETH price and gas">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l7 12-7 8-7-8 7-12z"/></svg>
             <span class="micro">ETH</span>
             <span class="micro numeric" id="eth-val">$3,482</span>
             <span class="dot-up" aria-hidden="true"></span>
             <span class="micro numeric" id="gas-val">Gas 24 gwei</span>
           </span>
-          <span tabindex="0" class="chip" aria-label="BTC price">
+          <span class="chip" aria-label="BTC price">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9 8h5a2 2 0 110 4H9zm0 0V6m0 6v6m5-2H9"/></svg>
             <span class="micro">BTC</span>
             <span class="micro numeric" id="btc-val">$62,140</span>
             <span class="dot-flat" aria-hidden="true"></span>
           </span>
           <!-- duplicate for seamless -->
-          <span tabindex="0" class="chip" aria-label="ETH price and gas duplicate" aria-hidden="true">
+          <span class="chip" aria-label="ETH price and gas duplicate" aria-hidden="true">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l7 12-7 8-7-8 7-12z"/></svg>
             <span class="micro">ETH</span>
             <span class="micro numeric">$3,482</span>
             <span class="dot-up"></span>
             <span class="micro numeric">Gas 24 gwei</span>
           </span>
-          <span tabindex="0" class="chip" aria-label="BTC price duplicate" aria-hidden="true">
+          <span class="chip" aria-label="BTC price duplicate" aria-hidden="true">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 8h5a2 2 0 110 4H9zm0 0V6m0 6v6m5-2H9"/></svg>
             <span class="micro">BTC</span>
             <span class="micro numeric">$62,140</span>
@@ -307,7 +342,7 @@
   <!-- Header / Nav -->
   <header class="header" id="site-header">
     <div class="container nav-inner">
-      <a href="#" class="brand" aria-label="Chaincraft home">
+      <a href="#main" class="brand" aria-label="Chaincraft home">
         <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12a7 7 0 007 7 7 7 0 000-14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <span>Chaincraft</span>
       </a>
@@ -321,13 +356,13 @@
         <a class="btn btn-primary" href="#contact" id="cta-book-desktop">Book discovery call</a>
         <a class="btn btn-ghost" href="mailto:hello@chaincraft.studio" aria-label="Email hello at chaincraft dot studio">hello@chaincraft.studio</a>
       </div>
-      <button class="menu-btn" id="open-drawer" aria-label="Open menu" aria-haspopup="true" aria-controls="drawer">
+      <button class="menu-btn" id="open-drawer" aria-label="Open menu" aria-haspopup="dialog" aria-controls="drawer" aria-expanded="false">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
     </div>
   </header>
   <div class="drawer-overlay" id="drawer-overlay" aria-hidden="true"></div>
-  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Mobile navigation">
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Mobile navigation" inert>
     <button class="ctrl drawer-close" id="close-drawer" aria-label="Close menu">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
     </button>
@@ -358,9 +393,8 @@
         <div class="hero-media">
           <div class="media-card">
             <div class="media-frame" aria-label="Featured work previews">
-              <div class="media-dots" aria-hidden="true"><span></span><span></span><span></span></div>
-              <!-- rotating thumbnails -->
-              <img id="hero-thumb" loading="lazy" width="1200" height="750" alt="Dashboard preview" />
+                            <!-- rotating thumbnails -->
+              <img id="hero-thumb" width="1200" height="750" alt="Preview of a DEX analytics dashboard designed by Chaincraft" />
             </div>
           </div>
         </div>
@@ -368,35 +402,40 @@
     </section>
 
     <!-- Logo wall -->
-    <section class="logo-strip" aria-label="Trusted by Web3 teams across chains">
+    <section class="logo-strip" aria-label="Clients">
       <div class="container logo-row">
-        <span class="micro muted">Trusted by Web3 teams across chains</span>
-        <div class="logo-track" id="logo-track" aria-hidden="false">
-          <!-- 12+ logos (duplicated for seamless loop) -->
-          <button class="logo-item ctrl" aria-label="Perimeter Protocol" tabindex="0"> 
-            <svg viewBox="0 0 160 32" aria-hidden="true"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Perimeter</text></svg>
-          </button>
-          <button class="logo-item ctrl" aria-label="Orbital Labs"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Orbital</text></svg></button>
-          <button class="logo-item ctrl" aria-label="Nexus Chain"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Nexus</text></svg></button>
-          <button class="logo-item ctrl" aria-label="Delta Exchange"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Delta</text></svg></button>
-          <button class="logo-item ctrl" aria-label="Foundry"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Foundry</text></svg></button>
-          <button class="logo-item ctrl" aria-label="Anchor"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Anchor</text></svg></button>
-          <button class="logo-item ctrl" aria-label="Covalent"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Covalent</text></svg></button>
-          <button class="logo-item ctrl" aria-label="Threshold"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Threshold</text></svg></button>
-          <button class="logo-item ctrl" aria-label="Relay"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Relay</text></svg></button>
-          <button class="logo-item ctrl" aria-label="Mosaic"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Mosaic</text></svg></button>
-          <button class="logo-item ctrl" aria-label="Layer Labs"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Layer</text></svg></button>
-          <button class="logo-item ctrl" aria-label="Ledgerly"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Ledgerly</text></svg></button>
-          <!-- duplicate the same to enable loop -->
-          <button class="logo-item ctrl" aria-label="Perimeter Protocol" aria-hidden="true"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Perimeter</text></svg></button>
-          <button class="logo-item ctrl" aria-label="Orbital Labs" aria-hidden="true"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Orbital</text></svg></button>
-          <button class="logo-item ctrl" aria-label="Nexus Chain" aria-hidden="true"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Nexus</text></svg></button>
-          <button class="logo-item ctrl" aria-label="Delta Exchange" aria-hidden="true"><svg viewBox="0 0 160 32"><text x="0" y="22" font-family="Sora,system-ui" font-size="20" fill="#334155">Delta</text></svg></button>
+        <span class="micro logo-label">Trusted by Web3 teams across chains</span>
+        <div class="logo-viewport">
+          <div class="logo-track" id="logo-track">
+            <span class="logo-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v16H4z"/></svg>Perimeter</span>
+            <span class="logo-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 100 18 9 9 0 000-18zm0 5a4 4 0 110 8 4 4 0 010-8z"/></svg>Orbital</span>
+            <span class="logo-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19L12 5l7 14z"/></svg>Nexus</span>
+            <span class="logo-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 18L12 6l8 12H4z"/></svg>Delta</span>
+            <span class="logo-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V9l7-5 7 5v11"/></svg>Foundry</span>
+            <span class="logo-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M5 14a7 7 0 0014 0"/></svg>Anchor</span>
+            <span class="logo-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12a4 4 0 108 0 4 4 0 00-8 0zM2 12h4M18 12h4"/></svg>Covalent</span>
+            <span class="logo-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16M7 20V8h10v12"/></svg>Threshold</span>
+            <span class="logo-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6"/></svg>Relay</span>
+            <span class="logo-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h7v7H4zM13 13h7v7h-7z"/></svg>Mosaic</span>
+            <span class="logo-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l9 5-9 5-9-5zM3 14l9 5 9-5"/></svg>Layer</span>
+            <span class="logo-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h12v16H6zM9 8h6M9 12h6"/></svg>Ledgerly</span>
+            <span class="logo-item" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v16H4z"/></svg>Perimeter</span>
+            <span class="logo-item" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 100 18 9 9 0 000-18zm0 5a4 4 0 110 8 4 4 0 010-8z"/></svg>Orbital</span>
+            <span class="logo-item" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19L12 5l7 14z"/></svg>Nexus</span>
+            <span class="logo-item" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 18L12 6l8 12H4z"/></svg>Delta</span>
+            <span class="logo-item" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V9l7-5 7 5v11"/></svg>Foundry</span>
+            <span class="logo-item" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M5 14a7 7 0 0014 0"/></svg>Anchor</span>
+            <span class="logo-item" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12a4 4 0 108 0 4 4 0 00-8 0zM2 12h4M18 12h4"/></svg>Covalent</span>
+            <span class="logo-item" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16M7 20V8h10v12"/></svg>Threshold</span>
+            <span class="logo-item" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6"/></svg>Relay</span>
+            <span class="logo-item" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h7v7H4zM13 13h7v7h-7z"/></svg>Mosaic</span>
+            <span class="logo-item" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l9 5-9 5-9-5zM3 14l9 5 9-5"/></svg>Layer</span>
+            <span class="logo-item" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h12v16H6zM9 8h6M9 12h6"/></svg>Ledgerly</span>
+          </div>
         </div>
-        <div class="logo-ctrls" aria-hidden="true">
-          <button class="ctrl" id="logo-prev" aria-label="Previous logos"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
-          <button class="ctrl" id="logo-next" aria-label="Next logos"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
-        </div>
+        <button class="ctrl logo-pause" id="logo-pause" type="button" aria-pressed="false" aria-label="Pause logo animation">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M9 6v12M15 6v12"/></svg>
+        </button>
       </div>
     </section>
 
@@ -404,25 +443,25 @@
     <section class="section container" id="services">
       <h2 class="h2">What we do</h2>
       <div class="grid services" style="margin-top: var(--space-6);">
-        <div class="tile" tabindex="0" style="grid-column: span 4;" role="group" aria-labelledby="svc-1">
+        <div class="tile" role="group" aria-labelledby="svc-1">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h18M12 3v18" opacity=".3"/><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>
           <h3 id="svc-1" class="h3">Strategy</h3>
           <p>Protocol and product strategy, token and growth mechanics, audits that find what others miss.</p>
           <a href="#" class="link-inline">Explore service <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
         </div>
-        <div class="tile" tabindex="0" style="grid-column: span 4;" role="group" aria-labelledby="svc-2">
+        <div class="tile" role="group" aria-labelledby="svc-2">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18M7 15h4"/></svg>
           <h3 id="svc-2" class="h3">Product Design</h3>
           <p>UX that converts, UI that builds trust, design systems that scale with your roadmap.</p>
           <a href="#" class="link-inline">Explore service <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
         </div>
-        <div class="tile" tabindex="0" style="grid-column: span 4;" role="group" aria-labelledby="svc-3">
+        <div class="tile" role="group" aria-labelledby="svc-3">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/><path d="M8 7v10M16 7v10" opacity=".3"/></svg>
           <h3 id="svc-3" class="h3">Engineering</h3>
           <p>Senior Solidity, Typescript and Rust teams shipping secure, gas-efficient code.</p>
           <a href="#" class="link-inline">Explore service <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
         </div>
-        <div class="tile" tabindex="0" style="grid-column: span 4;" role="group" aria-labelledby="svc-4">
+        <div class="tile" role="group" aria-labelledby="svc-4">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17s3-3 9-3 9 3 9 3"/><circle cx="12" cy="8" r="3"/></svg>
           <h3 id="svc-4" class="h3">Growth</h3>
           <p>Launch playbooks, partnerships and performance creative that compound.</p>
@@ -435,7 +474,7 @@
     <section class="featured" id="work">
       <div class="media-bleed" aria-labelledby="feat-title">
         <div class="frame">
-          <img id="featured-img" loading="lazy" width="1440" height="810" alt="Case study preview: DEX metrics" srcset="" sizes="100vw" />
+          <img id="featured-img" width="1440" height="810" alt="DEX analytics dashboard showing TVL growing to $120M over 90 days" />
           <!-- Signature confirmation -->
           <div class="confirm" aria-live="polite" aria-atomic="true">
             <span class="status-label" id="confirm-status">Mempool</span>
@@ -456,9 +495,9 @@
           <li>Passed audit with zero criticals.</li>
         </ul>
         <div class="metrics">
-          <div class="metric"><div class="caption">TVL</div><div class="value numeric" id="metric-tvl">$0M</div></div>
-          <div class="metric"><div class="caption">Conversion</div><div class="value numeric" id="metric-cvr">0%</div></div>
-          <div class="metric"><div class="caption">Time to ship</div><div class="value numeric" id="metric-tts">—</div></div>
+          <div class="metric"><div class="caption">TVL</div><div class="value numeric" id="metric-tvl">$120M</div></div>
+          <div class="metric"><div class="caption">Swap conversion</div><div class="value numeric" id="metric-cvr">38%</div></div>
+          <div class="metric"><div class="caption">Time to $120M TVL</div><div class="value numeric" id="metric-tts">90 days</div></div>
         </div>
         <div style="margin-top: var(--space-6); display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
           <a href="#" class="btn btn-primary">Read case study</a>
@@ -491,7 +530,7 @@
     </section>
 
     <!-- Approach -->
-    <section class="section container" id="approach">
+    <section class="section container approach" id="approach">
       <h2 class="h2">Our way to mainnet</h2>
       <div class="steps" style="margin-top: var(--space-6);">
         <div class="connector" aria-hidden="true"></div>
@@ -499,7 +538,7 @@
           <div class="step-index">1</div>
           <div class="h4">Discover</div>
           <p class="muted">Brief, audits, stakeholder interviews. We map value, risk and lift.</p>
-          <ul class="micro muted" style="padding-left:18px; margin:0;">
+          <ul class="caption" style="padding-left:18px; margin:0;">
             <li>Protocol + product audit</li>
             <li>Competitive mapping</li>
             <li>Risk + lift report</li>
@@ -509,7 +548,7 @@
           <div class="step-index">2</div>
           <div class="h4">Build</div>
           <p class="muted">Design sprints, dev sprints, weekly ship cadence.</p>
-          <ul class="micro muted" style="padding-left:18px; margin:0;">
+          <ul class="caption" style="padding-left:18px; margin:0;">
             <li>Design system</li>
             <li>Contracts + clients</li>
             <li>Security reviews</li>
@@ -519,7 +558,7 @@
           <div class="step-index">3</div>
           <div class="h4">Prove</div>
           <p class="muted">Launch, measure, iterate. Growth creative, on-chain analytics.</p>
-          <ul class="micro muted" style="padding-left:18px; margin:0;">
+          <ul class="caption" style="padding-left:18px; margin:0;">
             <li>Launch playbook</li>
             <li>Attribution setup</li>
             <li>Optimization loops</li>
@@ -536,40 +575,38 @@
       <h2 id="testi-title" class="h2">What our partners say</h2>
       <div class="testimonials" style="margin-top: var(--space-6);">
         <div class="carousel" id="carousel" aria-roledescription="carousel" aria-label="Testimonials">
-          <div class="track" id="track" role="group" aria-live="polite">
-            <article class="slide" tabindex="0" aria-label="Slide 1 of 3">
+          <div class="track" id="track" aria-live="polite" tabindex="0" aria-label="Testimonials, use arrow keys to switch">
+            <article class="slide" aria-roledescription="slide" aria-label="Testimonial 1 of 3">
               <p class="quote">“Chaincraft shipped in weeks what took others months — and it just worked.”</p>
-              <div class="person">
-                <div class="avatar" aria-hidden="true">MR</div>
-                <div>
-                  <div class="micro">Maya R., Head of Product — Perimeter Protocol</div>
-                </div>
-              </div>
+              <div class="person"><div class="avatar" aria-hidden="true">MR</div><div><div class="name">Maya R.</div><div class="role">Head of Product, Perimeter Protocol</div></div></div>
             </article>
-            <article class="slide" tabindex="0" aria-label="Slide 2 of 3">
+            <article class="slide" aria-roledescription="slide" aria-label="Testimonial 2 of 3">
               <p class="quote">“Design quality and engineering rigor in one team. Our conversion jumped immediately.”</p>
-              <div class="person"><div class="avatar">JP</div><div class="micro">Jon P., GM — Delta Exchange</div></div>
+              <div class="person"><div class="avatar" aria-hidden="true">JP</div><div><div class="name">Jon P.</div><div class="role">GM, Delta Exchange</div></div></div>
             </article>
-            <article class="slide" tabindex="0" aria-label="Slide 3 of 3">
+            <article class="slide" aria-roledescription="slide" aria-label="Testimonial 3 of 3">
               <p class="quote">“Security-first approach without slowing us down. Best vendor we’ve worked with.”</p>
-              <div class="person"><div class="avatar">LK</div><div class="micro">Lina K., CTO — Nexus Chain</div></div>
+              <div class="person"><div class="avatar" aria-hidden="true">LK</div><div><div class="name">Lina K.</div><div class="role">CTO, Nexus Chain</div></div></div>
             </article>
+          </div>
+          
+        </div>
+        <div class="carousel-bar">
+          <div class="dots" aria-label="Choose testimonial">
+            <button class="dot" type="button" data-index="0" aria-current="true" aria-label="Show testimonial 1"></button>
+            <button class="dot" type="button" data-index="1" aria-current="false" aria-label="Show testimonial 2"></button>
+            <button class="dot" type="button" data-index="2" aria-current="false" aria-label="Show testimonial 3"></button>
           </div>
           <div class="carousel-ctrls">
-            <button class="ctrl" id="prev-slide" aria-controls="track" aria-label="Previous testimonial"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
-            <button class="ctrl" id="next-slide" aria-controls="track" aria-label="Next testimonial"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+            <button class="ctrl" type="button" id="prev-slide" aria-controls="track" aria-label="Previous testimonial"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <button class="ctrl" type="button" id="next-slide" aria-controls="track" aria-label="Next testimonial"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
           </div>
         </div>
-        <div class="dots" role="tablist" aria-label="Testimonial pagination" style="margin-top:10px;">
-          <button class="dot" data-index="0" role="tab" aria-selected="true" aria-current="true" aria-controls="track"></button>
-          <button class="dot" data-index="1" role="tab" aria-selected="false" aria-controls="track"></button>
-          <button class="dot" data-index="2" role="tab" aria-selected="false" aria-controls="track"></button>
-        </div>
       </div>
-      <div class="grid" style="margin-top: var(--space-8);">
-        <div class="metric surface" style="grid-column: span 4;"><div class="caption">Projects shipped</div><div class="value numeric">120+</div></div>
-        <div class="metric surface" style="grid-column: span 4;"><div class="caption">Chains supported</div><div class="value numeric">12</div></div>
-        <div class="metric surface" style="grid-column: span 4;"><div class="caption">Avg time to launch</div><div class="value numeric">6 weeks</div></div>
+      <div class="stats" style="margin-top: var(--space-8);">
+        <div class="metric surface stat"><div class="caption">Projects shipped</div><div class="value numeric">120+</div></div>
+        <div class="metric surface stat"><div class="caption">Chains supported</div><div class="value numeric">12</div></div>
+        <div class="metric surface stat"><div class="caption">Avg time to launch</div><div class="value numeric">6 weeks</div></div>
       </div>
     </section>
 
@@ -594,43 +631,43 @@
       <div class="cta-split">
         <div>
           <h2 class="h2">Tell us what you’re building.</h2>
-          <p class="body-l">Share your goals. We’ll reply with a plan and timelines — no spam, no pressure.</p>
+          <p class="body-l" style="margin-top: var(--space-3);">Share your goals. We’ll reply with a plan and timelines — no spam, no pressure.</p>
         </div>
         <form class="form" id="brief-form" novalidate>
-          <div class="field"><label for="name">Your name</label><input id="name" type="text" required /><div class="error" id="err-name" style="display:none;">Please enter your name.</div></div>
-          <div class="field"><label for="email">Work email</label><input id="email" type="email" required /><div class="error" id="err-email" style="display:none;">Enter a valid work email.</div></div>
-          <div class="field"><label for="company">Company</label><input id="company" type="text" required /><div class="error" id="err-company" style="display:none;">Please enter your company.</div></div>
+          <div class="field"><label for="name">Your name</label><input id="name" type="text" required aria-describedby="err-name" autocomplete="name" /><div class="error" id="err-name" role="alert" style="display:none;">Please enter your name.</div></div>
+          <div class="field"><label for="email">Work email</label><input id="email" type="email" required aria-describedby="err-email" autocomplete="email" /><div class="error" id="err-email" role="alert" style="display:none;">Enter a valid work email.</div></div>
+          <div class="field"><label for="company">Company</label><input id="company" type="text" required aria-describedby="err-company" autocomplete="organization" /><div class="error" id="err-company" role="alert" style="display:none;">Please enter your company.</div></div>
           <div class="field">
-            <label>What you need</label>
-            <div class="chips" role="group" aria-label="What you need">
+            <span class="field-label" id="needs-label">What you need</span>
+            <div class="chips" role="group" aria-labelledby="needs-label" aria-describedby="err-needs">
               <button type="button" class="chip-select" data-need="Strategy" aria-pressed="false">Strategy</button>
               <button type="button" class="chip-select" data-need="Product design" aria-pressed="false">Product design</button>
               <button type="button" class="chip-select" data-need="Engineering" aria-pressed="false">Engineering</button>
               <button type="button" class="chip-select" data-need="Growth" aria-pressed="false">Growth</button>
             </div>
-            <div class="error" id="err-needs" style="display:none;">Select at least one need.</div>
+            <div class="error" id="err-needs" role="alert" style="display:none;">Select at least one need.</div>
           </div>
           <div class="field"><label for="budget">Budget range</label>
-            <select id="budget" required>
+            <select id="budget" required aria-describedby="err-budget">
               <option value="" disabled selected>Select</option>
               <option>&lt;$25k</option>
               <option>$25–100k</option>
               <option>$100–300k</option>
               <option>$300k+</option>
             </select>
-            <div class="error" id="err-budget" style="display:none;">Choose a budget range.</div>
+            <div class="error" id="err-budget" role="alert" style="display:none;">Choose a budget range.</div>
           </div>
           <div class="field"><label for="message">Project details</label><textarea id="message" placeholder="Goals, timeline, links…"></textarea></div>
-          <div class="consent"><input id="consent" type="checkbox" required aria-describedby="consent-help" /> <label for="consent" style="font-weight:400;">I agree to the privacy policy.</label></div>
-          <div class="error" id="err-consent" style="display:none;">Please agree to the privacy policy.</div>
+          <div class="consent"><input id="consent" type="checkbox" required aria-describedby="err-consent" /> <label for="consent" style="font-weight:400;">I agree to the privacy policy.</label></div>
+          <div class="error" id="err-consent" role="alert" style="display:none;">Please agree to the privacy policy.</div>
           <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
-            <button class="btn btn-primary" type="submit" id="submit-brief"><span id="submit-label">Send brief</span><span id="submit-spinner" class="hidden" aria-hidden="true">
+            <button class="btn btn-primary" type="submit" id="submit-brief" aria-live="polite"><span id="submit-label">Send brief</span><span id="submit-spinner" class="hidden spin" aria-hidden="true">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-9-9"/></svg>
             </span></button>
             <span class="micro muted">Response within 1–2 days</span>
           </div>
           <div id="form-success" class="notice hidden" role="status" aria-live="polite">
-            <strong>Brief received</strong><div>Thanks — want to book time now? <a href="#calendar" class="link-inline">Grab a slot that works</a>.</div>
+            <strong>Brief received</strong><div>Thanks — want to book time now? <a href="mailto:hello@chaincraft.studio?subject=Book%20a%20discovery%20call" class="link-inline">Grab a slot that works</a>.</div>
           </div>
         </form>
       </div>
@@ -639,29 +676,29 @@
     <!-- FAQ -->
     <section class="section container faq" aria-labelledby="faq-title">
       <h2 id="faq-title" class="h2">Questions, answered</h2>
-      <div class="grid" style="margin-top: var(--space-6); gap: 16px;">
-        <details class="item" role="group" style="grid-column: span 12;">
-          <summary><button class="q" aria-expanded="false"><span>What budgets do you work with?</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button></summary>
+      <div class="faq-list">
+        <details class="item">
+          <summary><span>What budgets do you work with?</span><svg class="chev" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
           <div class="a"><div>We scope outcomes to your stage. Most engagements range from $25k–$500k depending on scope and speed.</div></div>
         </details>
-        <details class="item" role="group" style="grid-column: span 12;">
-          <summary><button class="q" aria-expanded="false"><span>How fast can you start?</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button></summary>
+        <details class="item">
+          <summary><span>How fast can you start?</span><svg class="chev" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
           <div class="a"><div>We keep 1–2 build slots open each quarter. If you’re a fit, we can start within 2–3 weeks.</div></div>
         </details>
-        <details class="item" role="group" style="grid-column: span 12;">
-          <summary><button class="q" aria-expanded="false"><span>Which chains do you work with?</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button></summary>
+        <details class="item">
+          <summary><span>Which chains do you work with?</span><svg class="chev" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
           <div class="a"><div>We’re chain-agnostic and have shipped across L1s and L2s. We’ll recommend the best fit for your goals.</div></div>
         </details>
-        <details class="item" role="group" style="grid-column: span 12;">
-          <summary><button class="q" aria-expanded="false"><span>Do you run audits?</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button></summary>
+        <details class="item">
+          <summary><span>Do you run audits?</span><svg class="chev" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
           <div class="a"><div>Yes — our security team runs protocol and front-end audits. We also partner with tier-one firms when needed.</div></div>
         </details>
-        <details class="item" role="group" style="grid-column: span 12;">
-          <summary><button class="q" aria-expanded="false"><span>Engagement models?</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button></summary>
+        <details class="item">
+          <summary><span>Engagement models?</span><svg class="chev" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
           <div class="a"><div>Fixed-scope projects, monthly retainers, and dedicated squads. We co-own outcomes either way.</div></div>
         </details>
-        <details class="item" role="group" style="grid-column: span 12;">
-          <summary><button class="q" aria-expanded="false"><span>How do you price?</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button></summary>
+        <details class="item">
+          <summary><span>How do you price?</span><svg class="chev" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
           <div class="a"><div>Transparent rate cards with weekly burn mapping. We price on scope, speed, and seniority required.</div></div>
         </details>
       </div>
@@ -733,12 +770,62 @@
       const on = (el, ev, fn, opts) => el.addEventListener(ev, fn, opts);
 
       // SVG/data-URI generators (declared before first use)
-      function makeSVGThumb(accent){
-        const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='750' viewBox='0 0 1200 750'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='#F8FAFC'/><stop offset='1' stop-color='#EEF2F7'/></linearGradient></defs><rect width='1200' height='750' fill='url(#g)'/><rect x='60' y='60' width='1080' height='500' rx='16' fill='white' stroke='#E2E8F0'/><rect x='90' y='100' width='200' height='14' rx='7' fill='#CBD5E1'/><rect x='90' y='140' width='500' height='260' rx='8' fill='${accent}' opacity='0.14'/><rect x='620' y='140' width='460' height='40' rx='6' fill='#E5E7EB'/><rect x='620' y='190' width='300' height='40' rx='6' fill='#E5E7EB'/><rect x='620' y='240' width='420' height='40' rx='6' fill='#E5E7EB'/><rect x='60' y='590' width='1080' height='40' rx='8' fill='#F1F5F9'/></svg>`;
-        return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+      const SVG_FONT = "system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif";
+      const svgURI = svg => 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+      // Dashboard illustration: TVL line chart, KPI tiles and a pools table
+      function makeSVGThumb(accent, variant=0){
+        const series = [
+          [520,512,505,470,462,430,402,380,330,300,262,220,190,150],
+          [500,490,470,476,440,430,396,390,350,340,300,286,250,232],
+          [480,470,476,450,420,428,392,360,356,320,300,270,240,210]
+        ][variant % 3];
+        const xs = series.map((_,i)=> 96 + i*52);
+        const line = series.map((y,i)=> (i?'L':'M') + xs[i] + ' ' + y).join(' ');
+        const area = line + ' L ' + xs[xs.length-1] + ' 560 L 96 560 Z';
+        const kpis = [['TVL','$120M','+212%'],['24h volume','$38.4M','+18%'],['Active wallets','65,214','+9%']];
+        const kpiSvg = kpis.map((k,i)=>`<g transform='translate(${820},${118+i*118})'><rect width='300' height='100' rx='14' fill='#fff' stroke='#E2E8F0'/><text x='20' y='34' font-family="${SVG_FONT}" font-size='15' fill='#5B6678'>${k[0]}</text><text x='20' y='74' font-family="${SVG_FONT}" font-size='30' font-weight='700' fill='#0B1220'>${k[1]}</text><text x='280' y='74' text-anchor='end' font-family="${SVG_FONT}" font-size='15' font-weight='600' fill='#166534'>${k[2]}</text></g>`).join('');
+        const grid = [180,280,380,480].map(y=>`<line x1='96' x2='772' y1='${y}' y2='${y}' stroke='#EEF1F5'/>`).join('');
+        const rows = [['ETH / USDC','$41.2M','0.05%'],['ARB / ETH','$18.9M','0.30%']].map((r,i)=>`<g transform='translate(72,${618+i*46})'><text x='24' y='20' font-family="${SVG_FONT}" font-size='15' fill='#0B1220' font-weight='600'>${r[0]}</text><text x='520' y='20' font-family="${SVG_FONT}" font-size='15' fill='#0B1220'>${r[1]}</text><text x='700' y='20' font-family="${SVG_FONT}" font-size='15' fill='#5B6678'>${r[2]}</text></g>`).join('');
+        return svgURI(`<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='750' viewBox='0 0 1200 750'>
+          <rect width='1200' height='750' fill='#F6F7F9'/>
+          <rect x='48' y='48' width='1104' height='654' rx='22' fill='#fff' stroke='#E2E8F0'/>
+          <circle cx='80' cy='80' r='6' fill='#E2E8F0'/><circle cx='100' cy='80' r='6' fill='#E2E8F0'/><circle cx='120' cy='80' r='6' fill='#E2E8F0'/>
+          <text x='96' y='140' font-family="${SVG_FONT}" font-size='17' fill='#5B6678'>Total value locked · 90 days</text>
+          <rect x='72' y='108' width='724' height='478' rx='16' fill='none'/>
+          ${grid}
+          <path d='${area}' fill='${accent}' opacity='0.10'/>
+          <path d='${line}' fill='none' stroke='${accent}' stroke-width='4' stroke-linejoin='round' stroke-linecap='round'/>
+          <circle cx='${xs[xs.length-1]}' cy='${series[series.length-1]}' r='8' fill='#fff' stroke='${accent}' stroke-width='4'/>
+          ${kpiSvg}
+          <line x1='72' x2='1128' y1='600' y2='600' stroke='#E2E8F0'/>
+          ${rows}
+        </svg>`);
       }
-      function makeCardSVG(i){ const hue = [180,210,220,200,190,170][i%6]; const fill = `hsl(${hue} 40% 45%)`; const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675' viewBox='0 0 1200 675'><rect width='1200' height='675' fill='#F8FAFC'/><rect x='40' y='40' width='1120' height='460' rx='18' fill='${fill}' opacity='.12'/><rect x='80' y='100' width='320' height='28' rx='6' fill='#CBD5E1'/><rect x='80' y='150' width='680' height='18' rx='5' fill='#E2E8F0'/><rect x='80' y='180' width='680' height='18' rx='5' fill='#E2E8F0'/><rect x='80' y='210' width='540' height='18' rx='5' fill='#E2E8F0'/></svg>`; return 'data:image/svg+xml;utf8,'+encodeURIComponent(svg); }
-      function makeArticleSVG(i){ const hue = [160,180,200][i%3]; const fill = `hsl(${hue} 50% 45%)`; const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675' viewBox='0 0 1200 675'><rect width='1200' height='675' fill='#ffffff'/><rect x='60' y='80' width='1080' height='420' rx='18' fill='${fill}' opacity='.1'/><rect x='100' y='520' width='260' height='20' rx='5' fill='#CBD5E1'/><rect x='100' y='555' width='880' height='16' rx='4' fill='#E2E8F0'/></svg>`; return 'data:image/svg+xml;utf8,'+encodeURIComponent(svg); }
+      // Case cover: editorial result-first cover
+      function makeCardSVG(i, c){
+        const tones = ['#0F766E','#1E3A5F','#334155','#115E59','#3F3F46','#0E7490'];
+        const t = tones[i % tones.length];
+        const metric = (c && c.metric || '').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+        const chain = (c && c.chain || '').toUpperCase();
+        const blocks = Array.from({length: 12}, (_,k)=>`<rect x='${720 + (k%4)*104}' y='${150 + Math.floor(k/4)*104}' width='88' height='88' rx='12' fill='#fff' opacity='${[0.05,0.14,0.08,0.2][ (k+i) % 4 ]}'/>`).join('');
+        return svgURI(`<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675' viewBox='0 0 1200 675'>
+          <rect width='1200' height='675' fill='${t}'/>${blocks}
+          <text x='72' y='120' font-family="${SVG_FONT}" font-size='26' letter-spacing='4' fill='#fff' opacity='.7'>${chain}</text>
+          <text x='68' y='420' font-family="${SVG_FONT}" font-size='150' font-weight='700' letter-spacing='-4' fill='#fff'>${metric.split(' ')[0]}</text>
+          <text x='72' y='490' font-family="${SVG_FONT}" font-size='34' fill='#fff' opacity='.8'>${metric.split(' ').slice(1).join(' ')}</text>
+        </svg>`);
+      }
+      // Article cover: category + ruled lines
+      function makeArticleSVG(i, a){
+        const t = ['#0F766E','#1E3A5F','#115E59'][i % 3];
+        const cat = (a && a.cat || '').toUpperCase();
+        const lines = Array.from({length: 9}, (_,k)=>`<line x1='0' x2='1200' y1='${120 + k*60}' y2='${120 + k*60}' stroke='${t}' stroke-opacity='${k===4?0.6:0.12}' stroke-width='${k===4?3:1.5}'/>`).join('');
+        return svgURI(`<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675' viewBox='0 0 1200 675'>
+          <rect width='1200' height='675' fill='#F6F7F9'/>${lines}
+          <circle cx='${880 + i*60}' cy='360' r='120' fill='${t}' opacity='.9'/>
+          <text x='72' y='110' font-family="${SVG_FONT}" font-size='28' letter-spacing='4' font-weight='600' fill='${t}'>${cat}</text>
+        </svg>`);
+      }
 
       // Timer cleanup management
       let heroTimerId = null;
@@ -760,21 +847,24 @@
 
       // Mobile drawer
       const drawer = qs('#drawer'); const overlay = qs('#drawer-overlay');
-      const openDrawer = ()=>{ drawer.classList.add('open'); overlay.classList.add('open'); overlay.setAttribute('aria-hidden','false'); qs('#close-drawer').focus(); };
-      const closeDrawer = ()=>{ drawer.classList.remove('open'); overlay.classList.remove('open'); overlay.setAttribute('aria-hidden','true'); qs('#open-drawer').focus(); };
+      const openBtn = qs('#open-drawer');
+      const openDrawer = ()=>{ drawer.removeAttribute('inert'); drawer.classList.add('open'); overlay.classList.add('open'); overlay.setAttribute('aria-hidden','false'); openBtn.setAttribute('aria-expanded','true'); qs('#close-drawer').focus(); };
+      const closeDrawer = (returnFocus=true)=>{ drawer.classList.remove('open'); overlay.classList.remove('open'); overlay.setAttribute('aria-hidden','true'); drawer.setAttribute('inert',''); openBtn.setAttribute('aria-expanded','false'); if (returnFocus) openBtn.focus(); };
+      qsa('a', drawer).forEach(a => on(a, 'click', ()=> closeDrawer(false)));
+      on(drawer, 'keydown', (e)=>{ if (e.key !== 'Tab') return; const f = qsa('a[href], button', drawer); const first = f[0], last = f[f.length-1]; if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); } else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); } });
       on(qs('#open-drawer'), 'click', openDrawer);
-      on(qs('#close-drawer'), 'click', closeDrawer);
-      on(overlay, 'click', closeDrawer);
+      on(qs('#close-drawer'), 'click', ()=> closeDrawer());
+      on(overlay, 'click', ()=> closeDrawer());
       on(window, 'keydown', (e)=>{ if(e.key==='Escape' && overlay.classList.contains('open')) closeDrawer(); });
 
       // Hero thumbnails (data URI SVGs), cycle
       const svgThumbs = [
-        makeSVGThumb('#0F766E'), makeSVGThumb('#334155'), makeSVGThumb('#1E293B')
+        makeSVGThumb('#0F766E', 0), makeSVGThumb('#0F766E', 1), makeSVGThumb('#0F766E', 2)
       ];
       const heroImg = qs('#hero-thumb');
-      let heroIndex = 0; function setHero(i){ const src = svgThumbs[i%svgThumbs.length]; heroImg.src = src; heroImg.srcset = src + ' 800w, ' + src + ' 1200w'; }
+      let heroIndex = 0; function setHero(i){ const src = svgThumbs[i%svgThumbs.length]; heroImg.src = src; }
       setHero(heroIndex);
-      heroTimerId = setInterval(()=>{ heroIndex++; setHero(heroIndex); }, 3500);
+      if (!prefersReduced) heroTimerId = setInterval(()=>{ heroIndex++; setHero(heroIndex); }, 5000);
 
       // Market ticker simulated
       const ethVal = qs('#eth-val'); const btcVal = qs('#btc-val'); const gasVal = qs('#gas-val');
@@ -788,9 +878,12 @@
       // Logo marquee controls (pause + manual scroll for a11y)
       const logoStrip = document.querySelector('.logo-strip');
       const logoTrack = document.getElementById('logo-track');
-      on(qs('#logo-prev'), 'click', ()=>{ logoStrip.classList.add('paused'); logoTrack.scrollLeft = (logoTrack.scrollLeft||0) - 240; });
-      on(qs('#logo-next'), 'click', ()=>{ logoStrip.classList.add('paused'); logoTrack.scrollLeft = (logoTrack.scrollLeft||0) + 240; });
-      if (prefersReduced) { logoStrip.classList.add('paused'); }
+      const logoPause = qs('#logo-pause');
+      const pauseIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M9 6v12M15 6v12"/></svg>';
+      const playIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5l11 7-11 7z"/></svg>';
+      function setLogoPaused(p){ logoStrip.classList.toggle('paused', p); logoPause.setAttribute('aria-pressed', String(p)); logoPause.setAttribute('aria-label', p ? 'Play logo animation' : 'Pause logo animation'); logoPause.innerHTML = p ? playIcon : pauseIcon; }
+      on(logoPause, 'click', ()=> setLogoPaused(!logoStrip.classList.contains('paused')));
+      if (prefersReduced) setLogoPaused(true);
 
       // Cases data (local)
       const CASES = [
@@ -803,7 +896,7 @@
       ];
 
       const caseContainer = qs('#case-cards');
-      function caseSVG(i){ return makeCardSVG(i); }
+      function caseSVG(i, c){ return makeCardSVG(i, c); }
       function renderCases(items){
         caseContainer.innerHTML = '';
         items.forEach((c, idx)=>{
@@ -811,7 +904,7 @@
           card.className = 'card article';
           card.setAttribute('data-category', c.category);
           card.innerHTML = `
-            <div class="card-media"><img loading="lazy" width="800" height="450" alt="${escapeHtml(c.title)} preview" srcset="${caseSVG(idx)} 800w, ${caseSVG(idx)} 1200w" sizes="(max-width: 768px) 100vw, 33vw"/></div>
+            <div class="card-media"><img width="800" height="450" alt="" src="${caseSVG(CASES.indexOf(c), c)}"/></div>
             <div class="card-body">
               <div class="tag-row">
                 <span class="tag">Chain: ${c.chain}</span>
@@ -875,7 +968,7 @@
       function runConfirmation(){
         confirmed = true;
         if (prefersReduced) {
-          confirmStatus.textContent = 'Confirmed';
+          confirmStatus.textContent = 'Block 19,284,551';
           confirmBar.style.width = '100%';
           confirmChip.classList.add('show');
           tickMetricsInstant();
@@ -889,15 +982,15 @@
         ];
         const iv = setInterval(()=>{
           const s = stages[stage];
-          confirmStatus.textContent = s.label;
+          confirmStatus.textContent = stage === 2 ? 'Block 19,284,551' : s.label;
           confirmBar.style.width = s.width;
           if (stage===2) { confirmChip.classList.add('show'); tickMetrics(); clearInterval(iv); }
           stage++;
         }, 320);
       }
 
-      function tickMetrics(){ animateNumber(metricTVL, 0, 120, 900, v=>`$${v}M`); animateNumber(metricCVR, 0, 38, 900, v=>`${v}%`); setTimeout(()=> metricTTS.textContent = '6 weeks', 700); }
-      function tickMetricsInstant(){ metricTVL.textContent = '$120M'; metricCVR.textContent = '38%'; metricTTS.textContent = '6 weeks'; }
+      function tickMetrics(){ animateNumber(metricTVL, 0, 120, 900, v=>`$${v}M`); animateNumber(metricCVR, 0, 38, 900, v=>`${v}%`); animateNumber(metricTTS, 0, 90, 900, v=>`${v} days`); }
+      function tickMetricsInstant(){ metricTVL.textContent = '$120M'; metricCVR.textContent = '38%'; metricTTS.textContent = '90 days'; }
 
       function animateNumber(el, from, to, dur, fmt){
         const start = performance.now();
@@ -907,10 +1000,11 @@
 
       // Carousel
       const track = qs('#track'); const slides = qsa('.slide');
-      let idx = 0; function go(i){ idx = (i+slides.length)%slides.length; track.style.transform = `translateX(-${idx*100}%)`; updateDots(); }
-      function updateDots(){ qsa('.dot').forEach((d,di)=>{ d.setAttribute('aria-current', di===idx?'true':'false'); d.setAttribute('aria-selected', di===idx?'true':'false');}); }
+      let idx = 0; function go(i){ idx = (i+slides.length)%slides.length; track.style.transform = `translateX(-${idx*100}%)`; slides.forEach((sl, i)=> sl.setAttribute('aria-hidden', i===idx ? 'false' : 'true')); updateDots(); }
+      function updateDots(){ qsa('.dot').forEach((d,di)=>{ d.setAttribute('aria-current', di===idx?'true':'false');}); }
       on(qs('#prev-slide'),'click',()=>go(idx-1)); on(qs('#next-slide'),'click',()=>go(idx+1));
-      qsa('.dot').forEach(d=> on(d,'click',()=>go(parseInt(d.dataset.index))) );
+      qsa('.dot').forEach(d=> on(d,'click',()=>go(parseInt(d.dataset.index, 10))) );
+      qsa('.slide').forEach((sl, i)=> sl.setAttribute('aria-hidden', i===0 ? 'false' : 'true'));
       on(track,'keydown',(e)=>{ if(e.key==='ArrowRight') go(idx+1); if(e.key==='ArrowLeft') go(idx-1); });
       let startX=0; on(track,'touchstart',e=>{ startX=e.touches[0].clientX; },{passive:true}); on(track,'touchmove',e=>{ const dx=e.touches[0].clientX-startX; if(Math.abs(dx)>40){ go(idx+(dx<0?1:-1)); startX=e.touches[0].clientX; } },{passive:true});
 
@@ -922,13 +1016,13 @@
       ];
       const insightWrap = qs('#insight-cards');
       function renderInsights(list){ insightWrap.innerHTML=''; list.forEach((a,idx)=>{ const el=document.createElement('article'); el.className='card article'; el.innerHTML=`
-          <div class='card-media'><img loading='lazy' width='800' height='450' alt='${escapeHtml(a.title)} cover' srcset='${makeArticleSVG(idx)} 800w, ${makeArticleSVG(idx)} 1200w' sizes='(max-width: 768px) 100vw, 33vw' /></div>
+          <div class='card-media'><img width='800' height='450' alt='' src="${makeArticleSVG(idx, a)}" /></div>
           <div class='card-body'>
             <span class='tag'>${a.cat}</span>
             <div class='h4' style='margin-top:4px;'>${escapeHtml(a.title)}</div>
             <p class='muted'>${escapeHtml(a.excerpt)}</p>
             <div class='rtime'>${a.mins} min read • <span class='avatar' style='width:24px;height:24px;display:inline-grid;place-items:center;'>${a.author}</span></div>
-            <a href='#' class='card-link' style='margin-top:6px;'>Read <svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12h14M13 5l7 7-7 7'/></svg></a>
+            <a href='#' class='card-link'>Read <svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12h14M13 5l7 7-7 7'/></svg></a>
           </div>`; insightWrap.appendChild(el); }); }
       function renderInsightSkeleton(count=3){ insightWrap.innerHTML=''; for(let i=0;i<count;i++){ const s=document.createElement('div'); s.className='card'; s.innerHTML=`<div class='card-media skeleton'></div><div class='card-body'><div class='skeleton' style='width:80px;height:20px;'></div><div class='skeleton' style='height:22px;margin-top:8px;'></div><div class='skeleton' style='height:16px;width:70%;'></div></div>`; insightWrap.appendChild(s);} }
 
@@ -939,21 +1033,18 @@
 
       // Form
       const form = qs('#brief-form'); const submitBtn = qs('#submit-brief'); const submitLabel = qs('#submit-label'); const submitSpinner = qs('#submit-spinner'); const successNotice = qs('#form-success');
-      on(form,'submit',(e)=>{ e.preventDefault(); const v = validateForm(); if(!v.ok) return; setLoading(true); setTimeout(()=>{ setLoading(false); successNotice.classList.remove('hidden'); showToast('Brief received. We’ll reply soon.'); }, 1200); });
+      on(form,'submit',(e)=>{ e.preventDefault(); const v = validateForm(); if(!v.ok){ const firstBad = qs('[aria-invalid="true"]', form) || (qs('#err-needs').style.display==='block' ? qs('.chip-select', form) : null); if (firstBad) firstBad.focus(); return; } setLoading(true); setTimeout(()=>{ setLoading(false); successNotice.classList.remove('hidden'); showToast('Brief received. We’ll reply soon.'); }, 1200); });
       function setLoading(is){ if(is){ submitSpinner.classList.remove('hidden'); submitLabel.textContent='Sending…'; disable(form,true);} else { submitSpinner.classList.add('hidden'); submitLabel.textContent='Send brief'; disable(form,false);} }
       function disable(scope, d){ qsa('input,select,textarea,button', scope).forEach(el=> el.disabled = d); }
       function validateForm(){ let ok=true; const name=qs('#name'); const email=qs('#email'); const company=qs('#company'); const budget=qs('#budget'); const consent=qs('#consent');
         toggleErr('name', !name.value.trim()); toggleErr('email', !validEmail(email.value)); toggleErr('company', !company.value.trim()); toggleErr('budget', !budget.value); toggleErr('consent', !consent.checked);
-        const anyNeed = qsa('.chip-select[aria-pressed="true"]').length>0; if(!anyNeed){ qs('#err-needs').style.display='block'; ok=false; } else { qs('#err-needs').style.display='none'; }
+        const anyNeed = qsa('.chip-select[aria-pressed="true"]').length>0; qs('#err-needs').style.display = anyNeed ? 'none' : 'block'; if(!anyNeed) ok=false;
         if(!name.value.trim()||!validEmail(email.value)||!company.value.trim()||!budget.value||!consent.checked) ok=false; return {ok}; }
-      function toggleErr(id, show){ const el=qs('#err-'+id); if(el) el.style.display = show?'block':'none'; }
+      function toggleErr(id, show){ const el=qs('#err-'+id); if(el) el.style.display = show?'block':'none'; const f=qs('#'+id); if(f) f.setAttribute('aria-invalid', show?'true':'false'); }
       qsa('.chip-select').forEach(btn=> on(btn,'click',()=> btn.setAttribute('aria-pressed', String(btn.getAttribute('aria-pressed')!=='true'))));
 
       // FAQ accessibility: toggle aria-expanded
-      qsa('.faq details').forEach(d=>{
-        const btn = d.querySelector('button.q');
-        on(d,'toggle',()=> btn.setAttribute('aria-expanded', d.open?'true':'false'));
-      });
+      // (native <details>/<summary> handles expanded state)
 
       // Toast
       const toast = qs('#toast'); let toastTimer;
@@ -982,7 +1073,10 @@
 
       // Featured image
       const featImgSrc = makeSVGThumb('#0F766E');
-      const featImg = qs('#featured-img'); featImg.src = featImgSrc; featImg.srcset = featImgSrc + ' 1200w, ' + featImgSrc + ' 1440w';
+      const featImg = qs('#featured-img'); featImg.src = featImgSrc;
+
+      // Placeholder links: pages not part of this prototype
+      qsa('a[href="#"]').forEach(a => on(a, 'click', (e)=>{ e.preventDefault(); showToast('That page isn’t part of this prototype yet.'); }));
 
       // Global keyboard: Space/Enter toggles chips and filters accessibility
       qsa('.filter-chip').forEach(ch=> on(ch,'keydown',(e)=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); ch.click(); } }));
