@@ -1,0 +1,1002 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pricing — Scales with your team</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Typography */
+      --font-display: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji';
+      --font-text: 'Manrope', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji';
+      --font-feature-tabular: 'tnum' 1;
+
+      /* Type scale */
+      --text-display-xl-size: 56px; --text-display-xl-line: 64px; --text-display-xl-weight: 700;
+      --text-h1-size: 40px; --text-h1-line: 48px; --text-h1-weight: 700;
+      --text-h2-size: 32px; --text-h2-line: 40px; --text-h2-weight: 700;
+      --text-h3-size: 24px; --text-h3-line: 32px; --text-h3-weight: 600;
+      --text-body-l-size: 18px; --text-body-l-line: 28px; --text-body-l-weight: 400;
+      --text-body-m-size: 16px; --text-body-m-line: 24px; --text-body-m-weight: 400;
+      --text-caption-size: 14px; --text-caption-line: 20px; --text-caption-weight: 500;
+      --text-micro-size: 12px; --text-micro-line: 16px; --text-micro-weight: 500;
+
+      /* Colors */
+      --color-bg: #FFFFFF;
+      --color-surface: #F7FAFC;
+      --color-text: #0B1220;
+      --color-text-muted: #5B667A;
+      --color-border: #E5E7EB;
+      --color-accent: #0F766E;
+      --color-on-accent: #FFFFFF;
+      --color-success: #16A34A;
+      --color-warning: #B45309;
+      --color-danger: #DC2626;
+
+      /* Spacing */
+      --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px; --space-12: 48px; --space-16: 64px; --space-20: 80px;
+
+      /* Radii */
+      --radius-card: 12px; --radius-button: 8px; --radius-pill: 999px;
+
+      /* Elevation */
+      --shadow-0: none;
+      --shadow-1: 0 1px 2px rgba(16,24,40,0.06);
+      --shadow-2: 0 4px 12px rgba(16,24,40,0.08);
+      --shadow-3: 0 8px 24px rgba(16,24,40,0.12);
+
+      /* Motion */
+      --motion-fast: 150ms; --motion: 200ms; --motion-slow: 260ms;
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-spring: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+      /* Layout */
+      --container-max-desktop: 1200px; --container-max-tablet: 720px; --grid-columns: 12; --grid-gutter: 24px; --container-pad-mobile: 16px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: var(--font-text);
+      color: var(--color-text);
+      background: var(--color-bg);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .container {
+      max-width: var(--container-max-desktop);
+      margin-inline: auto;
+      padding-inline: var(--container-pad-mobile);
+    }
+
+    header.pricing-hero {
+      border-bottom: 1px solid var(--color-border);
+      padding-block: var(--space-10);
+    }
+    .hero-wrap { display: grid; align-items: start; gap: var(--space-8); }
+    .hero-left h1 { font-family: var(--font-display); font-size: var(--text-h1-size); line-height: var(--text-h1-line); font-weight: var(--text-h1-weight); margin: 0 0 var(--space-4) 0; letter-spacing: -0.01em; }
+    .hero-left p { font-size: var(--text-body-l-size); line-height: var(--text-body-l-line); color: var(--color-text-muted); max-width: 72ch; margin: 0; }
+
+    /* Toggle (Segmented Control) */
+    .toggle-wrap { display: flex; justify-content: flex-end; }
+    .pricing-toggle { display: inline-flex; align-items: center; position: relative; height: 40px; border-radius: var(--radius-pill); border: 1px solid var(--color-border); background: var(--color-bg); padding: 4px; gap: 4px; box-shadow: var(--shadow-1); }
+    .pricing-toggle[aria-disabled="true"] { opacity: .6; pointer-events: none; }
+    .pricing-toggle__label { position: absolute; left: -9999px; }
+    .pricing-toggle button[role="radio"] {
+      appearance: none; -webkit-appearance: none; border: 0; background: transparent; color: var(--color-text);
+      padding: 6px 12px; border-radius: calc(var(--radius-pill) - 2px); font: 600 14px/20px var(--font-text);
+      cursor: pointer; position: relative; min-width: 110px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background var(--motion) var(--ease-out), color var(--motion) var(--ease-out), transform var(--motion-fast) var(--ease-out);
+    }
+    .pricing-toggle button[role="radio"]:hover { background: var(--color-surface); }
+    .pricing-toggle button[role="radio"]:active { transform: translateY(1px); }
+    .pricing-toggle button[role="radio"][aria-checked="true"] { background: var(--color-accent); color: var(--color-on-accent); box-shadow: var(--shadow-1) inset; }
+    .pricing-toggle button[role="radio"]:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+    .save-pill-inline { font: 600 12px/16px var(--font-text); padding: 2px 8px; border-radius: var(--radius-pill); background: rgba(15, 118, 110, 0.12); color: var(--color-accent); border: 1px solid rgba(15,118,110,0.25); }
+    .save-pill-inline--on-accent { background: rgba(255,255,255,0.18); color: var(--color-on-accent); border-color: rgba(255,255,255,0.3); }
+
+    /* Signature Moment Floating Pill */
+    .save-floater { position: fixed; left: 0; top: 0; transform-origin: center; z-index: 40; pointer-events: none; opacity: 0; will-change: transform, opacity; }
+    .save-floater .pill { font: 600 12px/16px var(--font-text); padding: 6px 10px; border-radius: var(--radius-pill); background: var(--color-accent); color: var(--color-on-accent); box-shadow: var(--shadow-2); border: 1px solid rgba(255,255,255,0.2); white-space: nowrap; }
+    .save-near-cta { display: none; align-items: center; gap: 8px; margin-top: var(--space-3); }
+    .save-near-cta .pill { font: 600 12px/16px var(--font-text); padding: 4px 8px; border-radius: var(--radius-pill); background: rgba(15, 118, 110, 0.12); color: var(--color-accent); border: 1px solid rgba(15,118,110,0.25); }
+
+    /* Grid Section */
+    section.plans { background: var(--color-surface); padding-block: var(--space-16) var(--space-12); }
+
+    .plans-grid { display: grid; gap: var(--space-8); }
+
+    /* Cards */
+    .card { border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-bg); box-shadow: var(--shadow-1); display: flex; flex-direction: column; overflow: hidden; position: relative; transition: transform var(--motion) var(--ease-out), box-shadow var(--motion) var(--ease-out); }
+    .card:focus-within { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+    .card .toprule { height: 1px; background: var(--color-border); }
+    .card[data-variant="recommended"] .toprule { height: 2px; background: var(--color-accent); box-shadow: 0 0 0 1px rgba(15,118,110,0.08) inset; }
+
+    .card-inner { padding: var(--space-8); display: grid; gap: var(--space-6); }
+
+    .plan-head { display: grid; gap: var(--space-2); align-items: start; grid-template-columns: 1fr auto; }
+    .plan-name { font-family: var(--font-display); font-size: var(--text-h3-size); line-height: var(--text-h3-line); font-weight: var(--text-h3-weight); margin: 0; letter-spacing: -0.01em; }
+    .plan-tag { grid-column: 1 / 3; font-size: var(--text-caption-size); line-height: var(--text-caption-line); color: var(--color-text-muted); }
+
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: var(--radius-pill); border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text); font: 600 12px/16px var(--font-text); }
+    .badge svg { width: 14px; height: 14px; }
+
+    .price-block { display: grid; gap: var(--space-2); align-items: end; }
+    .price-row { display: flex; align-items: baseline; gap: var(--space-3); min-height: 48px; }
+    .currency { font-family: var(--font-display); font-size: 18px; font-weight: 700; transform: translateY(2px); }
+    .price { font-family: var(--font-display); font-size: var(--text-h2-size); line-height: var(--text-h2-line); font-weight: var(--text-h2-weight); letter-spacing: -0.01em; font-feature-settings: var(--font-feature-tabular); display: inline-flex; gap: 2px; }
+    .card[data-variant="recommended"] .price { font-size: var(--text-h1-size); line-height: var(--text-h1-line); }
+    .cadence { font-size: var(--text-caption-size); line-height: var(--text-caption-line); color: var(--color-text-muted); display: inline-flex; align-items: center; gap: 8px; }
+    .billed-note { font-size: var(--text-micro-size); line-height: var(--text-micro-line); color: var(--color-text-muted); }
+
+    /* Odometer */
+    .odometer { display: inline-flex; gap: 0; align-items: baseline; }
+    .digit { position: relative; width: 0.6em; height: 1em; overflow: hidden; display: inline-block; }
+    .digit-stack { position: absolute; left: 0; top: 0; will-change: transform; }
+    .digit-stack span { display: block; height: 1em; line-height: 1em; }
+    .odometer.reduced .digit { width: auto; overflow: visible; }
+
+    /* Feature list */
+    .features { display: grid; gap: var(--space-3); padding-top: var(--space-2); }
+    .feature { display: grid; grid-template-columns: 20px 1fr; gap: var(--space-3); align-items: start; }
+    .feature .icon { width: 20px; height: 20px; color: var(--color-success); flex: 0 0 20px; }
+    .feature .label { font-size: var(--text-body-m-size); line-height: var(--text-body-m-line); }
+    @media (max-width: 480px) {
+      .feature .label { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    }
+
+    /* Buttons */
+    .actions { display: grid; gap: var(--space-3); }
+    .btn { appearance: none; -webkit-appearance: none; border-radius: var(--radius-button); height: 48px; padding-inline: 16px; font: 600 16px/20px var(--font-text); display: inline-flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: transform var(--motion-fast) var(--ease-out), background var(--motion) var(--ease-out), color var(--motion) var(--ease-out), box-shadow var(--motion) var(--ease-out), border-color var(--motion) var(--ease-out); }
+    .btn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+    .btn:active { transform: translateY(1px); }
+    .btn[disabled] { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-primary { background: var(--color-accent); color: var(--color-on-accent); border: 1px solid rgba(0,0,0,0); box-shadow: var(--shadow-1); }
+    .btn-primary:hover { filter: brightness(0.94); box-shadow: var(--shadow-2); }
+
+    .btn-secondary { background: transparent; color: var(--color-text); border: 1px solid var(--color-border); }
+    .btn-secondary:hover { background: var(--color-surface); }
+
+    .btn-ghost { background: transparent; color: var(--color-text); border: 1px solid transparent; }
+    .btn-ghost:hover { background: var(--color-surface); border-color: var(--color-border); }
+
+    .btn .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.6); border-top-color: var(--color-on-accent); border-radius: 50%; animation: spin 1s linear infinite; }
+    .btn-secondary .spinner, .btn-ghost .spinner { border: 2px solid rgba(11,18,32,0.2); border-top-color: var(--color-text); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .footnote { font-size: var(--text-caption-size); line-height: var(--text-caption-line); color: var(--color-text-muted); padding-block: var(--space-8); border-top: 1px solid var(--color-border); }
+
+    /* Tooltip */
+    .tooltip { position: absolute; z-index: 30; background: #0B1220; color: #FFF; padding: 8px 12px; border-radius: 8px; box-shadow: var(--shadow-2); max-width: 260px; font: 500 14px/20px var(--font-text); opacity: 0; transform: translateY(-4px); pointer-events: none; transition: opacity var(--motion) var(--ease-out), transform var(--motion) var(--ease-out); }
+    .tooltip[data-open="true"] { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .tooltip .caret { position: absolute; width: 10px; height: 10px; background: #0B1220; transform: rotate(45deg); left: 12px; bottom: -5px; }
+
+    .info-trigger { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--color-border); background: var(--color-bg); cursor: pointer; }
+    .info-trigger:hover { background: var(--color-surface); }
+    .info-trigger:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+    /* Error banner */
+    .banner { background: #FFF4F4; border: 1px solid #F3DCDC; color: var(--color-danger); border-radius: 10px; padding: 12px 16px; display: none; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: var(--space-8); }
+    .banner[data-state="visible"] { display: flex; }
+    .banner .msg { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+    .banner .retry { white-space: nowrap; }
+
+    /* Skeletons */
+    .skeleton-card { border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-bg); padding: var(--space-8); box-shadow: var(--shadow-1); }
+    .skel { height: 14px; background: linear-gradient(90deg, #F3F4F6 25%, #E5E7EB 37%, #F3F4F6 63%); background-size: 400% 100%; border-radius: 6px; animation: shimmer 1.3s infinite; }
+    .skel.title { width: 60%; height: 20px; margin-bottom: var(--space-4); }
+    .skel.price { width: 40%; height: 40px; margin: var(--space-4) 0; }
+    .skel.line { height: 12px; margin: 10px 0; }
+    .skel.btn { width: 100%; height: 48px; border-radius: var(--radius-button); }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+    /* Focus highlight on deep-link */
+    .focus-flash { box-shadow: 0 0 0 2px var(--color-accent) inset; animation: flash 2s ease-out forwards; }
+    @keyframes flash { 0% { box-shadow: 0 0 0 2px var(--color-accent) inset; } 80% { box-shadow: 0 0 0 2px rgba(15,118,110,0.3) inset; } 100% { box-shadow: none; } }
+
+    /* State switcher */
+    .state-switcher { position: fixed; right: 12px; bottom: 12px; z-index: 50; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-pill); box-shadow: var(--shadow-2); padding: 6px 8px; display: flex; align-items: center; gap: 8px; }
+    .state-switcher label { font: 600 12px/16px var(--font-text); color: var(--color-text-muted); }
+    .state-switcher select { font: 600 12px/16px var(--font-text); border-radius: var(--radius-pill); padding: 6px 10px; border: 1px solid var(--color-border); background: var(--color-bg); }
+    .state-switcher select:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+    /* Icons */
+    .icon { display: inline-block; }
+
+    /* Responsive layout */
+    @media (min-width: 1280px) {
+      .hero-wrap { grid-template-columns: 1fr 360px; }
+      .plans-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: stretch; }
+      .card[data-variant="starter"]:hover { transform: translateY(-4px); box-shadow: var(--shadow-2); }
+      .card[data-variant="enterprise"]:hover { transform: translateY(-4px); box-shadow: var(--shadow-2); }
+      .card[data-variant="recommended"] { box-shadow: var(--shadow-3); }
+      .card[data-variant="recommended"]:hover { transform: translateY(-8px); box-shadow: var(--shadow-3); }
+    }
+
+    @media (min-width: 768px) and (max-width: 1279px) {
+      .container { max-width: var(--container-max-tablet); }
+      .hero-wrap { grid-template-columns: 1fr; }
+      .toggle-wrap { justify-content: flex-start; }
+      .hero-left h1 { font-size: var(--text-h2-size); line-height: var(--text-h2-line); }
+      .plans-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .card[data-variant="recommended"] { grid-column: 1 / -1; }
+      .price { font-size: var(--text-h2-size); line-height: var(--text-h2-line); }
+      .card[data-variant="recommended"] .price { font-size: var(--text-h2-size); line-height: var(--text-h2-line); }
+    }
+
+    @media (max-width: 767px) {
+      header.pricing-hero { padding-block: var(--space-8); }
+      .hero-left h1 { font-size: var(--text-h2-size); line-height: var(--text-h2-line); }
+      .hero-left p { font-size: var(--text-body-m-size); line-height: 26px; }
+      .toggle-wrap { justify-content: stretch; }
+      .pricing-toggle { width: 100%; height: 44px; }
+      .pricing-toggle button[role="radio"] { flex: 1 1 0; min-width: auto; }
+      .plans-grid { grid-template-columns: 1fr; }
+      /* Order: Team first */
+      .card[data-variant="recommended"] { order: -1; }
+      .price { font-size: var(--text-h2-size); line-height: var(--text-h2-line); }
+      .card[data-variant="recommended"] .price { font-size: var(--text-h2-size); line-height: var(--text-h2-line); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">Skip to content</a>
+
+  <div class="save-floater" aria-hidden="true">
+    <div class="pill">Save 20% yearly</div>
+  </div>
+
+  <header class="pricing-hero">
+    <div class="container hero-wrap">
+      <div class="hero-left">
+        <h1 id="page-title">Pricing that scales with your team</h1>
+        <p>Simple per‑seat pricing with predictable billing. Switch to yearly to save 20% — cancel anytime.</p>
+      </div>
+      <div class="toggle-wrap">
+        <div class="pricing-toggle" role="radiogroup" aria-labelledby="billing-label" id="billing-toggle">
+          <span id="billing-label" class="pricing-toggle__label">Billing period</span>
+          <button type="button" class="toggle-option" role="radio" aria-checked="true" data-period="monthly" tabindex="0" aria-label="Monthly">Monthly</button>
+          <button type="button" class="toggle-option" role="radio" aria-checked="false" data-period="yearly" tabindex="-1" aria-label="Yearly — save 20%">Yearly <span class="save-pill-inline">Save 20%</span></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="plans">
+      <div class="container">
+        <div class="banner" id="error-banner" role="alert" aria-live="polite">
+          <div class="msg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>We couldn’t load pricing. Retry.</span>
+          </div>
+          <button class="btn btn-secondary retry" type="button" id="retry-btn">Retry</button>
+        </div>
+
+        <div class="plans-grid" id="plans-grid" aria-live="polite" aria-busy="false"></div>
+
+        <p class="footnote" id="pricing-footnote">Prices shown in USD. Taxes may apply. Change currency at checkout.</p>
+
+        <section class="faq" aria-label="Pricing FAQs" style="margin-top: var(--space-12);">
+          <details>
+            <summary style="list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding: 16px 0; border-top:1px solid var(--color-border); font: 600 16px/24px var(--font-text);">
+              <span>How does per‑seat billing work?</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </summary>
+            <div style="color: var(--color-text-muted); padding-bottom:16px;">Pricing is per active user seat. You can add or remove seats anytime; charges are prorated on your next invoice.</div>
+          </details>
+          <details>
+            <summary style="list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding: 16px 0; border-top:1px solid var(--color-border); font: 600 16px/24px var(--font-text);">
+              <span>Can I switch between monthly and yearly later?</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </summary>
+            <div style="color: var(--color-text-muted); padding-bottom:16px;">Yes. You can change your billing period anytime. Switching to yearly applies the 20% discount to your remaining term.</div>
+          </details>
+          <details>
+            <summary style="list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding: 16px 0; border-top:1px solid var(--color-border); border-bottom:1px solid var(--color-border); font: 600 16px/24px var(--font-text);">
+              <span>Do you offer discounts for large teams?</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </summary>
+            <div style="color: var(--color-text-muted); padding-bottom:16px;">Volume discounts are available for organizations with 100+ seats. Contact sales to discuss tiered pricing.</div>
+          </details>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <div class="state-switcher" aria-label="Prototype state">
+    <label for="state-select">State</label>
+    <select id="state-select">
+      <option value="default">default</option>
+      <option value="loading">loading</option>
+      <option value="empty">empty</option>
+      <option value="error">error</option>
+      <option value="success">success</option>
+    </select>
+  </div>
+
+  <template id="plan-card-template">
+    <article class="card" tabindex="-1">
+      <div class="toprule" aria-hidden="true"></div>
+      <div class="card-inner">
+        <div class="plan-head">
+          <h3 class="plan-name"></h3>
+          <span class="badge" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9 12 2"></polygon></svg>
+            <span>Recommended</span>
+          </span>
+          <div class="plan-tag"></div>
+        </div>
+        <div class="price-block">
+          <div class="price-row">
+            <span class="currency" aria-hidden="true">$</span>
+            <div class="price" aria-live="polite"></div>
+            <span class="cadence">
+              <span class="per-seat-label">per seat / mo</span>
+              <button class="info-trigger" type="button" aria-label="Pricing is per active user seat. You can add or remove seats anytime." aria-describedby="" title="">
+                <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+              </button>
+            </span>
+          </div>
+          <div class="billed-note" aria-live="polite"></div>
+        </div>
+        <ul class="features" role="list"></ul>
+        <div class="actions">
+          <button class="btn" type="button"></button>
+          <div class="save-near-cta"><span class="pill">Save 20% yearly</span></div>
+        </div>
+        <div class="footnote micro" style="font-size: var(--text-micro-size); line-height: var(--text-micro-line); color: var(--color-text-muted);"></div>
+      </div>
+    </article>
+  </template>
+
+  <template id="skeleton-template">
+    <div class="skeleton-card" aria-hidden="true">
+      <div class="skel title"></div>
+      <div class="skel line" style="width: 40%;"></div>
+      <div class="skel price"></div>
+      <div class="skel line" style="width: 90%;"></div>
+      <div class="skel line" style="width: 95%;"></div>
+      <div class="skel line" style="width: 80%;"></div>
+      <div class="skel line" style="width: 85%;"></div>
+      <div class="skel line" style="width: 70%;"></div>
+      <div class="skel btn"></div>
+    </div>
+  </template>
+
+  <div id="tooltip" role="tooltip" class="tooltip" aria-hidden="true">
+    <div class="content">Pricing is per active user seat. You can add or remove seats anytime.</div>
+    <div class="caret" aria-hidden="true"></div>
+  </div>
+
+  <script>
+    (function(){
+      const $ = (sel, ctx=document) => ctx.querySelector(sel);
+      const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const ui = {
+        grid: $('#plans-grid'),
+        errorBanner: $('#error-banner'),
+        retryBtn: $('#retry-btn'),
+        toggle: $('#billing-toggle'),
+        stateSelect: $('#state-select'),
+        tooltip: $('#tooltip'),
+        saveFloater: $('.save-floater'),
+      };
+
+      const COPY = {
+        hero: {
+          title: 'Pricing that scales with your team',
+          subcopy: 'Simple per‑seat pricing with predictable billing. Switch to yearly to save 20% — cancel anytime.'
+        },
+        aria: { toggle: 'Billing period', monthly: 'Monthly', yearly: 'Yearly — save 20%' },
+        tax: 'Prices shown in USD. Taxes may apply. Change currency at checkout.',
+        tooltip: 'Pricing is per active user seat. You can add or remove seats anytime.',
+        error: 'We couldn’t load pricing. Retry.',
+        loadingCta: 'Preparing checkout…',
+      };
+
+      const DATA_STATIC = [
+        {
+          id: 'starter', name: 'Starter', tagline: 'Essentials to get moving',
+          monthly: 19, yearly: 15, cadence: 'per seat / mo', yearlyNote: 'Billed yearly at $180 / seat', recommended: false,
+          features: [
+            '3 active projects',
+            '5 GB storage per seat',
+            'Standard email support',
+            'Basic analytics',
+            'Community access',
+            'SOC 2-aligned security'
+          ],
+          cta: {
+            monthly: 'Start Starter — $19/seat',
+            yearly: 'Start Starter — $15/seat (billed yearly)'
+          },
+          footnote: ''
+        },
+        {
+          id: 'team', name: 'Team', tagline: 'Collaboration and controls for growing teams',
+          monthly: 49, yearly: 39, cadence: 'per seat / mo', yearlyNote: 'Billed yearly at $468 / seat', recommended: true,
+          features: [
+            'Unlimited projects',
+            '1 TB storage per org',
+            'Role‑based access control (RBAC)',
+            'Automations & API access',
+            'Priority chat & email support',
+            'SSO (SAML) included'
+          ],
+          cta: {
+            monthly: 'Upgrade to Team — $49/seat',
+            yearly: 'Upgrade to Team — $39/seat (billed yearly)'
+          },
+          footnote: ''
+        },
+        {
+          id: 'enterprise', name: 'Enterprise', tagline: 'Scale, security, and dedicated support',
+          monthly: null, yearly: null, cadence: 'per org', yearlyNote: '', recommended: false,
+          features: [
+            'Everything in Team',
+            'Uptime SLA 99.9%',
+            'Dedicated CSM & onboarding',
+            'Advanced audit logs',
+            'SCIM user provisioning',
+            'Custom contracts & security reviews'
+          ],
+          cta: { monthly: 'Talk to sales', yearly: 'Talk to sales' },
+          footnote: 'Volume discounts available for 100+ seats.'
+        }
+      ];
+
+      let billing = getInitialBilling();
+      let appState = 'default'; // default | loading | empty | error | success
+
+      // Initialize
+      initToggle();
+      renderState();
+      initStateSwitcher();
+      initGlobalListeners();
+
+      // Deep link handling
+      handleDeepLink();
+
+      function getInitialBilling(){
+        const params = new URLSearchParams(location.search);
+        const b = params.get('billing');
+        if(b === 'yearly' || b === 'monthly') return b;
+        return 'monthly';
+      }
+
+      function initToggle(){
+        const monthlyBtn = ui.toggle.querySelector('button[data-period="monthly"]');
+        const yearlyBtn = ui.toggle.querySelector('button[data-period="yearly"]');
+        updateToggleAria();
+
+        ui.toggle.addEventListener('click', (e) => {
+          const btn = e.target.closest('button[role="radio"]');
+          if(!btn) return;
+          const period = btn.getAttribute('data-period');
+          if(period && period !== billing){
+            setBilling(period);
+          }
+        });
+
+        ui.toggle.addEventListener('keydown', (e) => {
+          const options = $$("button[role='radio']", ui.toggle);
+          const currentIndex = options.findIndex(o => o.getAttribute('aria-checked') === 'true');
+          if(['ArrowRight','ArrowLeft'].includes(e.key)){
+            e.preventDefault();
+            let next = currentIndex + (e.key === 'ArrowRight' ? 1 : -1);
+            if(next < 0) next = options.length - 1;
+            if(next >= options.length) next = 0;
+            options.forEach((o,i)=>{
+              o.setAttribute('tabindex', i === next ? '0' : '-1');
+            });
+            options[next].focus();
+          } else if(['Enter',' '].includes(e.key)){
+            e.preventDefault();
+            const focused = document.activeElement;
+            if(focused && focused.getAttribute('role') === 'radio'){
+              const period = focused.getAttribute('data-period');
+              if(period && period !== billing){ setBilling(period); }
+            }
+          }
+        });
+
+        function updateToggleAria(){
+          const options = $$("button[role='radio']", ui.toggle);
+          options.forEach(btn => {
+            const isChecked = btn.getAttribute('data-period') === billing;
+            btn.setAttribute('aria-checked', isChecked ? 'true' : 'false');
+            btn.setAttribute('tabindex', isChecked ? '0' : '-1');
+            // Style yearly inline pill on selected
+            const inlinePill = btn.querySelector('.save-pill-inline');
+            if(inlinePill){
+              inlinePill.classList.toggle('save-pill-inline--on-accent', isChecked);
+            }
+          });
+        }
+
+        function setBilling(next){
+          billing = next;
+          updateToggleAria();
+          const url = new URL(location.href);
+          url.searchParams.set('billing', billing);
+          history.replaceState({}, '', url);
+          animateSavePillIfYearly();
+          // Update prices without reflow scroll
+          updateAllPrices();
+        }
+      }
+
+      function renderState(){
+        if(appState === 'loading'){
+          ui.errorBanner.setAttribute('data-state','');
+          showSkeletons();
+          // simulate fetch
+          simulateFetch('loading').then(plans => {
+            renderPlans(plans);
+          });
+        } else if(appState === 'error'){
+          ui.errorBanner.setAttribute('data-state','visible');
+          ui.grid.innerHTML = '';
+          ui.grid.setAttribute('aria-busy', 'false');
+          // still show fallback static
+          renderPlans(DATA_STATIC);
+        } else if(appState === 'empty'){
+          ui.errorBanner.setAttribute('data-state','');
+          showSkeletons(true);
+          // simulate empty
+          simulateFetch('empty').then(plans => {
+            renderPlans(plans);
+          });
+        } else if(appState === 'success'){
+          ui.errorBanner.setAttribute('data-state','');
+          renderPlans(DATA_STATIC);
+          // subtle toast-like indicator
+          showSuccessToast();
+        } else {
+          // default
+          ui.errorBanner.setAttribute('data-state','');
+          showSkeletons();
+          simulateFetch('default').then(plans => {
+            renderPlans(plans);
+          });
+        }
+      }
+
+      function showSkeletons(compact){
+        ui.grid.setAttribute('aria-busy', 'true');
+        ui.grid.innerHTML = '';
+        const tpl = $('#skeleton-template');
+        const count = 3;
+        for(let i=0;i<count;i++){
+          const node = tpl.content.cloneNode(true);
+          ui.grid.appendChild(node);
+        }
+      }
+
+      function simulateFetch(kind){
+        return new Promise((resolve, reject) => {
+          const delay = 600;
+          setTimeout(() => {
+            if(kind === 'error'){
+              reject(new Error('network'));
+            } else if(kind === 'empty'){
+              const emptyPlans = DATA_STATIC.map(p => ({...p, features: []}));
+              resolve(emptyPlans);
+            } else {
+              resolve(DATA_STATIC);
+            }
+          }, delay);
+        }).catch(() => {
+          // Surface banner; return static to continue
+          ui.errorBanner.setAttribute('data-state','visible');
+          return DATA_STATIC;
+        });
+      }
+
+      function renderPlans(plans){
+        ui.grid.innerHTML = '';
+        ui.grid.setAttribute('aria-busy', 'false');
+        const tpl = $('#plan-card-template');
+
+        // Ensure order Starter, Team, Enterprise
+        const order = ['starter','team','enterprise'];
+        plans.sort((a,b)=> order.indexOf(a.id) - order.indexOf(b.id));
+
+        plans.forEach(plan => {
+          const node = tpl.content.cloneNode(true);
+          const card = node.querySelector('.card');
+          card.id = plan.id;
+          card.setAttribute('data-variant', plan.recommended ? 'recommended' : plan.id);
+          const name = node.querySelector('.plan-name');
+          const tag = node.querySelector('.plan-tag');
+          const badge = node.querySelector('.badge');
+          const priceEl = node.querySelector('.price');
+          const currencyEl = node.querySelector('.currency');
+          const billedNote = node.querySelector('.billed-note');
+          const featureList = node.querySelector('.features');
+          const footnote = node.querySelector('.footnote');
+          const ctaBtn = node.querySelector('.btn');
+          const actions = node.querySelector('.actions');
+          const nearSave = node.querySelector('.save-near-cta');
+
+          name.textContent = plan.name;
+          tag.textContent = plan.tagline;
+          if(plan.recommended){ badge.hidden = false; }
+
+          // Enterprise custom pricing
+          let displayPrice = '—';
+          let isCustom = false;
+          if(plan.id === 'enterprise'){
+            isCustom = true;
+            currencyEl.style.visibility = 'hidden';
+          }
+
+          // Price build
+          if(isCustom){
+            buildCustomPrice(priceEl, 'Custom');
+            const perSeat = $('.per-seat-label', card);
+            if(perSeat){ perSeat.textContent = plan.cadence; }
+            billedNote.textContent = '';
+          } else {
+            const value = getPlanPrice(plan);
+            buildOdometer(priceEl, value);
+            billedNote.textContent = billing === 'yearly' ? plan.yearlyNote : '';
+          }
+
+          // Features
+          featureList.innerHTML = '';
+          if(plan.features && plan.features.length){
+            plan.features.forEach(text => {
+              const li = document.createElement('li');
+              li.className = 'feature';
+              li.innerHTML = `
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                <span class="label" title="${escapeHtml(text)}">${escapeHtml(text)}</span>
+              `;
+              featureList.appendChild(li);
+            });
+          } else {
+            featureList.style.display = 'none';
+          }
+
+          // CTA
+          let variant = 'secondary';
+          if(plan.id === 'enterprise'){ variant = 'ghost'; }
+          if(plan.recommended){ variant = 'primary'; }
+          ctaBtn.classList.add('btn-' + variant);
+          ctaBtn.setAttribute('data-plan', plan.id);
+          ctaBtn.addEventListener('click', onCtaClick);
+          updateCtaLabel(ctaBtn, plan);
+
+          // Near-CTA Save pill visible for yearly on recommended
+          if(plan.recommended){
+            nearSave.style.display = (billing === 'yearly') ? 'inline-flex' : 'none';
+          } else {
+            nearSave.remove();
+          }
+
+          // Tooltip trigger
+          const infoTrigger = node.querySelector('.info-trigger');
+          infoTrigger.addEventListener('click', (e)=>toggleTooltip(e.currentTarget));
+          infoTrigger.addEventListener('mouseenter', (e)=>openTooltip(e.currentTarget));
+          infoTrigger.addEventListener('mouseleave', closeTooltip);
+          infoTrigger.addEventListener('focus', (e)=>openTooltip(e.currentTarget));
+          infoTrigger.addEventListener('blur', closeTooltip);
+
+          // Footnote
+          if(plan.footnote){
+            footnote.textContent = plan.footnote;
+          } else {
+            footnote.remove();
+          }
+
+          // Hover effects are handled via CSS media queries; ensure enterprise with custom cadence
+          $('.per-seat-label', card).textContent = plan.id === 'enterprise' ? plan.cadence : 'per seat / mo';
+
+          // Append
+          ui.grid.appendChild(node);
+        });
+
+        // After render, trigger price animation to current billing
+        if(!prefersReduced && window.innerWidth >= 420){
+          requestAnimationFrame(()=>{
+            updateAllPrices(true);
+          });
+        } else {
+          // ensure reduced text set
+          updateAllPrices(false);
+        }
+      }
+
+      function updateCtaLabel(btn, plan){
+        const label = billing === 'yearly' ? plan.cta.yearly : plan.cta.monthly;
+        btn.textContent = label;
+      }
+
+      function getPlanPrice(plan){
+        return billing === 'yearly' ? plan.yearly : plan.monthly;
+      }
+
+      function buildCustomPrice(container, text){
+        container.textContent = text;
+        container.dataset.custom = 'true';
+      }
+
+      function buildOdometer(container, value){
+        container.innerHTML = '';
+        container.dataset.custom = 'false';
+        const str = String(value);
+        const reduced = prefersReduced || window.innerWidth < 420;
+        if(reduced){
+          container.classList.add('reduced');
+          container.textContent = str;
+          return;
+        }
+        container.classList.remove('reduced');
+        for(const ch of str){
+          if(/\d/.test(ch)){
+            const digit = document.createElement('span');
+            digit.className = 'digit';
+            const stack = document.createElement('span');
+            stack.className = 'digit-stack';
+            for(let i=0;i<=9;i++){
+              const s = document.createElement('span');
+              s.textContent = i;
+              stack.appendChild(s);
+            }
+            digit.appendChild(stack);
+            container.appendChild(digit);
+          } else {
+            const span = document.createElement('span');
+            span.textContent = ch;
+            container.appendChild(span);
+          }
+        }
+        // set initial position
+        setTimeout(()=> animateOdometerTo(container, value, true), 0);
+      }
+
+      function animateOdometerTo(container, value, instant){
+        const str = String(value);
+        const digits = $$('.digit', container);
+        const duration = 200;
+        const stagger = 20;
+        digits.forEach((digitEl, idx) => {
+          const target = parseInt(str[idx], 10);
+          const stack = $('.digit-stack', digitEl);
+          const h = digitEl.getBoundingClientRect().height;
+          const y = -target * h;
+          const d = instant ? 0 : (duration + idx * stagger);
+          stack.style.transition = `transform ${d}ms var(--ease-spring)`;
+          stack.style.transform = `translateY(${y}px)`;
+        });
+      }
+
+      function updateAllPrices(animate){
+        const cards = $$('.card');
+        cards.forEach(card => {
+          const id = card.id;
+          const plan = DATA_STATIC.find(p => p.id === id);
+          const priceEl = $('.price', card);
+          const billedNote = $('.billed-note', card);
+          const ctaBtn = $('.btn', card);
+          const nearSave = $('.save-near-cta', card);
+          if(plan.id !== 'enterprise'){
+            const newVal = getPlanPrice(plan);
+            if(priceEl.classList.contains('reduced')){
+              priceEl.textContent = newVal;
+            } else {
+              // ensure correct number of digits
+              const existingDigits = $$('.digit', priceEl).length;
+              const neededDigits = String(newVal).length;
+              if(existingDigits !== neededDigits){
+                buildOdometer(priceEl, newVal);
+              } else {
+                animateOdometerTo(priceEl, newVal, !animate || prefersReduced);
+              }
+            }
+            billedNote.textContent = (billing === 'yearly') ? plan.yearlyNote : '';
+          }
+          updateCtaLabel(ctaBtn, plan);
+          if(plan.recommended && nearSave){
+            nearSave.style.display = (billing === 'yearly') ? 'inline-flex' : 'none';
+          }
+        });
+      }
+
+      function onCtaClick(e){
+        const btn = e.currentTarget;
+        const planId = btn.getAttribute('data-plan');
+        const plan = DATA_STATIC.find(p => p.id === planId);
+        if(!plan) return;
+
+        // prevent double click
+        if(btn.disabled) return;
+        const original = btn.textContent;
+        btn.disabled = true; btn.setAttribute('aria-busy','true');
+        btn.innerHTML = `<span class="spinner" aria-hidden="true"></span> <span>${COPY.loadingCta}</span>`;
+
+        // In a real app, navigate to checkout or contact. Here, simulate and then set success state.
+        const url = new URL(location.href);
+        url.hash = `#${planId}`;
+        url.searchParams.set('plan', planId);
+        url.searchParams.set('billing', billing);
+        history.replaceState({}, '', url);
+
+        setTimeout(()=>{
+          btn.disabled = false; btn.removeAttribute('aria-busy'); btn.textContent = original;
+          appState = 'success';
+          renderState();
+          // keep hash focus flash
+          flashCard(planId);
+        }, 900);
+      }
+
+      function showSuccessToast(){
+        // a lightweight, non-blocking confirmation near the bottom
+        const toast = document.createElement('div');
+        toast.setAttribute('role','status');
+        toast.style.position = 'fixed';
+        toast.style.left = '50%';
+        toast.style.bottom = '24px';
+        toast.style.transform = 'translateX(-50%)';
+        toast.style.background = 'rgba(11,18,32,0.9)';
+        toast.style.color = '#fff';
+        toast.style.padding = '10px 14px';
+        toast.style.borderRadius = '10px';
+        toast.style.boxShadow = 'var(--shadow-2)';
+        toast.style.font = '600 14px/20px var(--font-text)';
+        toast.textContent = 'Success — proceeding to checkout/contact…';
+        document.body.appendChild(toast);
+        setTimeout(()=>{
+          if(toast && toast.parentNode){ toast.parentNode.removeChild(toast); }
+        }, 2200);
+      }
+
+      function animateSavePillIfYearly(){
+        // Guard all elements; skip animation if anything's missing
+        if(billing !== 'yearly' || prefersReduced) return;
+        const floater = ui.saveFloater;
+        const yearlyBtn = ui.toggle ? ui.toggle.querySelector('button[data-period="yearly"]') : null;
+        const teamCard = document.getElementById('team');
+        if(!floater || !yearlyBtn || !teamCard) return;
+        const targetBtn = $('.btn', teamCard);
+        const pill = floater.querySelector('.pill');
+        if(!targetBtn || !pill) return;
+
+        const srcRect = yearlyBtn.getBoundingClientRect();
+        const targetRect = targetBtn.getBoundingClientRect();
+        if(!srcRect || !targetRect) return;
+
+        floater.style.opacity = '1';
+        const startX = srcRect.left + srcRect.width/2 - pill.offsetWidth/2;
+        const startY = srcRect.top + srcRect.height/2 - pill.offsetHeight/2;
+        const endX = targetRect.left + targetRect.width - pill.offsetWidth - 8;
+        const endY = targetRect.top - pill.offsetHeight - 8;
+        floater.style.transform = `translate(${startX}px, ${startY}px) scale(0.9)`;
+        floater.style.transition = 'none';
+        requestAnimationFrame(()=>{
+          floater.style.transition = `transform var(--motion) var(--ease-out), opacity var(--motion) var(--ease-out)`;
+          floater.style.transform = `translate(${endX}px, ${endY}px) scale(1)`;
+        });
+        // Snap then hide and reveal near-cta pill
+        setTimeout(()=>{
+          floater.style.opacity = '0';
+        }, 240);
+      }
+
+      function initStateSwitcher(){
+        ui.stateSelect.value = appState;
+        ui.stateSelect.addEventListener('change', () => {
+          appState = ui.stateSelect.value;
+          renderState();
+        });
+        ui.retryBtn.addEventListener('click', () => {
+          appState = 'default';
+          renderState();
+        });
+      }
+
+      function initGlobalListeners(){
+        document.addEventListener('keydown', (e) => {
+          if(e.key === 'Escape'){
+            closeTooltip();
+          }
+        });
+        window.addEventListener('resize', () => {
+          // If layout changes, ensure odometer respects reduced on narrow widths
+          updateAllPrices(false);
+        });
+      }
+
+      // Tooltip logic
+      function openTooltip(trigger){
+        const tip = ui.tooltip;
+        tip.querySelector('.content').textContent = COPY.tooltip;
+        tip.setAttribute('data-open','true');
+        tip.removeAttribute('aria-hidden');
+        positionTooltip(trigger, tip);
+      }
+      function toggleTooltip(trigger){
+        const tip = ui.tooltip;
+        const isOpen = tip.getAttribute('data-open') === 'true';
+        if(isOpen){ closeTooltip(); } else { openTooltip(trigger); }
+      }
+      function closeTooltip(){
+        const tip = ui.tooltip;
+        tip.setAttribute('data-open','false');
+        tip.setAttribute('aria-hidden','true');
+      }
+      function positionTooltip(trigger, tip){
+        const r = trigger.getBoundingClientRect();
+        const pad = 8;
+        const x = r.left;
+        const y = r.bottom + pad + window.scrollY;
+        tip.style.left = `${x}px`;
+        tip.style.top = `${y}px`;
+      }
+
+      // Deep-link focus flash
+      function handleDeepLink(){
+        const hash = location.hash.replace('#','');
+        if(['starter','team','enterprise'].includes(hash)){
+          requestAnimationFrame(()=>{
+            const card = document.getElementById(hash);
+            if(card){
+              card.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'center' });
+              flashCard(hash);
+            }
+          });
+        }
+      }
+      function flashCard(id){
+        const card = document.getElementById(id);
+        if(!card) return;
+        card.classList.add('focus-flash');
+        setTimeout(()=> card.classList.remove('focus-flash'), 2000);
+      }
+
+      // Utility
+      function escapeHtml(str){
+        return String(str).replace(/[&<>"]+/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]));
+      }
+
+      // Initial billing sync on toggle UI
+      (function syncInitialToggle(){
+        const btn = ui.toggle.querySelector(`button[data-period='${billing}']`);
+        if(btn){
+          ui.toggle.querySelectorAll('button[role="radio"]').forEach(b=>{
+            const checked = b === btn;
+            b.setAttribute('aria-checked', checked ? 'true' : 'false');
+            b.setAttribute('tabindex', checked ? '0' : '-1');
+          });
+        }
+      })();
+
+    })();
+  </script>
+</body>
+</html>
