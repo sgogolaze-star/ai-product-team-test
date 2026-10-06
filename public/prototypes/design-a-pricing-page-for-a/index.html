@@ -2,794 +2,999 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Pricing Page Prototype — B2B SaaS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pricing — Scales with your team</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
   <style>
-    /* Design tokens (from HANDOFF.design_system) */
-    :root{
+    :root {
+      /* Typography */
+      --font-display: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji';
+      --font-text: 'Manrope', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji';
+      --font-feature-tabular: 'tnum' 1;
+
+      /* Type scale */
+      --text-display-xl-size: 56px; --text-display-xl-line: 64px; --text-display-xl-weight: 700;
+      --text-h1-size: 40px; --text-h1-line: 48px; --text-h1-weight: 700;
+      --text-h2-size: 32px; --text-h2-line: 40px; --text-h2-weight: 700;
+      --text-h3-size: 24px; --text-h3-line: 32px; --text-h3-weight: 600;
+      --text-body-l-size: 18px; --text-body-l-line: 28px; --text-body-l-weight: 400;
+      --text-body-m-size: 16px; --text-body-m-line: 24px; --text-body-m-weight: 400;
+      --text-caption-size: 14px; --text-caption-line: 20px; --text-caption-weight: 500;
+      --text-micro-size: 12px; --text-micro-line: 16px; --text-micro-weight: 500;
+
       /* Colors */
-      --color-primary: #0A66FF; /* main */
-      --color-accent: #0B7AFF; /* accent (slightly brighter) */
-      --neutral-900: #0b1220; /* body text */
-      --neutral-700: #475569; /* muted */
-      --neutral-300: #d1d5db; /* borders / skeleton */
-      --neutral-100: #f7fafc; /* card bg */
-      --success: #027A48;
-      --error: #C53030;
+      --color-bg: #FFFFFF;
+      --color-surface: #F7FAFC;
+      --color-text: #0B1220;
+      --color-text-muted: #5B667A;
+      --color-border: #E5E7EB;
+      --color-accent: #0F766E;
+      --color-on-accent: #FFFFFF;
+      --color-success: #16A34A;
+      --color-warning: #B45309;
+      --color-danger: #DC2626;
 
       /* Spacing */
-      --space-4: 8px;
-      --space-8: 16px;
-      --space-16: 32px;
-      --space-24: 48px;
+      --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px; --space-12: 48px; --space-16: 64px; --space-20: 80px;
 
-      /* Typography */
-      --font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-      --h1-size: 28px; --h1-line: 36px;
-      --h2-size: 20px; --h2-line: 28px;
-      --body-size: 16px; --body-line: 24px;
+      /* Radii */
+      --radius-card: 12px; --radius-button: 8px; --radius-pill: 999px;
 
-      /* Radii & Elevation */
-      --radius-2: 6px;
-      --e1: 0 1px 3px rgba(11,20,30,0.06), 0 1px 2px rgba(11,20,30,0.04);
-      --e2: 0 6px 20px rgba(11,20,30,0.12);
-      --focus-outline: 3px solid var(--color-accent);
+      /* Elevation */
+      --shadow-0: none;
+      --shadow-1: 0 1px 2px rgba(16,24,40,0.06);
+      --shadow-2: 0 4px 12px rgba(16,24,40,0.08);
+      --shadow-3: 0 8px 24px rgba(16,24,40,0.12);
 
-      /* Grid */
-      --gutter: 24px; /* desktop gutters */
+      /* Motion */
+      --motion-fast: 150ms; --motion: 200ms; --motion-slow: 260ms;
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-spring: cubic-bezier(0.2, 0.8, 0.2, 1);
 
-      /* Transitions */
-      --fast: 180ms;
-      --medium: 200ms;
-      --bounce: cubic-bezier(.2,.85,.32,1);
+      /* Layout */
+      --container-max-desktop: 1200px; --container-max-tablet: 720px; --grid-columns: 12; --grid-gutter: 24px; --container-pad-mobile: 16px;
     }
 
-    /* Base reset */
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;font-family:var(--font-family);background:#fff;color:var(--neutral-900);-webkit-font-smoothing:antialiased;
-      line-height:var(--body-line);font-size:var(--body-size);
-      -webkit-tap-highlight-color:transparent;
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: var(--font-text);
+      color: var(--color-text);
+      background: var(--color-bg);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    a{color:var(--color-primary);text-decoration:none}
-    a:focus{outline:var(--focus-outline);border-radius:4px}
+    .container {
+      max-width: var(--container-max-desktop);
+      margin-inline: auto;
+      padding-inline: var(--container-pad-mobile);
+    }
 
-    main{max-width:1200px;margin:40px auto;padding:0 var(--space-8);}    
+    header.pricing-hero {
+      border-bottom: 1px solid var(--color-border);
+      padding-block: var(--space-10);
+    }
+    .hero-wrap { display: grid; align-items: start; gap: var(--space-8); }
+    .hero-left h1 { font-family: var(--font-display); font-size: var(--text-h1-size); line-height: var(--text-h1-line); font-weight: var(--text-h1-weight); margin: 0 0 var(--space-4) 0; letter-spacing: -0.01em; }
+    .hero-left p { font-size: var(--text-body-l-size); line-height: var(--text-body-l-line); color: var(--color-text-muted); max-width: 72ch; margin: 0; }
 
-    /* Top bar / Hero */
-    .topbar{display:flex;align-items:center;justify-content:space-between;gap:var(--space-8);margin-bottom:24px}
-    .top-left{display:flex;flex-direction:column}
-    .kicker{font-size:12px;font-weight:600;color:var(--color-primary);letter-spacing:0.02em}
-    h1.hero-title{font-size:var(--h1-size);line-height:var(--h1-line);margin:6px 0;color:var(--neutral-900)}
-    .hero-sub{color:var(--neutral-700);margin:0;font-size:14px}
+    /* Toggle (Segmented Control) */
+    .toggle-wrap { display: flex; justify-content: flex-end; }
+    .pricing-toggle { display: inline-flex; align-items: center; position: relative; height: 40px; border-radius: var(--radius-pill); border: 1px solid var(--color-border); background: var(--color-bg); padding: 4px; gap: 4px; box-shadow: var(--shadow-1); }
+    .pricing-toggle[aria-disabled="true"] { opacity: .6; pointer-events: none; }
+    .pricing-toggle__label { position: absolute; left: -9999px; }
+    .pricing-toggle button[role="radio"] {
+      appearance: none; -webkit-appearance: none; border: 0; background: transparent; color: var(--color-text);
+      padding: 6px 12px; border-radius: calc(var(--radius-pill) - 2px); font: 600 14px/20px var(--font-text);
+      cursor: pointer; position: relative; min-width: 110px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background var(--motion) var(--ease-out), color var(--motion) var(--ease-out), transform var(--motion-fast) var(--ease-out);
+    }
+    .pricing-toggle button[role="radio"]:hover { background: var(--color-surface); }
+    .pricing-toggle button[role="radio"]:active { transform: translateY(1px); }
+    .pricing-toggle button[role="radio"][aria-checked="true"] { background: var(--color-accent); color: var(--color-on-accent); box-shadow: var(--shadow-1) inset; }
+    .pricing-toggle button[role="radio"]:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+    .save-pill-inline { font: 600 12px/16px var(--font-text); padding: 2px 8px; border-radius: var(--radius-pill); background: rgba(15, 118, 110, 0.12); color: var(--color-accent); border: 1px solid rgba(15,118,110,0.25); }
+    .save-pill-inline--on-accent { background: rgba(255,255,255,0.18); color: var(--color-on-accent); border-color: rgba(255,255,255,0.3); }
 
-    /* Visually hidden helper */
-    .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap;border:0;padding:0;margin:-1px}
+    /* Signature Moment Floating Pill */
+    .save-floater { position: fixed; left: 0; top: 0; transform-origin: center; z-index: 40; pointer-events: none; opacity: 0; will-change: transform, opacity; }
+    .save-floater .pill { font: 600 12px/16px var(--font-text); padding: 6px 10px; border-radius: var(--radius-pill); background: var(--color-accent); color: var(--color-on-accent); box-shadow: var(--shadow-2); border: 1px solid rgba(255,255,255,0.2); white-space: nowrap; }
+    .save-near-cta { display: none; align-items: center; gap: 8px; margin-top: var(--space-3); }
+    .save-near-cta .pill { font: 600 12px/16px var(--font-text); padding: 4px 8px; border-radius: var(--radius-pill); background: rgba(15, 118, 110, 0.12); color: var(--color-accent); border: 1px solid rgba(15,118,110,0.25); }
 
-    /* Segmented toggle */
-    .segmented{display:inline-flex;background:#fff;border:1px solid var(--neutral-300);border-radius:999px;padding:4px;gap:4px}
-    .segmented button{background:transparent;border:0;padding:6px 12px;border-radius:999px;font-weight:600;color:var(--neutral-700);cursor:pointer;min-width:88px}
-    .segmented button[aria-pressed="true"]{background:linear-gradient(180deg,var(--color-primary),var(--color-accent));color:white;box-shadow:var(--e1);transform:translateY(-1px)}
-    .segmented button:focus{outline:var(--focus-outline)}
+    /* Grid Section */
+    section.plans { background: var(--color-surface); padding-block: var(--space-16) var(--space-12); }
 
-    /* Discount hint */
-    .discount-hint{display:inline-block;background:linear-gradient(180deg,#f0f8ff, #e8f4ff);color:var(--color-primary);padding:6px 10px;border-radius:999px;margin-left:12px;font-weight:600;font-size:13px}
+    .plans-grid { display: grid; gap: var(--space-8); }
 
-    /* Layout grid */
-    .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:24px}
+    /* Cards */
+    .card { border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-bg); box-shadow: var(--shadow-1); display: flex; flex-direction: column; overflow: hidden; position: relative; transition: transform var(--motion) var(--ease-out), box-shadow var(--motion) var(--ease-out); }
+    .card:focus-within { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+    .card .toprule { height: 1px; background: var(--color-border); }
+    .card[data-variant="recommended"] .toprule { height: 2px; background: var(--color-accent); box-shadow: 0 0 0 1px rgba(15,118,110,0.08) inset; }
 
-    /* Card */
-    .card{background:linear-gradient(180deg,#ffffff,#fbfdff);border:1px solid #eef2ff;padding:18px;border-radius:var(--radius-2);box-shadow:var(--e1);display:flex;flex-direction:column;min-height:380px;position:relative}
-    .card.recommended{transform:translateY(-6px) scale(1.03);box-shadow:var(--e2);outline:8px solid rgba(11,122,255,0.06)}
-    .card:focus-within{outline:var(--focus-outline);border-radius:8px}
+    .card-inner { padding: var(--space-8); display: grid; gap: var(--space-6); }
 
-    .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-    .plan-name{font-weight:700;font-size:18px;color:var(--neutral-900)}
-    .badge{background:var(--color-accent);color:white;padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px}
+    .plan-head { display: grid; gap: var(--space-2); align-items: start; grid-template-columns: 1fr auto; }
+    .plan-name { font-family: var(--font-display); font-size: var(--text-h3-size); line-height: var(--text-h3-line); font-weight: var(--text-h3-weight); margin: 0; letter-spacing: -0.01em; }
+    .plan-tag { grid-column: 1 / 3; font-size: var(--text-caption-size); line-height: var(--text-caption-line); color: var(--color-text-muted); }
 
-    .price{text-align:left;font-weight:800;font-size:28px;color:var(--neutral-900);display:flex;align-items:baseline;gap:8px}
-    .billing-note{font-weight:600;color:var(--neutral-700);font-size:13px}
-    .sublabel{font-size:13px;color:var(--neutral-700);margin-top:8px}
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: var(--radius-pill); border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text); font: 600 12px/16px var(--font-text); }
+    .badge svg { width: 14px; height: 14px; }
+
+    .price-block { display: grid; gap: var(--space-2); align-items: end; }
+    .price-row { display: flex; align-items: baseline; gap: var(--space-3); min-height: 48px; }
+    .currency { font-family: var(--font-display); font-size: 18px; font-weight: 700; transform: translateY(2px); }
+    .price { font-family: var(--font-display); font-size: var(--text-h2-size); line-height: var(--text-h2-line); font-weight: var(--text-h2-weight); letter-spacing: -0.01em; font-feature-settings: var(--font-feature-tabular); display: inline-flex; gap: 2px; }
+    .card[data-variant="recommended"] .price { font-size: var(--text-h1-size); line-height: var(--text-h1-line); }
+    .cadence { font-size: var(--text-caption-size); line-height: var(--text-caption-line); color: var(--color-text-muted); display: inline-flex; align-items: center; gap: 8px; }
+    .billed-note { font-size: var(--text-micro-size); line-height: var(--text-micro-line); color: var(--color-text-muted); }
+
+    /* Odometer */
+    .odometer { display: inline-flex; gap: 0; align-items: baseline; }
+    .digit { position: relative; width: 0.6em; height: 1em; overflow: hidden; display: inline-block; }
+    .digit-stack { position: absolute; left: 0; top: 0; will-change: transform; }
+    .digit-stack span { display: block; height: 1em; line-height: 1em; }
+    .odometer.reduced .digit { width: auto; overflow: visible; }
 
     /* Feature list */
-    .features{margin-top:14px;flex:1;max-height:420px;overflow:auto;padding-right:6px}
-    .feature{display:flex;gap:10px;align-items:center;padding:8px;border-radius:6px}
-    .feature:hover,.feature:focus{background:rgba(11,122,255,0.03)}
-    .feature .icon{width:20px;height:20px;flex:0 0 20px}
-    .muted{color:var(--neutral-700)}
-
-    /* CTA area */
-    .card-cta{margin-top:16px;display:flex;flex-direction:column;gap:8px}
-    .btn{background:var(--color-primary);color:white;border:0;padding:12px;border-radius:8px;font-weight:700;cursor:pointer;min-height:44px}
-    .btn.secondary{background:transparent;color:var(--color-primary);border:1px solid rgba(10,102,255,0.12)}
-    .btn[disabled],.btn[aria-disabled="true"]{background:#f1f5f9;color:#94a3b8;cursor:not-allowed;border-color:#e2e8f0}
-    .secondary-link{font-size:14px;color:var(--neutral-700);text-decoration:underline;cursor:pointer;background:none;border:0;padding:6px}
-
-    /* Ribbon */
-    .ribbon{position:absolute;left:14px;top:14px;background:linear-gradient(90deg,var(--color-accent),var(--color-primary));color:white;padding:6px 10px;border-radius:6px;font-weight:700;font-size:12px}
-
-    /* Price animation containers */
-    .price-wrap{min-height:36px;display:inline-block;position:relative}
-    .price-text{position:relative;display:inline-block;transition:transform var(--medium) var(--bounce),opacity var(--fast) linear}
-    .price-text.leaving{transform:translateY(-6px);opacity:0}
-    .price-text.entering{transform:translateY(0);opacity:1}
-
-    /* Comparison matrix for desktop */
-    .matrix{margin-top:28px;border-top:1px solid #eef2ff;padding-top:16px}
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:10px 8px;text-align:center;border-bottom:1px solid #f1f5f9;font-size:14px}
-    th.row-label{position:sticky;left:0;background:white;text-align:left;width:280px;color:var(--neutral-700)}
-    td:first-child{border-left:1px solid #fff}
-    .matrix td{background:transparent}
-
-    /* Desktop specific */
-    @media (min-width:1024px){
-      main{padding:0 24px}
-      .pricing-grid{grid-template-columns:repeat(3,1fr)}
-      .matrix{display:block}
+    .features { display: grid; gap: var(--space-3); padding-top: var(--space-2); }
+    .feature { display: grid; grid-template-columns: 20px 1fr; gap: var(--space-3); align-items: start; }
+    .feature .icon { width: 20px; height: 20px; color: var(--color-success); flex: 0 0 20px; }
+    .feature .label { font-size: var(--text-body-m-size); line-height: var(--text-body-m-line); }
+    @media (max-width: 480px) {
+      .feature .label { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     }
 
-    /* Tablet layout 768-1023: 2-column with Enterprise stacked below */
-    @media (min-width:768px) and (max-width:1023px){
-      .pricing-grid{grid-template-columns:repeat(2,1fr)}
-      .pricing-grid .enterprise-card{grid-column:1 / -1}
-      .matrix{display:block}
-    }
+    /* Buttons */
+    .actions { display: grid; gap: var(--space-3); }
+    .btn { appearance: none; -webkit-appearance: none; border-radius: var(--radius-button); height: 48px; padding-inline: 16px; font: 600 16px/20px var(--font-text); display: inline-flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: transform var(--motion-fast) var(--ease-out), background var(--motion) var(--ease-out), color var(--motion) var(--ease-out), box-shadow var(--motion) var(--ease-out), border-color var(--motion) var(--ease-out); }
+    .btn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+    .btn:active { transform: translateY(1px); }
+    .btn[disabled] { opacity: 0.4; cursor: not-allowed; }
 
-    /* Mobile: stack cards, accordion features, compact spacing */
-    @media (max-width:767px){
-      .pricing-grid{display:flex;flex-direction:column;gap:16px}
-      .matrix{display:none}
-      .card{min-height:unset}
-      .features{max-height:280px}
-      .accordion-toggle{display:flex;align-items:center;justify-content:space-between;border-top:1px solid #f1f5f9;padding-top:12px;margin-top:8px}
-      .accordion-content{display:none}
-      .accordion-content.open{display:block}
-    }
+    .btn-primary { background: var(--color-accent); color: var(--color-on-accent); border: 1px solid rgba(0,0,0,0); box-shadow: var(--shadow-1); }
+    .btn-primary:hover { filter: brightness(0.94); box-shadow: var(--shadow-2); }
 
-    /* Skeleton styles */
-    .skeleton{background:linear-gradient(90deg,var(--neutral-300),#e9eef7,var(--neutral-300));height:16px;border-radius:6px}
-    .skeleton-lg{height:28px;width:120px}
-    .skeleton-price{height:36px;width:90px}
+    .btn-secondary { background: transparent; color: var(--color-text); border: 1px solid var(--color-border); }
+    .btn-secondary:hover { background: var(--color-surface); }
 
-    /* Toast */
-    .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--neutral-900);color:white;padding:12px 16px;border-radius:8px;box-shadow:var(--e2);z-index:90;display:flex;gap:12px;align-items:center}
-    .toast button{background:transparent;color:inherit;border:1px solid rgba(255,255,255,0.12);padding:6px 10px;border-radius:6px;cursor:pointer}
+    .btn-ghost { background: transparent; color: var(--color-text); border: 1px solid transparent; }
+    .btn-ghost:hover { background: var(--color-surface); border-color: var(--color-border); }
 
-    /* Modal */
-    .modal-backdrop{position:fixed;inset:0;background:rgba(3,6,23,0.5);display:flex;align-items:center;justify-content:center;z-index:100}
-    .modal{background:white;border-radius:10px;max-width:720px;width:92%;padding:20px;box-shadow:var(--e2)}
-    .modal h3{margin:0 0 8px 0}
-    .form-row{display:flex;flex-direction:column;margin-bottom:10px}
-    label{font-size:13px;margin-bottom:6px;font-weight:600}
-    input,textarea,select{padding:10px;border-radius:8px;border:1px solid var(--neutral-300);font-size:14px}
-    .form-error{color:var(--error);font-size:13px;margin-top:8px}
+    .btn .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.6); border-top-color: var(--color-on-accent); border-radius: 50%; animation: spin 1s linear infinite; }
+    .btn-secondary .spinner, .btn-ghost .spinner { border: 2px solid rgba(11,18,32,0.2); border-top-color: var(--color-text); }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Tooltip for disabled CTA */
-    .tooltip{position:relative}
-    .tooltip .tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--neutral-900);color:white;padding:8px;border-radius:6px;font-size:13px;display:none;white-space:nowrap}
-    .tooltip:focus-within .tip,.tooltip:hover .tip{display:block}
+    .footnote { font-size: var(--text-caption-size); line-height: var(--text-caption-line); color: var(--color-text-muted); padding-block: var(--space-8); border-top: 1px solid var(--color-border); }
+
+    /* Tooltip */
+    .tooltip { position: absolute; z-index: 30; background: #0B1220; color: #FFF; padding: 8px 12px; border-radius: 8px; box-shadow: var(--shadow-2); max-width: 260px; font: 500 14px/20px var(--font-text); opacity: 0; transform: translateY(-4px); pointer-events: none; transition: opacity var(--motion) var(--ease-out), transform var(--motion) var(--ease-out); }
+    .tooltip[data-open="true"] { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .tooltip .caret { position: absolute; width: 10px; height: 10px; background: #0B1220; transform: rotate(45deg); left: 12px; bottom: -5px; }
+
+    .info-trigger { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--color-border); background: var(--color-bg); cursor: pointer; }
+    .info-trigger:hover { background: var(--color-surface); }
+    .info-trigger:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+    /* Error banner */
+    .banner { background: #FFF4F4; border: 1px solid #F3DCDC; color: var(--color-danger); border-radius: 10px; padding: 12px 16px; display: none; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: var(--space-8); }
+    .banner[data-state="visible"] { display: flex; }
+    .banner .msg { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+    .banner .retry { white-space: nowrap; }
+
+    /* Skeletons */
+    .skeleton-card { border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-bg); padding: var(--space-8); box-shadow: var(--shadow-1); }
+    .skel { height: 14px; background: linear-gradient(90deg, #F3F4F6 25%, #E5E7EB 37%, #F3F4F6 63%); background-size: 400% 100%; border-radius: 6px; animation: shimmer 1.3s infinite; }
+    .skel.title { width: 60%; height: 20px; margin-bottom: var(--space-4); }
+    .skel.price { width: 40%; height: 40px; margin: var(--space-4) 0; }
+    .skel.line { height: 12px; margin: 10px 0; }
+    .skel.btn { width: 100%; height: 48px; border-radius: var(--radius-button); }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+    /* Focus highlight on deep-link */
+    .focus-flash { box-shadow: 0 0 0 2px var(--color-accent) inset; animation: flash 2s ease-out forwards; }
+    @keyframes flash { 0% { box-shadow: 0 0 0 2px var(--color-accent) inset; } 80% { box-shadow: 0 0 0 2px rgba(15,118,110,0.3) inset; } 100% { box-shadow: none; } }
 
     /* State switcher */
-    .state-switcher{position:fixed;right:12px;bottom:12px;background:white;border:1px solid var(--neutral-300);padding:8px;border-radius:10px;box-shadow:var(--e1);z-index:200;width:220px}
-    .state-switcher h4{margin:0 0 6px 0;font-size:13px}
-    .state-switcher select{width:100%;padding:8px;border-radius:6px;border:1px solid var(--neutral-300)}
+    .state-switcher { position: fixed; right: 12px; bottom: 12px; z-index: 50; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-pill); box-shadow: var(--shadow-2); padding: 6px 8px; display: flex; align-items: center; gap: 8px; }
+    .state-switcher label { font: 600 12px/16px var(--font-text); color: var(--color-text-muted); }
+    .state-switcher select { font: 600 12px/16px var(--font-text); border-radius: var(--radius-pill); padding: 6px 10px; border: 1px solid var(--color-border); background: var(--color-bg); }
+    .state-switcher select:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 
-    /* focus visible utility */
-    :focus-visible{outline:var(--focus-outline);outline-offset:2px}
+    /* Icons */
+    .icon { display: inline-block; }
 
-    /* pref reduce motion */
-    @media (prefers-reduced-motion: reduce){
-      .price-text{transition:none !important}
-      .segmented button{transition:none}
+    /* Responsive layout */
+    @media (min-width: 1280px) {
+      .hero-wrap { grid-template-columns: 1fr 360px; }
+      .plans-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: stretch; }
+      .card[data-variant="starter"]:hover { transform: translateY(-4px); box-shadow: var(--shadow-2); }
+      .card[data-variant="enterprise"]:hover { transform: translateY(-4px); box-shadow: var(--shadow-2); }
+      .card[data-variant="recommended"] { box-shadow: var(--shadow-3); }
+      .card[data-variant="recommended"]:hover { transform: translateY(-8px); box-shadow: var(--shadow-3); }
+    }
+
+    @media (min-width: 768px) and (max-width: 1279px) {
+      .container { max-width: var(--container-max-tablet); }
+      .hero-wrap { grid-template-columns: 1fr; }
+      .toggle-wrap { justify-content: flex-start; }
+      .hero-left h1 { font-size: var(--text-h2-size); line-height: var(--text-h2-line); }
+      .plans-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .card[data-variant="recommended"] { grid-column: 1 / -1; }
+      .price { font-size: var(--text-h2-size); line-height: var(--text-h2-line); }
+      .card[data-variant="recommended"] .price { font-size: var(--text-h2-size); line-height: var(--text-h2-line); }
+    }
+
+    @media (max-width: 767px) {
+      header.pricing-hero { padding-block: var(--space-8); }
+      .hero-left h1 { font-size: var(--text-h2-size); line-height: var(--text-h2-line); }
+      .hero-left p { font-size: var(--text-body-m-size); line-height: 26px; }
+      .toggle-wrap { justify-content: stretch; }
+      .pricing-toggle { width: 100%; height: 44px; }
+      .pricing-toggle button[role="radio"] { flex: 1 1 0; min-width: auto; }
+      .plans-grid { grid-template-columns: 1fr; }
+      /* Order: Team first */
+      .card[data-variant="recommended"] { order: -1; }
+      .price { font-size: var(--text-h2-size); line-height: var(--text-h2-line); }
+      .card[data-variant="recommended"] .price { font-size: var(--text-h2-size); line-height: var(--text-h2-line); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; animation: none !important; }
     }
   </style>
 </head>
 <body>
-  <main>
-    <header class="topbar" aria-label="Pricing header">
-      <div class="top-left">
-        <span class="kicker">Plans & Pricing</span>
-        <h1 class="hero-title">Simple pricing for growing teams</h1>
-        <p class="hero-sub">Choose a plan that scales with your team. No hidden fees, cancel anytime.</p>
-      </div>
+  <a href="#main" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">Skip to content</a>
 
-      <div style="display:flex;align-items:center;gap:12px">
-        <div id="billing-toggle" class="segmented" role="group" aria-label="Billing toggle">
-          <button id="toggle-monthly" aria-pressed="true">Monthly</button>
-          <button id="toggle-yearly" aria-pressed="false">Yearly</button>
+  <div class="save-floater" aria-hidden="true">
+    <div class="pill">Save 20% yearly</div>
+  </div>
+
+  <header class="pricing-hero">
+    <div class="container hero-wrap">
+      <div class="hero-left">
+        <h1 id="page-title">Pricing that scales with your team</h1>
+        <p>Simple per‑seat pricing with predictable billing. Switch to yearly to save 20% — cancel anytime.</p>
+      </div>
+      <div class="toggle-wrap">
+        <div class="pricing-toggle" role="radiogroup" aria-labelledby="billing-label" id="billing-toggle">
+          <span id="billing-label" class="pricing-toggle__label">Billing period</span>
+          <button type="button" class="toggle-option" role="radio" aria-checked="true" data-period="monthly" tabindex="0" aria-label="Monthly">Monthly</button>
+          <button type="button" class="toggle-option" role="radio" aria-checked="false" data-period="yearly" tabindex="-1" aria-label="Yearly — save 20%">Yearly <span class="save-pill-inline">Save 20%</span></button>
         </div>
-        <div id="discount-hint" class="discount-hint" aria-hidden="true">Save 20%/yr</div>
       </div>
+    </div>
+  </header>
 
-    </header>
-
-    <!-- Pricing grid -->
-    <section aria-labelledby="plans-heading">
-      <h2 id="plans-heading" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden">Plans</h2>
-
-      <div class="pricing-grid" id="pricing-grid">
-        <!-- Starter -->
-        <article class="card starter-card" data-plan="starter" tabindex="0" aria-labelledby="starter-label">
-          <div class="card-header">
-            <div>
-              <div id="starter-label" class="plan-name">Starter</div>
-              <div class="sublabel">For individuals & small teams</div>
-            </div>
-            <div class="badge" aria-hidden="true">Popular</div>
+  <main id="main">
+    <section class="plans">
+      <div class="container">
+        <div class="banner" id="error-banner" role="alert" aria-live="polite">
+          <div class="msg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>We couldn’t load pricing. Retry.</span>
           </div>
+          <button class="btn btn-secondary retry" type="button" id="retry-btn">Retry</button>
+        </div>
 
-          <div>
-            <div class="price-wrap">
-              <span class="price-text" data-price-id="starter">$<span class="price-value">19</span><span style="font-size:14px">/mo</span></span>
-            </div>
-            <div class="billing-note">Billed monthly. <span class="muted">Start for free — no credit card</span></div>
-          </div>
+        <div class="plans-grid" id="plans-grid" aria-live="polite" aria-busy="false"></div>
 
-          <div class="features" role="list" aria-label="Starter features">
-            <div class="feature" role="listitem"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden><path fill="#027A48" d="M9 16.2 4.8 12l-1.4 1.4L9 19 22 6l-1.4-1.4z"></path></svg><div><strong>Up to 5 projects</strong><div class="muted">Basic collaboration</div></div></div>
-            <div class="feature" role="listitem"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden><path fill="#027A48" d="M9 16.2 4.8 12l-1.4 1.4L9 19 22 6l-1.4-1.4z"></path></svg><div><strong>Community support</strong></div></div>
-            <div class="feature" role="listitem"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden><path fill="#C53030" d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z"></path></svg><div class="muted"><strong>SSO</strong><div class="muted">Not included</div></div></div>
-          </div>
+        <p class="footnote" id="pricing-footnote">Prices shown in USD. Taxes may apply. Change currency at checkout.</p>
 
-          <div class="card-cta">
-            <div class="tooltip">
-              <button class="btn start-free" data-plan="starter">Start free</button>
-              <div class="tip" role="tooltip">Start a free trial — no credit card</div>
-            </div>
-            <button class="secondary-link" aria-label="View starter details">View details</button>
-          </div>
-        </article>
-
-        <!-- Team (recommended) -->
-        <article class="card recommended team-card" data-plan="team" tabindex="0" aria-labelledby="team-label" aria-describedby="recommended-note">
-          <div class="ribbon">Recommended</div>
-          <span id="recommended-note" class="visually-hidden">Recommended plan</span>
-          <div class="card-header">
-            <div>
-              <div id="team-label" class="plan-name">Team</div>
-              <div class="sublabel">For growing product teams</div>
-            </div>
-            <div class="badge" aria-hidden="true">Best value</div>
-          </div>
-
-          <div>
-            <div class="price-wrap">
-              <span class="price-text" data-price-id="team">$<span class="price-value">49</span><span style="font-size:14px">/mo</span></span>
-            </div>
-            <div class="billing-note">Billed monthly. <span class="muted">Includes advanced collaboration</span></div>
-          </div>
-
-          <div class="features" role="list" aria-label="Team features">
-            <div class="feature" role="listitem"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden><path fill="#027A48" d="M9 16.2 4.8 12l-1.4 1.4L9 19 22 6l-1.4-1.4z"></path></svg><div><strong>Unlimited projects</strong><div class="muted">Advanced permissions</div></div></div>
-            <div class="feature" role="listitem"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden><path fill="#027A48" d="M9 16.2 4.8 12l-1.4 1.4L9 19 22 6l-1.4-1.4z"></path></svg><div><strong>Priority support</strong></div></div>
-            <div class="feature" role="listitem"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden><path fill="#027A48" d="M9 16.2 4.8 12l-1.4 1.4L9 19 22 6l-1.4-1.4z"></path></svg><div><strong>SSO & SCIM</strong><div class="muted">Enterprise-grade</div></div></div>
-          </div>
-
-          <div class="card-cta">
-            <button class="btn start-free" data-plan="team">Start free</button>
-            <button class="secondary-link" aria-label="View team details">View details</button>
-          </div>
-        </article>
-
-        <!-- Enterprise -->
-        <article class="card enterprise-card" data-plan="enterprise" tabindex="0" aria-labelledby="enterprise-label">
-          <div class="card-header">
-            <div>
-              <div id="enterprise-label" class="plan-name">Enterprise</div>
-              <div class="sublabel">Security, compliance & dedicated support</div>
-            </div>
-            <div style="min-width:72px;text-align:right"><div class="muted" style="font-weight:700">Custom</div></div>
-          </div>
-
-          <div>
-            <div class="price-wrap">
-              <span class="price-text" data-price-id="enterprise">$<span class="price-value">149</span><span style="font-size:14px">/mo</span></span>
-            </div>
-            <div class="billing-note">Contact sales for enterprise pricing</div>
-          </div>
-
-          <div class="features" role="list" aria-label="Enterprise features">
-            <div class="feature" role="listitem"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden><path fill="#027A48" d="M9 16.2 4.8 12l-1.4 1.4L9 19 22 6l-1.4-1.4z"></path></svg><div><strong>Everything in Team</strong></div></div>
-            <div class="feature" role="listitem"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden><path fill="#027A48" d="M9 16.2 4.8 12l-1.4 1.4L9 19 22 6l-1.4-1.4z"></path></svg><div><strong>Dedicated account manager</strong></div></div>
-            <div class="feature" role="listitem"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden><path fill="#027A48" d="M9 16.2 4.8 12l-1.4 1.4L9 19 22 6l-1.4-1.4z"></path></svg><div><strong>SSO, SCIM, VPC</strong></div></div>
-            <div class="feature" role="listitem"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden><path fill="#027A48" d="M9 16.2 4.8 12l-1.4 1.4L9 19 22 6l-1.4-1.4z"></path></svg><div><strong>Audit logs</strong></div></div>
-          </div>
-
-          <div class="card-cta">
-            <button class="btn contact-sales" data-plan="enterprise">Contact sales</button>
-            <button class="secondary-link" aria-label="View enterprise details">View details</button>
-          </div>
-        </article>
+        <section class="faq" aria-label="Pricing FAQs" style="margin-top: var(--space-12);">
+          <details>
+            <summary style="list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding: 16px 0; border-top:1px solid var(--color-border); font: 600 16px/24px var(--font-text);">
+              <span>How does per‑seat billing work?</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </summary>
+            <div style="color: var(--color-text-muted); padding-bottom:16px;">Pricing is per active user seat. You can add or remove seats anytime; charges are prorated on your next invoice.</div>
+          </details>
+          <details>
+            <summary style="list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding: 16px 0; border-top:1px solid var(--color-border); font: 600 16px/24px var(--font-text);">
+              <span>Can I switch between monthly and yearly later?</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </summary>
+            <div style="color: var(--color-text-muted); padding-bottom:16px;">Yes. You can change your billing period anytime. Switching to yearly applies the 20% discount to your remaining term.</div>
+          </details>
+          <details>
+            <summary style="list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding: 16px 0; border-top:1px solid var(--color-border); border-bottom:1px solid var(--color-border); font: 600 16px/24px var(--font-text);">
+              <span>Do you offer discounts for large teams?</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </summary>
+            <div style="color: var(--color-text-muted); padding-bottom:16px;">Volume discounts are available for organizations with 100+ seats. Contact sales to discuss tiered pricing.</div>
+          </details>
+        </section>
       </div>
-
-      <!-- Comparison matrix (desktop & tablet) -->
-      <div class="matrix" id="matrix">
-        <table aria-label="Feature comparison">
-          <thead>
-            <tr>
-              <th class="row-label">Features</th>
-              <th>Starter</th>
-              <th>Team</th>
-              <th>Enterprise</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td class="row-label">Projects</td><td>5</td><td>Unlimited</td><td>Unlimited</td></tr>
-            <tr><td class="row-label">Support</td><td>Email</td><td>Priority</td><td>Dedicated</td></tr>
-            <tr><td class="row-label">SSO</td><td><span class="muted">No</span></td><td>Yes</td><td>Yes</td></tr>
-            <tr><td class="row-label">SLA</td><td><span class="muted">No</span></td><td>99.9%</td><td>Custom</td></tr>
-          </tbody>
-        </table>
-      </div>
-
     </section>
-
-    <!-- Signup modal (for Start free simple flow) -->
-    <div id="signup-modal" aria-hidden="true" style="display:none;">
-      <div class="modal-backdrop" role="dialog" aria-modal="true">
-        <div class="modal" role="document">
-          <h3 id="signup-title">Start your free trial</h3>
-          <p class="muted">We'll create an account for you — no credit card required.</p>
-          <div style="display:flex;gap:8px;margin-top:12px">
-            <input id="trial-email" placeholder="Your email" style="flex:1" />
-            <button id="trial-submit" class="btn">Start</button>
-            <button id="trial-close" class="secondary-link">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Enterprise contact modal -->
-    <div id="enterprise-modal" style="display:none;" aria-hidden="true">
-      <div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="enterprise-modal-title">
-        <div class="modal" role="document">
-          <button id="enterprise-close" style="float:right;background:none;border:0;font-size:20px;cursor:pointer" aria-label="Close">✕</button>
-          <h3 id="enterprise-modal-title">Contact Sales</h3>
-          <p class="muted">Tell us about your needs and we'll get back within 1 business day.</p>
-          <form id="enterprise-form">
-            <div id="form-error" class="form-error" style="display:none"></div>
-            <div class="form-row"><label for="name">Name</label><input id="name" name="name" required /></div>
-            <div class="form-row"><label for="company">Company</label><input id="company" name="company" required /></div>
-            <div class="form-row"><label for="email">Work email</label><input id="email" name="email" type="email" required /></div>
-            <div class="form-row"><label for="team_size">Team size</label><select id="team_size" name="team_size"><option value="1-5">1–5</option><option value="6-25">6–25</option><option value="26-100">26–100</option><option value="100+">100+</option></select></div>
-            <div class="form-row"><label for="message">Message</label><textarea id="message" name="message" rows="4"></textarea></div>
-            <div style="display:flex;gap:8px;align-items:center">
-              <button id="contact-submit" class="btn" type="submit">Submit</button>
-              <button id="contact-cancel" class="secondary-link" type="button">Cancel</button>
-              <div id="form-status" style="margin-left:auto;color:var(--neutral-700);font-size:13px"></div>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- Toast area -->
-    <div id="toast-area" aria-live="polite" aria-atomic="true"></div>
-
-    <!-- Single aria-live announcer for price updates -->
-    <div id="price-announcer" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
-
   </main>
 
-  <!-- State switcher -->
-  <div class="state-switcher" aria-hidden="false">
-    <h4>Prototype State</h4>
-    <select id="state-select" aria-label="Prototype state selector">
-      <option value="default">Default (monthly)</option>
-      <option value="yearly">Yearly (discount)</option>
-      <option value="loading">Loading</option>
-      <option value="failure">Toggle failure (toast)</option>
-      <option value="cta-disabled">CTA disabled</option>
-      <option value="empty">Empty features (edge)</option>
+  <div class="state-switcher" aria-label="Prototype state">
+    <label for="state-select">State</label>
+    <select id="state-select">
+      <option value="default">default</option>
+      <option value="loading">loading</option>
+      <option value="empty">empty</option>
+      <option value="error">error</option>
+      <option value="success">success</option>
     </select>
+  </div>
+
+  <template id="plan-card-template">
+    <article class="card" tabindex="-1">
+      <div class="toprule" aria-hidden="true"></div>
+      <div class="card-inner">
+        <div class="plan-head">
+          <h3 class="plan-name"></h3>
+          <span class="badge" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9 12 2"></polygon></svg>
+            <span>Recommended</span>
+          </span>
+          <div class="plan-tag"></div>
+        </div>
+        <div class="price-block">
+          <div class="price-row">
+            <span class="currency" aria-hidden="true">$</span>
+            <div class="price" aria-live="polite"></div>
+            <span class="cadence">
+              <span class="per-seat-label">per seat / mo</span>
+              <button class="info-trigger" type="button" aria-label="Pricing is per active user seat. You can add or remove seats anytime." aria-describedby="" title="">
+                <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+              </button>
+            </span>
+          </div>
+          <div class="billed-note" aria-live="polite"></div>
+        </div>
+        <ul class="features" role="list"></ul>
+        <div class="actions">
+          <button class="btn" type="button"></button>
+          <div class="save-near-cta"><span class="pill">Save 20% yearly</span></div>
+        </div>
+        <div class="footnote micro" style="font-size: var(--text-micro-size); line-height: var(--text-micro-line); color: var(--color-text-muted);"></div>
+      </div>
+    </article>
+  </template>
+
+  <template id="skeleton-template">
+    <div class="skeleton-card" aria-hidden="true">
+      <div class="skel title"></div>
+      <div class="skel line" style="width: 40%;"></div>
+      <div class="skel price"></div>
+      <div class="skel line" style="width: 90%;"></div>
+      <div class="skel line" style="width: 95%;"></div>
+      <div class="skel line" style="width: 80%;"></div>
+      <div class="skel line" style="width: 85%;"></div>
+      <div class="skel line" style="width: 70%;"></div>
+      <div class="skel btn"></div>
+    </div>
+  </template>
+
+  <div id="tooltip" role="tooltip" class="tooltip" aria-hidden="true">
+    <div class="content">Pricing is per active user seat. You can add or remove seats anytime.</div>
+    <div class="caret" aria-hidden="true"></div>
   </div>
 
   <script>
     (function(){
-      // Price data
-      const baseMonthly = {starter:19, team:49, enterprise:149};
-      const discountFactor = 0.8; // 20% off yearly
+      const $ = (sel, ctx=document) => ctx.querySelector(sel);
+      const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      // Elements
-      const btnMonthly = document.getElementById('toggle-monthly');
-      const btnYearly = document.getElementById('toggle-yearly');
-      const discountHint = document.getElementById('discount-hint');
-      const pricingGrid = document.getElementById('pricing-grid');
-      const toastArea = document.getElementById('toast-area');
-      const stateSelect = document.getElementById('state-select');
-      const priceAnnouncer = document.getElementById('price-announcer');
+      const ui = {
+        grid: $('#plans-grid'),
+        errorBanner: $('#error-banner'),
+        retryBtn: $('#retry-btn'),
+        toggle: $('#billing-toggle'),
+        stateSelect: $('#state-select'),
+        tooltip: $('#tooltip'),
+        saveFloater: $('.save-floater'),
+      };
 
-      const signupModal = document.getElementById('signup-modal');
-      const trialClose = document.getElementById('trial-close');
-      const trialSubmit = document.getElementById('trial-submit');
-      const trialEmail = document.getElementById('trial-email');
+      const COPY = {
+        hero: {
+          title: 'Pricing that scales with your team',
+          subcopy: 'Simple per‑seat pricing with predictable billing. Switch to yearly to save 20% — cancel anytime.'
+        },
+        aria: { toggle: 'Billing period', monthly: 'Monthly', yearly: 'Yearly — save 20%' },
+        tax: 'Prices shown in USD. Taxes may apply. Change currency at checkout.',
+        tooltip: 'Pricing is per active user seat. You can add or remove seats anytime.',
+        error: 'We couldn’t load pricing. Retry.',
+        loadingCta: 'Preparing checkout…',
+      };
 
-      const enterpriseModal = document.getElementById('enterprise-modal');
-      const enterpriseForm = document.getElementById('enterprise-form');
-      const enterpriseClose = document.getElementById('enterprise-close');
-      const contactCancel = document.getElementById('contact-cancel');
-      const formStatus = document.getElementById('form-status');
-      const formError = document.getElementById('form-error');
+      const DATA_STATIC = [
+        {
+          id: 'starter', name: 'Starter', tagline: 'Essentials to get moving',
+          monthly: 19, yearly: 15, cadence: 'per seat / mo', yearlyNote: 'Billed yearly at $180 / seat', recommended: false,
+          features: [
+            '3 active projects',
+            '5 GB storage per seat',
+            'Standard email support',
+            'Basic analytics',
+            'Community access',
+            'SOC 2-aligned security'
+          ],
+          cta: {
+            monthly: 'Start Starter — $19/seat',
+            yearly: 'Start Starter — $15/seat (billed yearly)'
+          },
+          footnote: ''
+        },
+        {
+          id: 'team', name: 'Team', tagline: 'Collaboration and controls for growing teams',
+          monthly: 49, yearly: 39, cadence: 'per seat / mo', yearlyNote: 'Billed yearly at $468 / seat', recommended: true,
+          features: [
+            'Unlimited projects',
+            '1 TB storage per org',
+            'Role‑based access control (RBAC)',
+            'Automations & API access',
+            'Priority chat & email support',
+            'SSO (SAML) included'
+          ],
+          cta: {
+            monthly: 'Upgrade to Team — $49/seat',
+            yearly: 'Upgrade to Team — $39/seat (billed yearly)'
+          },
+          footnote: ''
+        },
+        {
+          id: 'enterprise', name: 'Enterprise', tagline: 'Scale, security, and dedicated support',
+          monthly: null, yearly: null, cadence: 'per org', yearlyNote: '', recommended: false,
+          features: [
+            'Everything in Team',
+            'Uptime SLA 99.9%',
+            'Dedicated CSM & onboarding',
+            'Advanced audit logs',
+            'SCIM user provisioning',
+            'Custom contracts & security reviews'
+          ],
+          cta: { monthly: 'Talk to sales', yearly: 'Talk to sales' },
+          footnote: 'Volume discounts available for 100+ seats.'
+        }
+      ];
 
-      let billing = 'monthly';
-      let lastKnown = {monthly: {...baseMonthly}};
-      // Save lastKnown in localStorage
-      try{const stored = localStorage.getItem('pricing-last-known'); if(stored) lastKnown=JSON.parse(stored);}catch(e){}
+      let billing = getInitialBilling();
+      let appState = 'default'; // default | loading | empty | error | success
 
-      // Focus trap helpers for modal
-      let lastFocusedBeforeModal = null;
-      let enterpriseKeyHandler = null;
+      // Initialize
+      initToggle();
+      renderState();
+      initStateSwitcher();
+      initGlobalListeners();
 
-      // Accessibility helpers
-      function setAriaPressed(which){
-        btnMonthly.setAttribute('aria-pressed', which==='monthly' ? 'true' : 'false');
-        btnYearly.setAttribute('aria-pressed', which==='yearly' ? 'true' : 'false');
+      // Deep link handling
+      handleDeepLink();
+
+      function getInitialBilling(){
+        const params = new URLSearchParams(location.search);
+        const b = params.get('billing');
+        if(b === 'yearly' || b === 'monthly') return b;
+        return 'monthly';
       }
 
-      // Price update with animation
-      function updatePrices({targetBilling=billing,simulateLoading=false,simulateFailure=false,useLast=false}={}){
-        billing = targetBilling;
-        setAriaPressed(billing);
-        // Update discount hint visibility
-        discountHint.style.visibility = billing==='yearly'?'visible':'hidden';
+      function initToggle(){
+        const monthlyBtn = ui.toggle.querySelector('button[data-period="monthly"]');
+        const yearlyBtn = ui.toggle.querySelector('button[data-period="yearly"]');
+        updateToggleAria();
 
-        // For each price element, animate
-        const priceEls = document.querySelectorAll('.price-text');
-
-        if(simulateLoading){
-          // show skeletons
-          priceEls.forEach(el=>{
-            const parent = el.parentElement;
-            const sk = document.createElement('div');
-            sk.className='skeleton skeleton-price';
-            sk.setAttribute('aria-hidden','true');
-            parent.appendChild(sk);
-            el.style.display='none';
-          });
-          // disable CTAs
-          toggleCTAs(true);
-          return;
-        }
-
-        // remove skeletons if present
-        document.querySelectorAll('.skeleton-price').forEach(s=>s.remove());
-        document.querySelectorAll('.price-text').forEach(el=>el.style.display='inline-block');
-
-        // If failure, show toast and fallback to last-known
-        if(simulateFailure){
-          showToast('Unable to fetch prices', 'Retry', ()=>{
-            // retry: simulate a successful fetch
-            performFetchPrices(false);
-          });
-          // load last-known if available
-          const fallback = useLast ? (lastKnown[billing] || baseMonthly) : baseMonthly;
-          applyPriceValues(fallback);
-          announcePrices(fallback, billing);
-          toggleCTAs(false);
-          return;
-        }
-
-        // Normal fetch
-        performFetchPrices();
-      }
-
-      function performFetchPrices(forceFail=false){
-        // Simulate network fetch with timeout
-        toggleCTAs(true);
-        setTimeout(()=>{
-          if(forceFail){
-            showToast('Unable to fetch prices', 'Retry', ()=>performFetchPrices(false));
-            toggleCTAs(false);
-            return;
+        ui.toggle.addEventListener('click', (e) => {
+          const btn = e.target.closest('button[role="radio"]');
+          if(!btn) return;
+          const period = btn.getAttribute('data-period');
+          if(period && period !== billing){
+            setBilling(period);
           }
+        });
 
-          // compute prices
-          const data = (billing==='monthly')? baseMonthly : {
-            starter: Math.round(baseMonthly.starter*12*discountFactor/12),
-            team: Math.round(baseMonthly.team*12*discountFactor/12),
-            enterprise: Math.round(baseMonthly.enterprise*12*discountFactor/12)
-          };
+        ui.toggle.addEventListener('keydown', (e) => {
+          const options = $$("button[role='radio']", ui.toggle);
+          const currentIndex = options.findIndex(o => o.getAttribute('aria-checked') === 'true');
+          if(['ArrowRight','ArrowLeft'].includes(e.key)){
+            e.preventDefault();
+            let next = currentIndex + (e.key === 'ArrowRight' ? 1 : -1);
+            if(next < 0) next = options.length - 1;
+            if(next >= options.length) next = 0;
+            options.forEach((o,i)=>{
+              o.setAttribute('tabindex', i === next ? '0' : '-1');
+            });
+            options[next].focus();
+          } else if(['Enter',' '].includes(e.key)){
+            e.preventDefault();
+            const focused = document.activeElement;
+            if(focused && focused.getAttribute('role') === 'radio'){
+              const period = focused.getAttribute('data-period');
+              if(period && period !== billing){ setBilling(period); }
+            }
+          }
+        });
 
-          // animate numeric transitions
-          animatePriceTransition(data);
+        function updateToggleAria(){
+          const options = $$("button[role='radio']", ui.toggle);
+          options.forEach(btn => {
+            const isChecked = btn.getAttribute('data-period') === billing;
+            btn.setAttribute('aria-checked', isChecked ? 'true' : 'false');
+            btn.setAttribute('tabindex', isChecked ? '0' : '-1');
+            // Style yearly inline pill on selected
+            const inlinePill = btn.querySelector('.save-pill-inline');
+            if(inlinePill){
+              inlinePill.classList.toggle('save-pill-inline--on-accent', isChecked);
+            }
+          });
+        }
 
-          // announce updated prices
-          announcePrices(data, billing);
-
-          // update lastKnown
-          try{ lastKnown[billing] = {...(data)}; localStorage.setItem('pricing-last-known', JSON.stringify(lastKnown)); }catch(e){}
-
-          toggleCTAs(false);
-        }, 700);
+        function setBilling(next){
+          billing = next;
+          updateToggleAria();
+          const url = new URL(location.href);
+          url.searchParams.set('billing', billing);
+          history.replaceState({}, '', url);
+          animateSavePillIfYearly();
+          // Update prices without reflow scroll
+          updateAllPrices();
+        }
       }
 
-      function applyPriceValues(data){
-        Object.keys(data).forEach(plan=>{
-          const planNode = document.querySelector(`[data-price-id="${plan}"]`);
-          if(!planNode) return;
-          const el = planNode.querySelector('.price-value');
-          if(el) el.textContent = String(data[plan]);
+      function renderState(){
+        if(appState === 'loading'){
+          ui.errorBanner.setAttribute('data-state','');
+          showSkeletons();
+          // simulate fetch
+          simulateFetch('loading').then(plans => {
+            renderPlans(plans);
+          });
+        } else if(appState === 'error'){
+          ui.errorBanner.setAttribute('data-state','visible');
+          ui.grid.innerHTML = '';
+          ui.grid.setAttribute('aria-busy', 'false');
+          // still show fallback static
+          renderPlans(DATA_STATIC);
+        } else if(appState === 'empty'){
+          ui.errorBanner.setAttribute('data-state','');
+          showSkeletons(true);
+          // simulate empty
+          simulateFetch('empty').then(plans => {
+            renderPlans(plans);
+          });
+        } else if(appState === 'success'){
+          ui.errorBanner.setAttribute('data-state','');
+          renderPlans(DATA_STATIC);
+          // subtle toast-like indicator
+          showSuccessToast();
+        } else {
+          // default
+          ui.errorBanner.setAttribute('data-state','');
+          showSkeletons();
+          simulateFetch('default').then(plans => {
+            renderPlans(plans);
+          });
+        }
+      }
+
+      function showSkeletons(compact){
+        ui.grid.setAttribute('aria-busy', 'true');
+        ui.grid.innerHTML = '';
+        const tpl = $('#skeleton-template');
+        const count = 3;
+        for(let i=0;i<count;i++){
+          const node = tpl.content.cloneNode(true);
+          ui.grid.appendChild(node);
+        }
+      }
+
+      function simulateFetch(kind){
+        return new Promise((resolve, reject) => {
+          const delay = 600;
+          setTimeout(() => {
+            if(kind === 'error'){
+              reject(new Error('network'));
+            } else if(kind === 'empty'){
+              const emptyPlans = DATA_STATIC.map(p => ({...p, features: []}));
+              resolve(emptyPlans);
+            } else {
+              resolve(DATA_STATIC);
+            }
+          }, delay);
+        }).catch(() => {
+          // Surface banner; return static to continue
+          ui.errorBanner.setAttribute('data-state','visible');
+          return DATA_STATIC;
         });
       }
 
-      function animatePriceTransition(data){
-        // If reduced motion, jump
-        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        Object.keys(data).forEach(plan=>{
-          const textWrap = document.querySelector(`[data-price-id="${plan}"]`);
-          if(!textWrap) return;
-          const valEl = textWrap.querySelector('.price-value');
-          const from = parseInt(valEl.textContent,10) || 0;
-          const to = data[plan];
+      function renderPlans(plans){
+        ui.grid.innerHTML = '';
+        ui.grid.setAttribute('aria-busy', 'false');
+        const tpl = $('#plan-card-template');
 
-          if(reduce){ valEl.textContent = to; return; }
+        // Ensure order Starter, Team, Enterprise
+        const order = ['starter','team','enterprise'];
+        plans.sort((a,b)=> order.indexOf(a.id) - order.indexOf(b.id));
 
-          // animate: fade out old & slide up, count numerically
-          textWrap.classList.add('leaving');
-          // ensure entering class will run on next frame after leaving removed
-          setTimeout(()=>{
-            textWrap.classList.remove('leaving');
-            textWrap.classList.add('entering');
-            // numeric count
-            const duration = 300; const start = performance.now();
-            function step(ts){
-              const t = Math.min(1, (ts-start)/duration);
-              const cur = Math.round(from + (to-from)*t);
-              valEl.textContent = String(cur);
-              if(t<1) requestAnimationFrame(step);
-              else {
-                // remove entering after animation completes
-                setTimeout(()=>{ textWrap.classList.remove('entering'); }, 40);
+        plans.forEach(plan => {
+          const node = tpl.content.cloneNode(true);
+          const card = node.querySelector('.card');
+          card.id = plan.id;
+          card.setAttribute('data-variant', plan.recommended ? 'recommended' : plan.id);
+          const name = node.querySelector('.plan-name');
+          const tag = node.querySelector('.plan-tag');
+          const badge = node.querySelector('.badge');
+          const priceEl = node.querySelector('.price');
+          const currencyEl = node.querySelector('.currency');
+          const billedNote = node.querySelector('.billed-note');
+          const featureList = node.querySelector('.features');
+          const footnote = node.querySelector('.footnote');
+          const ctaBtn = node.querySelector('.btn');
+          const actions = node.querySelector('.actions');
+          const nearSave = node.querySelector('.save-near-cta');
+
+          name.textContent = plan.name;
+          tag.textContent = plan.tagline;
+          if(plan.recommended){ badge.hidden = false; }
+
+          // Enterprise custom pricing
+          let displayPrice = '—';
+          let isCustom = false;
+          if(plan.id === 'enterprise'){
+            isCustom = true;
+            currencyEl.style.visibility = 'hidden';
+          }
+
+          // Price build
+          if(isCustom){
+            buildCustomPrice(priceEl, 'Custom');
+            const perSeat = $('.per-seat-label', card);
+            if(perSeat){ perSeat.textContent = plan.cadence; }
+            billedNote.textContent = '';
+          } else {
+            const value = getPlanPrice(plan);
+            buildOdometer(priceEl, value);
+            billedNote.textContent = billing === 'yearly' ? plan.yearlyNote : '';
+          }
+
+          // Features
+          featureList.innerHTML = '';
+          if(plan.features && plan.features.length){
+            plan.features.forEach(text => {
+              const li = document.createElement('li');
+              li.className = 'feature';
+              li.innerHTML = `
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                <span class="label" title="${escapeHtml(text)}">${escapeHtml(text)}</span>
+              `;
+              featureList.appendChild(li);
+            });
+          } else {
+            featureList.style.display = 'none';
+          }
+
+          // CTA
+          let variant = 'secondary';
+          if(plan.id === 'enterprise'){ variant = 'ghost'; }
+          if(plan.recommended){ variant = 'primary'; }
+          ctaBtn.classList.add('btn-' + variant);
+          ctaBtn.setAttribute('data-plan', plan.id);
+          ctaBtn.addEventListener('click', onCtaClick);
+          updateCtaLabel(ctaBtn, plan);
+
+          // Near-CTA Save pill visible for yearly on recommended
+          if(plan.recommended){
+            nearSave.style.display = (billing === 'yearly') ? 'inline-flex' : 'none';
+          } else {
+            nearSave.remove();
+          }
+
+          // Tooltip trigger
+          const infoTrigger = node.querySelector('.info-trigger');
+          infoTrigger.addEventListener('click', (e)=>toggleTooltip(e.currentTarget));
+          infoTrigger.addEventListener('mouseenter', (e)=>openTooltip(e.currentTarget));
+          infoTrigger.addEventListener('mouseleave', closeTooltip);
+          infoTrigger.addEventListener('focus', (e)=>openTooltip(e.currentTarget));
+          infoTrigger.addEventListener('blur', closeTooltip);
+
+          // Footnote
+          if(plan.footnote){
+            footnote.textContent = plan.footnote;
+          } else {
+            footnote.remove();
+          }
+
+          // Hover effects are handled via CSS media queries; ensure enterprise with custom cadence
+          $('.per-seat-label', card).textContent = plan.id === 'enterprise' ? plan.cadence : 'per seat / mo';
+
+          // Append
+          ui.grid.appendChild(node);
+        });
+
+        // After render, trigger price animation to current billing
+        if(!prefersReduced && window.innerWidth >= 420){
+          requestAnimationFrame(()=>{
+            updateAllPrices(true);
+          });
+        } else {
+          // ensure reduced text set
+          updateAllPrices(false);
+        }
+      }
+
+      function updateCtaLabel(btn, plan){
+        const label = billing === 'yearly' ? plan.cta.yearly : plan.cta.monthly;
+        btn.textContent = label;
+      }
+
+      function getPlanPrice(plan){
+        return billing === 'yearly' ? plan.yearly : plan.monthly;
+      }
+
+      function buildCustomPrice(container, text){
+        container.textContent = text;
+        container.dataset.custom = 'true';
+      }
+
+      function buildOdometer(container, value){
+        container.innerHTML = '';
+        container.dataset.custom = 'false';
+        const str = String(value);
+        const reduced = prefersReduced || window.innerWidth < 420;
+        if(reduced){
+          container.classList.add('reduced');
+          container.textContent = str;
+          return;
+        }
+        container.classList.remove('reduced');
+        for(const ch of str){
+          if(/\d/.test(ch)){
+            const digit = document.createElement('span');
+            digit.className = 'digit';
+            const stack = document.createElement('span');
+            stack.className = 'digit-stack';
+            for(let i=0;i<=9;i++){
+              const s = document.createElement('span');
+              s.textContent = i;
+              stack.appendChild(s);
+            }
+            digit.appendChild(stack);
+            container.appendChild(digit);
+          } else {
+            const span = document.createElement('span');
+            span.textContent = ch;
+            container.appendChild(span);
+          }
+        }
+        // set initial position
+        setTimeout(()=> animateOdometerTo(container, value, true), 0);
+      }
+
+      function animateOdometerTo(container, value, instant){
+        const str = String(value);
+        const digits = $$('.digit', container);
+        const duration = 200;
+        const stagger = 20;
+        digits.forEach((digitEl, idx) => {
+          const target = parseInt(str[idx], 10);
+          const stack = $('.digit-stack', digitEl);
+          const h = digitEl.getBoundingClientRect().height;
+          const y = -target * h;
+          const d = instant ? 0 : (duration + idx * stagger);
+          stack.style.transition = `transform ${d}ms var(--ease-spring)`;
+          stack.style.transform = `translateY(${y}px)`;
+        });
+      }
+
+      function updateAllPrices(animate){
+        const cards = $$('.card');
+        cards.forEach(card => {
+          const id = card.id;
+          const plan = DATA_STATIC.find(p => p.id === id);
+          const priceEl = $('.price', card);
+          const billedNote = $('.billed-note', card);
+          const ctaBtn = $('.btn', card);
+          const nearSave = $('.save-near-cta', card);
+          if(plan.id !== 'enterprise'){
+            const newVal = getPlanPrice(plan);
+            if(priceEl.classList.contains('reduced')){
+              priceEl.textContent = newVal;
+            } else {
+              // ensure correct number of digits
+              const existingDigits = $$('.digit', priceEl).length;
+              const neededDigits = String(newVal).length;
+              if(existingDigits !== neededDigits){
+                buildOdometer(priceEl, newVal);
+              } else {
+                animateOdometerTo(priceEl, newVal, !animate || prefersReduced);
               }
             }
-            requestAnimationFrame(step);
-          }, 180);
-        });
-      }
-
-      function toggleCTAs(disable){
-        document.querySelectorAll('.btn.start-free, .btn.contact-sales').forEach(b=>{
-          if(disable){ b.setAttribute('aria-disabled','true'); /* keep focusable for keyboard users; do not set native disabled */ }
-          else { b.setAttribute('aria-disabled','false'); b.removeAttribute('aria-disabled'); }
-        });
-      }
-
-      function showToast(message, actionLabel, action){
-        toastArea.innerHTML='';
-        const t = document.createElement('div');
-        t.className='toast';
-        t.setAttribute('role','alert');
-        t.tabIndex = -1;
-        t.innerHTML = `<div>${escapeHtml(message)}</div>`;
-        if(actionLabel){
-          const btn = document.createElement('button');
-          btn.textContent = actionLabel;
-          btn.setAttribute('aria-label', actionLabel + ' — retry');
-          btn.onclick = ()=>{ action && action(); hideToast(); };
-          btn.onkeydown = (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); action && action(); hideToast(); } };
-          t.appendChild(btn);
-          // make the action easily reachable for keyboard users
-          setTimeout(()=>{ try{ btn.focus(); }catch(e){} }, 50);
-        }
-        toastArea.appendChild(t);
-        setTimeout(()=>{ hideToast(); }, 8000);
-
-        function hideToast(){ if(t.parentElement) t.parentElement.removeChild(t); }
-      }
-
-      // Utility to escape text for toast
-      function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-      // CTA handlers
-      document.querySelectorAll('.start-free').forEach(btn=>{
-        btn.addEventListener('click', (e)=>{
-          const disabled = btn.getAttribute('aria-disabled')==='true';
-          if(disabled) return;
-          openSignup();
-        });
-      });
-      document.querySelectorAll('.contact-sales').forEach(btn=>{
-        btn.addEventListener('click', (e)=>{
-          const disabled = btn.getAttribute('aria-disabled')==='true';
-          if(disabled) return;
-          openEnterpriseModal(btn);
-        });
-      });
-
-      // Signup modal
-      function openSignup(){ signupModal.style.display='block'; signupModal.setAttribute('aria-hidden','false'); try{ trialEmail.focus(); }catch(e){} }
-      function closeSignup(){ signupModal.style.display='none'; signupModal.setAttribute('aria-hidden','true'); }
-      trialClose.addEventListener('click', closeSignup);
-      trialSubmit.addEventListener('click', ()=>{
-        const email = trialEmail.value.trim();
-        if(!/[^@\s]+@[^@\s]+\.[^@\s]+/.test(email)){
-          alert('Please enter a valid email'); return;
-        }
-        alert('Signup started for ' + email + '. (Prototype)');
-        closeSignup();
-      });
-
-      // Enterprise modal with focus trap and ESC handling
-      function openEnterpriseModal(invoker){
-        lastFocusedBeforeModal = invoker || document.activeElement;
-        enterpriseModal.style.display='block'; enterpriseModal.setAttribute('aria-hidden','false');
-        // focus first field
-        const first = document.getElementById('name');
-        try{ first.focus(); }catch(e){}
-
-        // key handler to trap focus and handle Escape
-        enterpriseKeyHandler = function(e){
-          if(e.key === 'Escape'){
-            e.preventDefault(); closeEnterpriseModal(); return;
+            billedNote.textContent = (billing === 'yearly') ? plan.yearlyNote : '';
           }
-          if(e.key === 'Tab'){
-            const modal = enterpriseModal.querySelector('.modal');
-            const focusables = modal.querySelectorAll('a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])');
-            if(!focusables.length) return;
-            const nodes = Array.prototype.slice.call(focusables);
-            const idx = nodes.indexOf(document.activeElement);
-            if(e.shiftKey){
-              if(idx === 0){ e.preventDefault(); nodes[nodes.length-1].focus(); }
-            } else {
-              if(idx === nodes.length-1){ e.preventDefault(); nodes[0].focus(); }
-            }
+          updateCtaLabel(ctaBtn, plan);
+          if(plan.recommended && nearSave){
+            nearSave.style.display = (billing === 'yearly') ? 'inline-flex' : 'none';
           }
-        };
-        document.addEventListener('keydown', enterpriseKeyHandler);
+        });
       }
-      function closeEnterpriseModal(){ enterpriseModal.style.display='none'; enterpriseModal.setAttribute('aria-hidden','true'); resetForm(); if(enterpriseKeyHandler) { document.removeEventListener('keydown', enterpriseKeyHandler); enterpriseKeyHandler = null; } try{ if(lastFocusedBeforeModal && lastFocusedBeforeModal.focus) lastFocusedBeforeModal.focus(); }catch(e){} }
-      enterpriseClose.addEventListener('click', closeEnterpriseModal);
-      contactCancel.addEventListener('click', closeEnterpriseModal);
 
-      enterpriseForm.addEventListener('submit', function(e){
-        e.preventDefault();
-        submitEnterpriseForm();
-      });
+      function onCtaClick(e){
+        const btn = e.currentTarget;
+        const planId = btn.getAttribute('data-plan');
+        const plan = DATA_STATIC.find(p => p.id === planId);
+        if(!plan) return;
 
-      function resetForm(){ enterpriseForm.reset(); formStatus.textContent=''; formError.style.display='none'; }
+        // prevent double click
+        if(btn.disabled) return;
+        const original = btn.textContent;
+        btn.disabled = true; btn.setAttribute('aria-busy','true');
+        btn.innerHTML = `<span class="spinner" aria-hidden="true"></span> <span>${COPY.loadingCta}</span>`;
 
-      function submitEnterpriseForm(){
-        // validate
-        const name = document.getElementById('name').value.trim();
-        const company = document.getElementById('company').value.trim();
-        const email = document.getElementById('email').value.trim();
-        if(!name || !company || !email || !/[^@\s]+@[^@\s]+\.[^@\s]+/.test(email)){
-          formError.style.display='block'; formError.textContent = 'Please complete all required fields with valid information.'; return;
-        }
-        formError.style.display='none';
-        // simulate server
-        formStatus.textContent = 'Submitting...';
-        document.getElementById('contact-submit').disabled = true;
+        // In a real app, navigate to checkout or contact. Here, simulate and then set success state.
+        const url = new URL(location.href);
+        url.hash = `#${planId}`;
+        url.searchParams.set('plan', planId);
+        url.searchParams.set('billing', billing);
+        history.replaceState({}, '', url);
+
         setTimeout(()=>{
-          // random success/fail for prototype
-          const fail = Math.random()<0.12; // 12% fail
-          if(fail){ formError.style.display='block'; formError.textContent = 'Server error: please try again.'; formStatus.textContent=''; document.getElementById('contact-submit').disabled=false; }
-          else{ formStatus.textContent='Thanks — we will contact you shortly.'; document.getElementById('contact-submit').disabled=false; setTimeout(closeEnterpriseModal,1200); }
-        },1000);
+          btn.disabled = false; btn.removeAttribute('aria-busy'); btn.textContent = original;
+          appState = 'success';
+          renderState();
+          // keep hash focus flash
+          flashCard(planId);
+        }, 900);
       }
 
-      // Matrix rows focus highlight
-      document.querySelectorAll('.matrix tr').forEach(r=>{
-        r.addEventListener('mouseover', ()=>r.style.background='rgba(11,122,255,0.02)');
-        r.addEventListener('mouseout', ()=>r.style.background='');
-      });
-
-      // Mobile accordion toggle
-      function updateAccordions(){
-        if(window.innerWidth<=767){
-          document.querySelectorAll('.card').forEach(card=>{
-            if(card.querySelector('.accordion-toggle')) return; // already
-
-            // prepare content container
-            const content = document.createElement('div');
-            content.className='accordion-content';
-            const contentId = 'acc-content-' + Math.random().toString(36).slice(2,9);
-            content.id = contentId;
-
-            // move features into content
-            const feats = card.querySelector('.features');
-            if(!feats) return;
-            content.appendChild(feats);
-
-            // create toggle and insert BEFORE content for logical flow
-            const toggle = document.createElement('button');
-            toggle.className='accordion-toggle';
-            toggle.type='button';
-            toggle.setAttribute('aria-expanded','false');
-            toggle.setAttribute('aria-controls', contentId);
-            toggle.innerHTML = '<span class="muted">Features</span><span aria-hidden>▾</span>';
-
-            card.appendChild(toggle);
-            card.appendChild(content);
-
-            toggle.addEventListener('click', ()=>{
-              const open = content.classList.toggle('open');
-              toggle.setAttribute('aria-expanded', String(open));
-            });
-          });
-        } else {
-          // reset for desktop/tablet - not fully implemented for prototype
-        }
+      function showSuccessToast(){
+        // a lightweight, non-blocking confirmation near the bottom
+        const toast = document.createElement('div');
+        toast.setAttribute('role','status');
+        toast.style.position = 'fixed';
+        toast.style.left = '50%';
+        toast.style.bottom = '24px';
+        toast.style.transform = 'translateX(-50%)';
+        toast.style.background = 'rgba(11,18,32,0.9)';
+        toast.style.color = '#fff';
+        toast.style.padding = '10px 14px';
+        toast.style.borderRadius = '10px';
+        toast.style.boxShadow = 'var(--shadow-2)';
+        toast.style.font = '600 14px/20px var(--font-text)';
+        toast.textContent = 'Success — proceeding to checkout/contact…';
+        document.body.appendChild(toast);
+        setTimeout(()=>{
+          if(toast && toast.parentNode){ toast.parentNode.removeChild(toast); }
+        }, 2200);
       }
 
-      window.addEventListener('resize', updateAccordions);
-      updateAccordions();
+      function animateSavePillIfYearly(){
+        // Guard all elements; skip animation if anything's missing
+        if(billing !== 'yearly' || prefersReduced) return;
+        const floater = ui.saveFloater;
+        const yearlyBtn = ui.toggle ? ui.toggle.querySelector('button[data-period="yearly"]') : null;
+        const teamCard = document.getElementById('team');
+        if(!floater || !yearlyBtn || !teamCard) return;
+        const targetBtn = $('.btn', teamCard);
+        const pill = floater.querySelector('.pill');
+        if(!targetBtn || !pill) return;
 
-      // Disabled CTA overlay tooltip
-      function setCTADisabledUI(state){
-        if(state){
-          // disable CTAs semantically and keep them focusable so keyboard users can see tooltip
-          document.querySelectorAll('.btn').forEach(b=>{ b.setAttribute('aria-disabled','true'); });
-          // Add tooltip text to first start-free
-          document.querySelectorAll('.tooltip .tip').forEach(t=>t.textContent='You have reached the trial limit for your account');
-        } else {
-          document.querySelectorAll('.btn').forEach(b=>{ b.removeAttribute('aria-disabled'); });
-          document.querySelectorAll('.tooltip .tip').forEach(t=>t.textContent='Start a free trial — no credit card');
-        }
+        const srcRect = yearlyBtn.getBoundingClientRect();
+        const targetRect = targetBtn.getBoundingClientRect();
+        if(!srcRect || !targetRect) return;
+
+        floater.style.opacity = '1';
+        const startX = srcRect.left + srcRect.width/2 - pill.offsetWidth/2;
+        const startY = srcRect.top + srcRect.height/2 - pill.offsetHeight/2;
+        const endX = targetRect.left + targetRect.width - pill.offsetWidth - 8;
+        const endY = targetRect.top - pill.offsetHeight - 8;
+        floater.style.transform = `translate(${startX}px, ${startY}px) scale(0.9)`;
+        floater.style.transition = 'none';
+        requestAnimationFrame(()=>{
+          floater.style.transition = `transform var(--motion) var(--ease-out), opacity var(--motion) var(--ease-out)`;
+          floater.style.transform = `translate(${endX}px, ${endY}px) scale(1)`;
+        });
+        // Snap then hide and reveal near-cta pill
+        setTimeout(()=>{
+          floater.style.opacity = '0';
+        }, 240);
       }
 
-      // State switcher handling
-      stateSelect.addEventListener('change', ()=>{
-        const val = stateSelect.value;
-        switch(val){
-          case 'default': setCTADisabledUI(false); updatePrices({targetBilling:'monthly'}); break;
-          case 'yearly': setCTADisabledUI(false); updatePrices({targetBilling:'yearly'}); break;
-          case 'loading': setCTADisabledUI(false); updatePrices({targetBilling:billing, simulateLoading:true}); // after 1.5s show real prices
-            setTimeout(()=>{ performFetchPrices(); },1500);
-            break;
-          case 'failure': setCTADisabledUI(false); updatePrices({targetBilling:billing, simulateFailure:true, useLast:true}); break;
-          case 'cta-disabled': setCTADisabledUI(true); break;
-          case 'empty': setCTADisabledUI(false); makeEmptyFeatures(); break;
-        }
-      });
-
-      function makeEmptyFeatures(){
-        document.querySelectorAll('.features').forEach(f=>{
-          f.innerHTML = '<div class="muted" style="padding:12px">No features listed.</div>';
+      function initStateSwitcher(){
+        ui.stateSelect.value = appState;
+        ui.stateSelect.addEventListener('change', () => {
+          appState = ui.stateSelect.value;
+          renderState();
+        });
+        ui.retryBtn.addEventListener('click', () => {
+          appState = 'default';
+          renderState();
         });
       }
 
-      // Initialize UI
-      setAriaPressed('monthly');
-      updatePrices({targetBilling:'monthly'});
-
-      // Keyboard support for segmented control
-      [btnMonthly, btnYearly].forEach(btn=>{
-        btn.addEventListener('keydown', (e)=>{
-          if(e.key==='ArrowLeft' || e.key==='ArrowRight'){
-            e.preventDefault();
-            const next = (btn===btnMonthly)? btnYearly : btnMonthly;
-            next.focus();
-            // also change selection when navigating with arrows (toggle button pattern)
-            const targetBilling = (next === btnMonthly) ? 'monthly' : 'yearly';
-            updatePrices({targetBilling});
+      function initGlobalListeners(){
+        document.addEventListener('keydown', (e) => {
+          if(e.key === 'Escape'){
+            closeTooltip();
           }
-          if(e.key==='Enter' || e.key===' '){ e.preventDefault(); btn.click(); }
         });
-      });
-
-      btnMonthly.addEventListener('click', ()=> updatePrices({targetBilling:'monthly'}));
-      btnYearly.addEventListener('click', ()=> updatePrices({targetBilling:'yearly'}));
-
-      // CTA disabled tooltip keyboard trap
-      document.querySelectorAll('.tooltip').forEach(t=>{
-        t.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); } });
-      });
-
-      // Card keyboard interactions: Enter to activate primary CTA
-      document.querySelectorAll('.card').forEach(card=>{
-        card.addEventListener('keydown', (e)=>{
-          if(e.key==='Enter'){ const primary = card.querySelector('.btn:not([aria-disabled])'); if(primary) primary.click(); }
+        window.addEventListener('resize', () => {
+          // If layout changes, ensure odometer respects reduced on narrow widths
+          updateAllPrices(false);
         });
-      });
+      }
 
-      // Utility: escape html (already defined)
+      // Tooltip logic
+      function openTooltip(trigger){
+        const tip = ui.tooltip;
+        tip.querySelector('.content').textContent = COPY.tooltip;
+        tip.setAttribute('data-open','true');
+        tip.removeAttribute('aria-hidden');
+        positionTooltip(trigger, tip);
+      }
+      function toggleTooltip(trigger){
+        const tip = ui.tooltip;
+        const isOpen = tip.getAttribute('data-open') === 'true';
+        if(isOpen){ closeTooltip(); } else { openTooltip(trigger); }
+      }
+      function closeTooltip(){
+        const tip = ui.tooltip;
+        tip.setAttribute('data-open','false');
+        tip.setAttribute('aria-hidden','true');
+      }
+      function positionTooltip(trigger, tip){
+        const r = trigger.getBoundingClientRect();
+        const pad = 8;
+        const x = r.left;
+        const y = r.bottom + pad + window.scrollY;
+        tip.style.left = `${x}px`;
+        tip.style.top = `${y}px`;
+      }
 
-      // Expose some functions for debugging in window (optional)
-      window.__prototype = {updatePrices, showToast, performFetchPrices};
+      // Deep-link focus flash
+      function handleDeepLink(){
+        const hash = location.hash.replace('#','');
+        if(['starter','team','enterprise'].includes(hash)){
+          requestAnimationFrame(()=>{
+            const card = document.getElementById(hash);
+            if(card){
+              card.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'center' });
+              flashCard(hash);
+            }
+          });
+        }
+      }
+      function flashCard(id){
+        const card = document.getElementById(id);
+        if(!card) return;
+        card.classList.add('focus-flash');
+        setTimeout(()=> card.classList.remove('focus-flash'), 2000);
+      }
+
+      // Utility
+      function escapeHtml(str){
+        return String(str).replace(/[&<>"]+/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]));
+      }
+
+      // Initial billing sync on toggle UI
+      (function syncInitialToggle(){
+        const btn = ui.toggle.querySelector(`button[data-period='${billing}']`);
+        if(btn){
+          ui.toggle.querySelectorAll('button[role="radio"]').forEach(b=>{
+            const checked = b === btn;
+            b.setAttribute('aria-checked', checked ? 'true' : 'false');
+            b.setAttribute('tabindex', checked ? '0' : '-1');
+          });
+        }
+      })();
 
     })();
   </script>
